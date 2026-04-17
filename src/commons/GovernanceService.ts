@@ -1,0 +1,103 @@
+import { Proposal, ProposalStatus, VoteThreshold } from "./Proposal.js";
+import { Constitution } from "./Constitution.js";
+import { Commons } from "./Commons.js";
+import { Position } from "./Position.js";
+import { MemberService } from "../member/MemberService.js";
+
+export class GovernanceService {
+    private static instance: GovernanceService;
+
+    private proposals: Map<string, Proposal> = new Map();
+
+    private constructor() {}
+
+    static getInstance(): GovernanceService {
+        if (!GovernanceService.instance) {
+            GovernanceService.instance = new GovernanceService();
+        }
+        return GovernanceService.instance;
+    }
+
+    submitProposal(
+        proposerId: string,
+        title: string,
+        description: string,
+        threshold: VoteThreshold = VoteThreshold.SIMPLE_MAJORITY
+    ): Proposal {
+        const proposal = new Proposal(
+            proposerId,
+            title,
+            description,
+            threshold,
+            Constitution.deliberationPeriodDays
+        );
+        this.proposals.set(proposal.id, proposal);
+        return proposal;
+    }
+
+    vote(proposalId: string, memberId: string, inFavor: boolean): void {
+        const proposal = this.proposals.get(proposalId);
+        if (!proposal) throw new Error(`Proposal ${proposalId} not found`);
+        if (proposal.status !== ProposalStatus.OPEN) throw new Error(`Proposal is no longer open`);
+        proposal.vote(memberId, inFavor);
+    }
+
+    // Tallies votes and closes the proposal if the deliberation period has ended
+    closeProposal(proposalId: string): ProposalStatus {
+        const proposal = this.proposals.get(proposalId);
+        if (!proposal) throw new Error(`Proposal ${proposalId} not found`);
+        if (proposal.status !== ProposalStatus.OPEN) return proposal.status;
+        if (new Date() < proposal.closesAt) throw new Error(`Deliberation period has not ended`);
+
+        const requiredFraction = Constitution.thresholds[proposal.threshold];
+        const totalMembers = MemberService.getInstance().count();
+        const approvalFraction = totalMembers > 0 ? proposal.yesCount / totalMembers : 0;
+
+        proposal.status = approvalFraction >= requiredFraction
+            ? ProposalStatus.PASSED
+            : ProposalStatus.FAILED;
+
+        return proposal.status;
+    }
+
+    // Elect a member to a position — requires a passed proposal
+    electToPosition(position: Position, memberId: string, proposalId: string): void {
+        const proposal = this.proposals.get(proposalId);
+        if (!proposal || proposal.status !== ProposalStatus.PASSED) {
+            throw new Error(`A passed proposal is required to elect a member to a position`);
+        }
+        position.memberId = memberId;
+        position.termStartDate = new Date();
+    }
+
+    // Fund a position at a given monthly rate — requires a passed proposal
+    fundPosition(position: Position, creditsPerMonth: number, proposalId: string): void {
+        const proposal = this.proposals.get(proposalId);
+        if (!proposal || proposal.status !== ProposalStatus.PASSED) {
+            throw new Error(`A passed proposal is required to fund a position`);
+        }
+        position.creditsPerMonth = creditsPerMonth;
+        position.funded = true;
+    }
+
+    // Defund a position — requires a passed proposal
+    defundPosition(position: Position, proposalId: string): void {
+        const proposal = this.proposals.get(proposalId);
+        if (!proposal || proposal.status !== ProposalStatus.PASSED) {
+            throw new Error(`A passed proposal is required to defund a position`);
+        }
+        position.funded = false;
+    }
+
+    getProposal(id: string): Proposal | undefined {
+        return this.proposals.get(id);
+    }
+
+    getAll(): Proposal[] {
+        return Array.from(this.proposals.values());
+    }
+
+    getOpen(): Proposal[] {
+        return this.getAll().filter((p) => p.status === ProposalStatus.OPEN);
+    }
+}
