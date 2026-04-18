@@ -15,6 +15,8 @@ import { TraderProfileLoader } from "./marketplace/TraderProfileLoader.js";
 import { Scheduler, every } from "./scheduler/Scheduler.js";
 import { PayrollService } from "./commons/PayrollService.js";
 import { HttpServer } from "./http/HttpServer.js";
+import { NodeService } from "./network/NodeService.js";
+import { type NodeType } from "./network/NodeIdentity.js";
 
 
 const community = Community.getInstance();
@@ -79,3 +81,13 @@ scheduler.register({
 void scheduler.start();
 
 new HttpServer().start();
+
+void NodeService.getInstance().init({
+    type:    (process.env.NODE_TYPE ?? "community") as NodeType,
+    name:    process.env.NODE_NAME ?? community.name,
+    address: process.env.NODE_ADDRESS ?? "http://localhost:3000",
+    dataDir: "data/network",
+    seeds:   process.env.NODE_SEEDS
+                 ? process.env.NODE_SEEDS.split(",").map(s => s.trim()).filter(Boolean)
+                 : [],
+});

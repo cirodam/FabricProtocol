@@ -7,6 +7,7 @@ import memberRoutes from "./routes/memberRoutes.js";
 import bankRoutes from "./routes/bankRoutes.js";
 import centralBankRoutes from "./routes/centralBankRoutes.js";
 import marketplaceRoutes from "./routes/marketplaceRoutes.js";
+import networkRoutes from "../network/networkRoutes.js";
 
 /**
  * HTTP REST API server.
@@ -42,7 +43,11 @@ export class HttpServer {
 
     constructor(private readonly port: number = 3000) {
         this.app = express();
-        this.app.use(express.json());
+        this.app.use(express.json({
+            verify: (req, _res, buf) => {
+                (req as typeof req & { rawBody: string }).rawBody = buf.toString("utf-8");
+            },
+        }));
         this.registerRoutes();
     }
 
@@ -58,6 +63,7 @@ export class HttpServer {
         this.app.use("/", bankRoutes);
         this.app.use("/", centralBankRoutes);
         this.app.use("/marketplace", marketplaceRoutes);
+        this.app.use("/node", networkRoutes);
     }
 
     start(): void {
