@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner, OwnerType } from "../IAccountOwner.js";
+import { IAccountOwner, OwnerType } from "../bank/IAccountOwner.js";
 import { Bank } from "../bank/Bank.js";
 import { MemberEndowmentProfile } from "./MemberEndowmentProfile.js";
 import { EndowmentProfileLoader } from "./EndowmentProfileLoader.js";

@@ -1,6 +1,6 @@
 import { Account } from "./Account.js";
 import { FileStore } from "../storage/FileStore.js";
-import { OwnerType } from "../IAccountOwner.js";
+import { OwnerType } from "./IAccountOwner.js";
 
 interface AccountRecord {
   id: string;

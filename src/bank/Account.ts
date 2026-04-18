@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner, OwnerType } from "../IAccountOwner.js";
+import { IAccountOwner, OwnerType } from "./IAccountOwner.js";
 
 export class Account {
     readonly id: string;

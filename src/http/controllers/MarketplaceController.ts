@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Marketplace } from "../../marketplace/Marketplace.js";
 import { Post, PostSide, PostType, PricingUnit } from "../../marketplace/Post.js";
 import { TraderProfile } from "../../marketplace/TraderProfile.js";
-import { OwnerType } from "../../IAccountOwner.js";
+import { OwnerType } from "../../bank/IAccountOwner.js";
 
 const market = () => Marketplace.getInstance();
 

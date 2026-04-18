@@ -1,6 +1,6 @@
 import { TraderProfile } from "./TraderProfile.js";
 import { FileStore } from "../storage/FileStore.js";
-import { OwnerType } from "../IAccountOwner.js";
+import { OwnerType } from "../bank/IAccountOwner.js";
 
 interface TraderProfileRecord {
   id: string;

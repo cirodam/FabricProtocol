@@ -1,4 +1,4 @@
-import { IAccountOwner } from "../IAccountOwner.js";
+import { IAccountOwner } from "./IAccountOwner.js";
 import { Account } from "./Account.js";
 import { AccountLoader } from "./AccountLoader.js";
 import { BankTransaction, Currency } from "./BankTransaction.js";

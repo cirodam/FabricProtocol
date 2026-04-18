@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { OwnerType } from "../IAccountOwner.js";
+import { OwnerType } from "../bank/IAccountOwner.js";
 
 // TraderProfile is a marketplace registration for any entity that wants to trade.
 // The marketplace holds a registry of these. Members and enterprises create one

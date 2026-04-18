@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner } from "../IAccountOwner.js";
+import { IAccountOwner } from "../bank/IAccountOwner.js";
 import { Asset } from "../Asset.js";
 
 // AssetLedger is a named, owner-bound list of physical assets.

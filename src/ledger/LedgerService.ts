@@ -1,4 +1,4 @@
-import { IAccountOwner } from "../IAccountOwner.js";
+import { IAccountOwner } from "../bank/IAccountOwner.js";
 import { AssetLedger } from "./AssetLedger.js";
 
 // LedgerService is the singleton registry for all AssetLedgers.
