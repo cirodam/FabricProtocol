@@ -4,6 +4,7 @@ import { DEFAULT_NUTRITIONAL_PROFILES, NutritionalProfile } from "../domains/foo
 import { CentralBank } from "../central_bank/CentralBank.js";
 import { Commons } from "../commons/Commons.js";
 import { Bank } from "../bank/Bank.js";
+import { Marketplace } from "../marketplace/Marketplace.js";
 import { createHash } from "crypto";
 
 export class MemberService {
@@ -51,6 +52,11 @@ export class MemberService {
 
   getByPhone(phone: string): Member | undefined {
     return Array.from(this.members.values()).find(m => m.phone === phone);
+  }
+
+  getByHandle(handle: string): Member | undefined {
+    const normalized = handle.toLowerCase().replace(/[^a-z0-9_]/g, "");
+    return Array.from(this.members.values()).find(m => m.handle === normalized);
   }
 
   getAll(): Member[] {
@@ -114,35 +120,19 @@ export class MemberService {
   }
 
   /**
-   * Discharge a member.
-   * 1. Balance up to the endowment amount → returned to CentralBank
-   * 2. Any surplus above the endowment → transferred to Commons
-   * 3. Member and accounts removed
+   * Discharge a member (departure or death).
+   * 1. CentralBank reclaims up to the endowment amount from the member's balance.
+   * 2. Any remaining balance is transferred to the Commons.
+   * 3. Member's accounts are closed.
+   * 4. Member record is deleted.
    */
   discharge(member: Member): void {
-    const bankInst = Bank.getInstance();
-    const centralBank = CentralBank.getInstance();
-    const commons = Commons.getInstance();
-    const profile = centralBank.getProfile(member.getId());
-    const endowment = profile?.endowment ?? 0;
+    Marketplace.getInstance().removePostsByPoster(member.getId());
+    CentralBank.getInstance().reclaimEndowment(member);
+    Commons.getInstance().collect(member);
 
-    const memberAccount = bankInst.getPrimaryAccount(member.getId());
-    const bankAccount = bankInst.getPrimaryAccount(centralBank.getId());
-    const commonsAccount = bankInst.getPrimaryAccount(commons.getId());
-
-    if (memberAccount && memberAccount.credits > 0) {
-      const toBank = Math.min(memberAccount.credits, endowment);
-      if (toBank > 0 && bankAccount) {
-        bankInst.transfer(memberAccount.id, bankAccount.id, "credits", toBank, "endowment reclaim");
-      }
-      const surplus = memberAccount.credits;
-      if (surplus > 0 && commonsAccount) {
-        bankInst.transfer(memberAccount.id, commonsAccount.id, "credits", surplus, "exit surplus");
-      }
-    }
-
+    Bank.getInstance().closeAccounts(member.getId());
     this.loader?.delete(member.getId());
     this.members.delete(member.getId());
-    Bank.getInstance().closeAccounts(member.getId());
   }
 }

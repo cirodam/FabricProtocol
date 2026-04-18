@@ -1,15 +1,14 @@
 import { Request, Response } from "express";
 import { Marketplace } from "../../marketplace/Marketplace.js";
 import { Post, PostSide, PostType, PricingUnit } from "../../marketplace/Post.js";
-import { TraderProfile } from "../../marketplace/TraderProfile.js";
-import { OwnerType } from "../../bank/IAccountOwner.js";
+import { MemberService } from "../../member/MemberService.js";
+import { Bank } from "../../bank/Bank.js";
 
 const market = () => Marketplace.getInstance();
 
 const POST_TYPES:    PostType[]    = ["item", "service"];
 const POST_SIDES:    PostSide[]    = ["offer", "request"];
 const PRICING_UNITS: PricingUnit[] = ["per_hour", "in_total"];
-const OWNER_TYPES:   OwnerType[]   = ["member", "commons", "domain", "unit", "central_bank"];
 
 // GET /posts?type=&side=&category=
 export function listPosts(req: Request, res: Response): void {
@@ -74,7 +73,16 @@ export function createPost(req: Request, res: Response): void {
         res.status(400).json({ error: `pricingUnit must be one of: ${PRICING_UNITS.join(", ")}` }); return;
     }
 
-    const post = new Post(posterId, type, side, category, title, description, price, {
+    // Resolve the poster — must be a known member with a primary account
+    const poster = MemberService.getInstance().get(posterId);
+    if (!poster) {
+        res.status(422).json({ error: "posterId does not match a known member" }); return;
+    }
+    if (!Bank.getInstance().getPrimaryAccount(posterId)) {
+        res.status(422).json({ error: "poster has no primary bank account" }); return;
+    }
+
+    const post = new Post(posterId, poster.getDisplayName(), poster.getHandle(), type, side, category, title, description, price, {
         quantity: type === "item" ? quantity : undefined,
         pricingUnit: type === "service" ? (pricingUnit ?? "in_total") : undefined,
     });
@@ -113,68 +121,23 @@ export function fulfillTrade(req: Request, res: Response): void {
     }
 }
 
-// GET /traders
-export function listTraders(_req: Request, res: Response): void {
-    res.json(market().getTraders().map(toTraderDto));
-}
-
-// GET /traders/:id
-export function getTrader(req: Request, res: Response): void {
-    const trader = market().getTrader(req.params.id as string);
-    if (!trader) { res.status(404).json({ error: "Trader not found" }); return; }
-    res.json(toTraderDto(trader));
-}
-
-// POST /traders
-// Body: { displayName, handle, ownerId, ownerType }
-export function registerTrader(req: Request, res: Response): void {
-    const { displayName, handle, ownerId, ownerType } = req.body ?? {};
-
-    if (typeof displayName !== "string" || !displayName) {
-        res.status(400).json({ error: "displayName is required" }); return;
-    }
-    if (typeof handle !== "string" || !handle) {
-        res.status(400).json({ error: "handle is required" }); return;
-    }
-    if (typeof ownerId !== "string" || !ownerId) {
-        res.status(400).json({ error: "ownerId is required" }); return;
-    }
-    if (!OWNER_TYPES.includes(ownerType)) {
-        res.status(400).json({ error: `ownerType must be one of: ${OWNER_TYPES.join(", ")}` }); return;
-    }
-
-    try {
-        const profile = new TraderProfile(displayName, handle, ownerId, ownerType as OwnerType);
-        market().registerTrader(profile);
-        res.status(201).json(toTraderDto(profile));
-    } catch (err) {
-        res.status(409).json({ error: (err as Error).message });
-    }
-}
-
 function toPostDto(p: Post) {
     return {
-        id:          p.id,
-        posterId:    p.posterId,
-        type:        p.type,
-        side:        p.side,
-        category:    p.category,
-        title:       p.title,
-        description: p.description,
-        price:       p.price,
-        quantity:    p.quantity,
-        pricingUnit: p.pricingUnit,
-        createdAt:   p.createdAt,
+        id:           p.id,
+        posterId:     p.posterId,
+        posterName:   p.posterName,
+        posterHandle: p.posterHandle,
+        type:         p.type,
+        side:         p.side,
+        category:     p.category,
+        title:        p.title,
+        description:  p.description,
+        price:        p.price,
+        quantity:     p.quantity,
+        pricingUnit:  p.pricingUnit,
+        createdAt:    p.createdAt,
     };
 }
 
-function toTraderDto(t: TraderProfile) {
-    return {
-        id:           t.id,
-        displayName:  t.displayName,
-        handle:       t.handle,
-        ownerId:      t.ownerId,
-        ownerType:    t.ownerType,
-        registeredAt: t.registeredAt,
-    };
-}
+
+

@@ -1,10 +1,10 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner } from "../bank/IAccountOwner.js";
+import { IEconomicActor } from "../IEconomicActor.js";
 import { Asset } from "../Asset.js";
 
 // AssetLedger is a named, owner-bound list of physical assets.
 // It mirrors the Account model: one owner can hold multiple ledgers.
-// Any IAccountOwner (Commons, FunctionalDomain, Member) can open one.
+// Any IEconomicActor (Commons, FunctionalDomain, Member) can open one.
 export class AssetLedger {
     readonly id: string;
     readonly ownerId: string;
@@ -13,7 +13,7 @@ export class AssetLedger {
 
     private assets: Asset[] = [];
 
-    constructor(owner: IAccountOwner, label: string) {
+    constructor(owner: IEconomicActor, label: string) {
         this.id = randomUUID();
         this.ownerId = owner.getId();
         this.label = label;

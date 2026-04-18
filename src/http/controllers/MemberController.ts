@@ -21,9 +21,9 @@ export function getMember(req: Request, res: Response): void {
 }
 
 // POST /members
-// Body: { firstName, lastName, birthDate, physicalCapacity, cognitiveCapacity, guardianId?, phone? }
+// Body: { firstName, lastName, birthDate, physicalCapacity, cognitiveCapacity, handle?, guardianId?, phone? }
 export function createMember(req: Request, res: Response): void {
-    const { firstName, lastName, birthDate, physicalCapacity, cognitiveCapacity, guardianId, phone } = req.body ?? {};
+    const { firstName, lastName, birthDate, physicalCapacity, cognitiveCapacity, handle, guardianId, phone } = req.body ?? {};
 
     if (typeof firstName !== "string" || !firstName.trim()) {
         res.status(400).json({ error: "firstName is required" });
@@ -45,6 +45,10 @@ export function createMember(req: Request, res: Response): void {
         res.status(400).json({ error: "cognitiveCapacity must be a number between 0 and 1" });
         return;
     }
+    if (handle !== undefined && typeof handle !== "string") {
+        res.status(400).json({ error: "handle must be a string" });
+        return;
+    }
     if (guardianId !== undefined && typeof guardianId !== "string") {
         res.status(400).json({ error: "guardianId must be a string" });
         return;
@@ -60,6 +64,7 @@ export function createMember(req: Request, res: Response): void {
         new Date(birthDate),
         physicalCapacity,
         cognitiveCapacity,
+        handle || undefined,
     );
     if (guardianId) member.guardianId = guardianId;
     if (phone) member.phone = phone;
@@ -129,6 +134,7 @@ function toDto(m: Member) {
         birthDate:          m.birthDate.toISOString(),
         joinDate:           m.joinDate.toISOString(),
         memberType:         m.memberType,
+        handle:             m.handle,
         trustScore:         m.trustScore,
         physicalCapacity:   m.physicalCapacity,
         cognitiveCapacity:  m.cognitiveCapacity,

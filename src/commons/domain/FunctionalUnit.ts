@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner, OwnerType } from "../../bank/IAccountOwner.js";
+import { IEconomicActor } from "../../IEconomicActor.js";
 import { Bank } from "../../bank/Bank.js";
 import { CommunityRole } from "../CommunityRole.js";
 
@@ -12,9 +12,8 @@ import { CommunityRole } from "../CommunityRole.js";
  * (paid roles) and a member roster. Multiple units can exist within a single domain
  * as the community grows.
  */
-export abstract class FunctionalUnit implements IAccountOwner {
+export abstract class FunctionalUnit implements IEconomicActor {
     readonly id: string;
-    readonly ownerType: OwnerType = "unit";
     readonly name: string;
     readonly description: string;
 
@@ -29,6 +28,8 @@ export abstract class FunctionalUnit implements IAccountOwner {
     }
 
     getId(): string { return this.id; }
+    getDisplayName(): string { return this.name; }
+    getHandle(): string { return this.name.toLowerCase().replace(/[^a-z0-9_]/g, "_"); }
 
     addRole(role: CommunityRole): void { this.roles.push(role); }
     getRoles(): CommunityRole[] { return this.roles; }

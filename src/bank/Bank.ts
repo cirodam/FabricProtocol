@@ -1,4 +1,4 @@
-import { IAccountOwner } from "./IAccountOwner.js";
+import { IEconomicActor } from "../IEconomicActor.js";
 import { Account } from "./Account.js";
 import { AccountLoader } from "./AccountLoader.js";
 import { BankTransaction, Currency } from "./BankTransaction.js";
@@ -41,7 +41,7 @@ export class Bank {
 
     // --- Account management ---
 
-    openAccount(owner: IAccountOwner, label: string, allowNegativeCredits: boolean = false, exemptFromDemurrage: boolean = false): Account {
+    openAccount(owner: IEconomicActor, label: string, allowNegativeCredits: boolean = false, exemptFromDemurrage: boolean = false): Account {
         const account = new Account(owner, label, allowNegativeCredits, exemptFromDemurrage);
         this.accounts.set(account.id, account);
 

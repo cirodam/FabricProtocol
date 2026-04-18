@@ -1,8 +1,8 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner, OwnerType } from "../bank/IAccountOwner.js";
+import { IEconomicActor } from "../IEconomicActor.js";
 import { Bank } from "../bank/Bank.js";
-import { MemberEndowmentProfile } from "./MemberEndowmentProfile.js";
-import { EndowmentProfileLoader } from "./EndowmentProfileLoader.js";
+import { MemberEndowment } from "./MemberEndowment.js";
+import { MemberEndowmentLoader } from "./MemberEndowmentLoader.js";
 
 /**
  * The CentralBank is the sole issuer of currency in the community.
@@ -11,18 +11,17 @@ import { EndowmentProfileLoader } from "./EndowmentProfileLoader.js";
  * On exit, the member's remaining balance (up to the endowment amount) is
  * returned to the bank. Any shortfall is recovered gradually via bank demurrage.
  */
-export class CentralBank implements IAccountOwner {
+export class CentralBank implements IEconomicActor {
     private static instance: CentralBank;
 
     /** Base endowment issued to a fully-trusted member (trustScore = 1.0). */
     static readonly BASE_ENDOWMENT = 1000;
 
     readonly id: string;
-    readonly ownerType: OwnerType = "central_bank";
 
-    /** One profile per member, keyed by memberId. */
-    private profiles: Map<string, MemberEndowmentProfile> = new Map();
-    private profileLoader: EndowmentProfileLoader | null = null;
+    /** One endowment record per member, keyed by memberId. */
+    private endowments: Map<string, MemberEndowment> = new Map();
+    private endowmentLoader: MemberEndowmentLoader | null = null;
 
     private constructor() {
         this.id = randomUUID();
@@ -40,82 +39,86 @@ export class CentralBank implements IAccountOwner {
      * Set the persistence layer and load all endowment profiles from disk.
      * Call once at app startup before any other operations.
      */
-    init(loader: EndowmentProfileLoader): void {
-        this.profileLoader = loader;
-        for (const profile of loader.loadAll()) {
-            this.profiles.set(profile.memberId, profile);
+    init(loader: MemberEndowmentLoader): void {
+        this.endowmentLoader = loader;
+        for (const e of loader.loadAll()) {
+            this.endowments.set(e.memberId, e);
         }
     }
 
     /** Returns the unique identifier for this account owner. */
     getId(): string { return this.id; }
+    getDisplayName(): string { return "Central Bank"; }
+    getHandle(): string { return "central_bank"; }
 
-    /** Total credits currently in circulation (sum of active endowments). */
+    /** Total credits actually in circulation (magnitude of the bank's negative balance). */
     get moneyInCirculation(): number {
+        const bankAccount = Bank.getInstance().getPrimaryAccount(this.id);
+        return Math.max(0, -(bankAccount?.credits ?? 0));
+    }
+
+    /** What money in circulation should be — sum of all active member endowments. */
+    get desiredMoneyInCirculation(): number {
         let total = 0;
-        for (const profile of this.profiles.values()) {
-            if (!profile.departed) total += profile.endowment;
-        }
+        for (const e of this.endowments.values()) total += e.endowment;
         return total;
     }
 
-    /** Total credits that could not be reclaimed on member exit (recovered gradually via demurrage). */
+    /** Credits still floating from departed members we couldn't fully reclaim. */
     get unrecoveredCredits(): number {
-        let total = 0;
-        for (const profile of this.profiles.values()) {
-            total += profile.unrecoveredCredits;
-        }
-        return total;
+        return Math.max(0, this.moneyInCirculation - this.desiredMoneyInCirculation);
     }
 
-    /** Returns the endowment profile for a given member, or undefined if none exists. */
-    getProfile(memberId: string): MemberEndowmentProfile | undefined {
-        return this.profiles.get(memberId);
+    /** Returns the endowment record for a given member, or undefined if none exists. */
+    getEndowment(memberId: string): MemberEndowment | undefined {
+        return this.endowments.get(memberId);
     }
 
     /**
      * Issue a membership endowment to a member.
-     * This is money creation — credits are issued from nothing and added
-     * directly to the member's balance. The amount may not exceed the
-     * member's credit limit.
+     * Credits are transferred from the CentralBank account (which goes negative)
+     * directly to the member's primary account.
      */
-    issueEndowment(member: IAccountOwner, amount: number): void {
-        let profile = this.profiles.get(member.getId());
-        if (!profile) {
-            profile = new MemberEndowmentProfile(member.getId());
-            this.profiles.set(profile.memberId, profile);
+    issueEndowment(member: IEconomicActor, amount: number): void {
+        let e = this.endowments.get(member.getId());
+        if (!e) {
+            e = new MemberEndowment(member.getId());
+            this.endowments.set(e.memberId, e);
         }
 
-        profile.endowment += amount;
+        e.endowment += amount;
         const bankAccount = Bank.getInstance().getPrimaryAccount(this.id);
         const memberAccount = Bank.getInstance().getPrimaryAccount(member.getId());
         if (!bankAccount) throw new Error("CentralBank has no primary account");
         if (!memberAccount) throw new Error(`Member ${member.getId()} has no primary account`);
         Bank.getInstance().transfer(bankAccount.id, memberAccount.id, "credits", amount, "endowment issuance");
-        this.profileLoader?.save(profile);
+        this.endowmentLoader?.save(e);
     }
 
     /**
-     * Reclaim a member's balance on exit (up to their endowment amount).
-     * Called by MemberService.discharge(). Any surplus above the endowment
-     * is handled separately by the caller (transferred to Commons).
-     * Any shortfall is left as a negative bank balance, recovered via demurrage.
+     * Reclaim a departing member's balance (up to their endowment amount).
+     * Any shortfall remains as a negative balance on the bank account and is
+     * recovered gradually through demurrage.
      */
-    reclaimEndowment(member: IAccountOwner): void {
-        const profile = this.profiles.get(member.getId());
-        if (!profile) return;
+    reclaimEndowment(member: IEconomicActor): void {
+        const e = this.endowments.get(member.getId());
+        if (!e) return;
 
         const bankInst = Bank.getInstance();
-        const memberAccount = bankInst.getPrimaryAccount(member.getId());
         const bankAccount = bankInst.getPrimaryAccount(this.id);
-        const balance = memberAccount?.credits ?? 0;
-        const reclaim = Math.min(balance, profile.endowment);
-        if (reclaim > 0 && memberAccount && bankAccount) {
-            bankInst.transfer(memberAccount.id, bankAccount.id, "credits", reclaim, "endowment reclaim on exit");
+        if (!bankAccount) return;
+
+        let remaining = e.endowment;
+        for (const account of bankInst.getAccounts(member.getId())) {
+            if (remaining <= 0) break;
+            const take = Math.min(account.credits, remaining);
+            if (take > 0) {
+                bankInst.transfer(account.id, bankAccount.id, "credits", take, "endowment reclaim on exit");
+                remaining -= take;
+            }
         }
-        profile.unrecoveredCredits = profile.endowment - reclaim;
-        profile.departed = true;
-        this.profileLoader?.save(profile);
+        this.endowments.delete(member.getId());
+        this.endowmentLoader?.delete(member.getId());
     }
 
     /**

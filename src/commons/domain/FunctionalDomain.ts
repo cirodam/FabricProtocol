@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner, OwnerType } from "../../bank/IAccountOwner.js";
+import { IEconomicActor } from "../../IEconomicActor.js";
 import { Bank } from "../../bank/Bank.js";
 import { FunctionalUnit } from "./FunctionalUnit.js";
 
@@ -7,9 +7,8 @@ import { FunctionalUnit } from "./FunctionalUnit.js";
 // Each domain has its own Bank account, funded by the Commons via fundDomain().
 // Domains may contain one or more FunctionalUnits — the operational bodies that
 // do the actual work (a mill, a clinic, a grain store, a community kitchen).
-export abstract class FunctionalDomain implements IAccountOwner {
+export abstract class FunctionalDomain implements IEconomicActor {
     readonly id: string;
-    readonly ownerType: OwnerType = "domain";
     readonly name: string;
     readonly description: string;
 
@@ -23,6 +22,8 @@ export abstract class FunctionalDomain implements IAccountOwner {
     }
 
     getId(): string { return this.id; }
+    getDisplayName(): string { return this.name; }
+    getHandle(): string { return this.name.toLowerCase().replace(/[^a-z0-9_]/g, "_"); }
 
     addUnit(unit: FunctionalUnit): void { this.units.push(unit); }
     getUnits(): FunctionalUnit[] { return this.units; }

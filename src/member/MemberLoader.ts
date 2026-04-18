@@ -8,6 +8,7 @@ interface MemberRecord {
   lastName: string;
   birthDate: string;
   joinDate: string;
+  handle: string;
   physicalCapacity: number;
   cognitiveCapacity: number;
   trustScore: number;
@@ -30,6 +31,7 @@ export class MemberLoader {
       lastName: member.lastName,
       birthDate: member.birthDate.toISOString(),
       joinDate: member.joinDate.toISOString(),
+      handle: member.handle,
       physicalCapacity: member.physicalCapacity,
       cognitiveCapacity: member.cognitiveCapacity,
       trustScore: member.trustScore,
@@ -55,6 +57,7 @@ export class MemberLoader {
       new Date(r.birthDate),
       r.physicalCapacity,
       r.cognitiveCapacity,
+      r.handle,
     );
     // Restore persisted identity fields — bypass readonly via cast
     (m as unknown as Record<string, unknown>)["id"] = r.id;

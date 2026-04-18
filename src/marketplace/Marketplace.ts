@@ -1,30 +1,18 @@
 import { Post } from "./Post.js";
 import { Bank } from "../bank/Bank.js";
-import { TraderProfile } from "./TraderProfile.js";
 import { PostLoader } from "./PostLoader.js";
-import { TraderProfileLoader } from "./TraderProfileLoader.js";
 
 export class Marketplace {
     private static instance: Marketplace;
 
     private posts: Post[] = [];
-    private traders: Map<string, TraderProfile> = new Map();
     private postLoader: PostLoader | null = null;
-    private traderLoader: TraderProfileLoader | null = null;
 
     private constructor() {}
 
-    /**
-     * Set the persistence layers and load all posts and trader profiles from disk.
-     * Call once at app startup before any other operations.
-     */
-    init(postLoader: PostLoader, traderLoader: TraderProfileLoader): void {
+    init(postLoader: PostLoader): void {
         this.postLoader = postLoader;
-        this.traderLoader = traderLoader;
         this.posts = postLoader.loadAll();
-        for (const profile of traderLoader.loadAll()) {
-            this.traders.set(profile.id, profile);
-        }
     }
 
     static getInstance(): Marketplace {
@@ -34,37 +22,13 @@ export class Marketplace {
         return Marketplace.instance;
     }
 
-    // --- Trader Registry ---
-
-    registerTrader(profile: TraderProfile): void {
-        const existing = this.getTraderByHandle(profile.handle);
-        if (existing && existing.id !== profile.id) {
-            throw new Error(`Handle "${profile.handle}" is already taken`);
-        }
-        this.traders.set(profile.id, profile);
-        this.traderLoader?.save(profile);
-    }
-
-    getTrader(traderId: string): TraderProfile | undefined {
-        return this.traders.get(traderId);
-    }
-
-    getTraderByHandle(handle: string): TraderProfile | undefined {
-        const normalized = handle.toLowerCase().replace(/[^a-z0-9_]/g, "");
-        return Array.from(this.traders.values()).find(t => t.handle === normalized);
-    }
-
-    getTraderByOwnerId(ownerId: string): TraderProfile | undefined {
-        return Array.from(this.traders.values()).find(t => t.ownerId === ownerId);
-    }
-
-    getTraders(): TraderProfile[] {
-        return Array.from(this.traders.values());
-    }
-
     // --- Posting ---
 
+    /** Add a post. Throws if the poster has no primary bank account. */
     addPost(post: Post): void {
+        if (!Bank.getInstance().getPrimaryAccount(post.posterId)) {
+            throw new Error(`Poster ${post.posterId} has no primary bank account`);
+        }
         this.posts.push(post);
         this.postLoader?.save(post);
     }
@@ -72,6 +36,12 @@ export class Marketplace {
     removePost(postId: string): void {
         this.posts = this.posts.filter(p => p.id !== postId);
         this.postLoader?.delete(postId);
+    }
+
+    removePostsByPoster(posterId: string): void {
+        const toRemove = this.posts.filter(p => p.posterId === posterId);
+        this.posts = this.posts.filter(p => p.posterId !== posterId);
+        for (const p of toRemove) this.postLoader?.delete(p.id);
     }
 
     // --- Querying ---

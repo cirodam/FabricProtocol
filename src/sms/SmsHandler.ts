@@ -64,10 +64,10 @@ export class SmsHandler {
         const fromAccount = Bank.getInstance().getPrimaryAccount(member.getId());
         if (!fromAccount) return reply("No account found.");
 
-        const recipientTrader = Marketplace.getInstance().getTraderByHandle(handle);
-        if (!recipientTrader) return reply(`Unknown handle: ${handle}`);
+        const recipientMember = MemberService.getInstance().getByHandle(handle);
+        if (!recipientMember) return reply(`Unknown handle: ${handle}`);
 
-        const toAccount = Bank.getInstance().getPrimaryAccount(recipientTrader.ownerId);
+        const toAccount = Bank.getInstance().getPrimaryAccount(recipientMember.getId());
         if (!toAccount) return reply(`No account found for ${handle}`);
 
         try {
@@ -85,8 +85,7 @@ export class SmsHandler {
         const posts = Marketplace.getInstance().getPosts({ category });
         if (posts.length === 0) return reply("No active posts.");
         const lines = posts.slice(0, 5).map(p => {
-          const trader = Marketplace.getInstance().getTraderByOwnerId(p.posterId);
-          const who = trader ? `@${trader.handle}` : p.posterId.slice(0, 8);
+          const who = p.posterHandle ? `@${p.posterHandle}` : p.posterName || p.posterId.slice(0, 8);
           const qty = p.quantity !== undefined ? ` (qty: ${p.quantity})` : "";
           return `${p.side.toUpperCase()} ${p.title} ${p.price}cr${qty} ${who}`;
         });
@@ -122,11 +121,10 @@ export class SmsHandler {
         if (qty !== undefined && (isNaN(qty) || qty <= 0))
             return reply("qty must be a positive number");
 
-        const trader = Marketplace.getInstance().getTraderByOwnerId(member.id);
-        if (!trader) return reply("You need a trader profile to post. Contact an administrator.");
-
         const post = new Post(
             member.id,
+            member.getDisplayName(),
+            member.getHandle(),
             qty !== undefined ? "item" : "service",
             side === "OFFER" ? "offer" : "request",
             category,

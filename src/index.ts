@@ -5,10 +5,9 @@ import { MemberLoader } from "./member/MemberLoader.js";
 import { Bank } from "./bank/Bank.js";
 import { AccountLoader } from "./bank/AccountLoader.js";
 import { TransactionLoader } from "./bank/TransactionLoader.js";
-import { EndowmentProfileLoader } from "./central_bank/EndowmentProfileLoader.js";
+import { MemberEndowmentLoader } from "./central_bank/MemberEndowmentLoader.js";
 import { Marketplace } from "./marketplace/Marketplace.js";
 import { PostLoader } from "./marketplace/PostLoader.js";
-import { TraderProfileLoader } from "./marketplace/TraderProfileLoader.js";
 import { Scheduler, every } from "./scheduler/Scheduler.js";
 import { PayrollService } from "./commons/PayrollService.js";
 import { HttpServer } from "./http/HttpServer.js";
@@ -22,11 +21,10 @@ async function init(): Promise<void> {
     new AccountLoader("data/accounts"),
     new TransactionLoader("data/transactions")
   );
-  CentralBank.getInstance().init(new EndowmentProfileLoader("data/endowment-profiles"));
+  CentralBank.getInstance().init(new MemberEndowmentLoader("data/endowment-profiles"));
   MemberService.getInstance().init(new MemberLoader("data/members"));
   Marketplace.getInstance().init(
-    new PostLoader("data/posts"),
-    new TraderProfileLoader("data/trader-profiles")
+    new PostLoader("data/posts")
   );
 
   // ── Scheduler ────────────────────────────────────────────────────────────────

@@ -7,6 +7,8 @@ export type PricingUnit = "per_hour" | "in_total";
 export class Post {
     readonly id: string;
     readonly posterId: string;
+    readonly posterName: string;
+    readonly posterHandle: string;
     readonly type: PostType;
     readonly side: PostSide;
     readonly category: string;
@@ -23,6 +25,8 @@ export class Post {
 
     constructor(
         posterId: string,
+        posterName: string,
+        posterHandle: string,
         type: PostType,
         side: PostSide,
         category: string,
@@ -33,6 +37,8 @@ export class Post {
     ) {
         this.id = randomUUID();
         this.posterId = posterId;
+        this.posterName = posterName;
+        this.posterHandle = posterHandle;
         this.type = type;
         this.side = side;
         this.category = category;

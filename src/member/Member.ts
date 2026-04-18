@@ -1,16 +1,16 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner, OwnerType } from "../bank/IAccountOwner.js";
 import { MemberType, getMemberType } from "../domains/food/NutritionalProfile.js";
+import { IEconomicActor } from "../IEconomicActor.js";
 
-export class Member implements IAccountOwner {
+export class Member implements IEconomicActor {
 
     readonly id: string;
-    readonly ownerType: OwnerType = "member";
     firstName: string;
     lastName: string;
     birthDate: Date;
     get memberType(): MemberType { return getMemberType(this.birthDate); }
     readonly joinDate: Date;
+    handle: string;              // lowercase alphanumeric + underscores, unique in community
     physicalCapacity: number;    // 0.0–1.0
     cognitiveCapacity: number;   // 0.0–1.0
     trustScore: number;          // 0.0–1.0
@@ -23,12 +23,14 @@ export class Member implements IAccountOwner {
         birthDate: Date,
         physicalCapacity: number,
         cognitiveCapacity: number,
+        handle: string = "",
     ) {
         this.id = randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthDate;
         this.joinDate = new Date();
+        this.handle = handle.toLowerCase().replace(/[^a-z0-9_]/g, "");
         this.physicalCapacity = physicalCapacity;
         this.cognitiveCapacity = cognitiveCapacity;
         this.trustScore = 1.0;
@@ -38,4 +40,6 @@ export class Member implements IAccountOwner {
     }
 
     getId(): string { return this.id; }
+    getDisplayName(): string { return `${this.firstName} ${this.lastName}`; }
+    getHandle(): string { return this.handle; }
 }

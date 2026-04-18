@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner, OwnerType } from "../bank/IAccountOwner.js";
+import { IEconomicActor } from "../IEconomicActor.js";
 import { Bank } from "../bank/Bank.js";
 import { CommunityRole } from "./CommunityRole.js";
 import { FunctionalDomain } from "./domain/FunctionalDomain.js";
@@ -9,11 +9,10 @@ import { AssetLedger } from "../ledger/AssetLedger.js";
 // The Commons represents the community's collective investment in itself.
 // It holds pooled credits used to meet basic needs, provide care for dependents,
 // fund insurance, and support members who cannot fully participate in the credit system.
-export class Commons implements IAccountOwner {
+export class Commons implements IEconomicActor {
     private static instance: Commons;
 
     readonly id: string;
-    readonly ownerType: OwnerType = "commons";
 
     private positions: CommunityRole[] = [];
     private domains: FunctionalDomain[] = [];
@@ -33,6 +32,8 @@ export class Commons implements IAccountOwner {
     }
 
     getId(): string { return this.id; }
+    getDisplayName(): string { return "Commons"; }
+    getHandle(): string { return "commons"; }
 
     addPosition(position: CommunityRole): void {
         this.positions.push(position);
@@ -59,6 +60,21 @@ export class Commons implements IAccountOwner {
         if (!from) throw new Error("Commons has no primary account");
         if (!to) throw new Error(`Domain "${domain.name}" has no primary account`);
         bankInst.transfer(from.id, to.id, "credits", amount, `fund domain: ${domain.name}`);
+    }
+
+    /** Transfer all balances from every account of the given actor into the Commons. */
+    collect(actor: IEconomicActor): void {
+        const bankInst = Bank.getInstance();
+        const commonsAccount = bankInst.getPrimaryAccount(this.id);
+        if (!commonsAccount) return;
+        for (const account of bankInst.getAccounts(actor.getId())) {
+            if (account.credits > 0)
+                bankInst.transfer(account.id, commonsAccount.id, "credits", account.credits, `collect on exit: ${actor.getDisplayName()}`);
+            if (account.foodVouchers > 0)
+                bankInst.transfer(account.id, commonsAccount.id, "foodVouchers", account.foodVouchers, `collect on exit: ${actor.getDisplayName()}`);
+            if (account.fec > 0)
+                bankInst.transfer(account.id, commonsAccount.id, "fec", account.fec, `collect on exit: ${actor.getDisplayName()}`);
+        }
     }
 
     // Collect demurrage from all non-exempt accounts into the Commons primary account.

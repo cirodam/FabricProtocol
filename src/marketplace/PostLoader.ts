@@ -4,6 +4,8 @@ import { FileStore } from "../storage/FileStore.js";
 interface PostRecord {
   id: string;
   posterId: string;
+  posterName: string;
+  posterHandle: string;
   type: PostType;
   side: PostSide;
   category: string;
@@ -26,6 +28,8 @@ export class PostLoader {
     const record: PostRecord = {
       id: post.id,
       posterId: post.posterId,
+      posterName: post.posterName,
+      posterHandle: post.posterHandle,
       type: post.type,
       side: post.side,
       category: post.category,
@@ -45,7 +49,7 @@ export class PostLoader {
 
   loadAll(): Post[] {
     return this.store.readAll<PostRecord>().map(r => {
-      const post = new Post(r.posterId, r.type, r.side, r.category, r.title, r.description, r.price, {
+      const post = new Post(r.posterId, r.posterName, r.posterHandle, r.type, r.side, r.category, r.title, r.description, r.price, {
         quantity: r.quantity,
         pricingUnit: r.pricingUnit,
       });

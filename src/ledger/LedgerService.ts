@@ -1,4 +1,4 @@
-import { IAccountOwner } from "../bank/IAccountOwner.js";
+import { IEconomicActor } from "../IEconomicActor.js";
 import { AssetLedger } from "./AssetLedger.js";
 
 // LedgerService is the singleton registry for all AssetLedgers.
@@ -17,7 +17,7 @@ export class LedgerService {
         return LedgerService.instance;
     }
 
-    openLedger(owner: IAccountOwner, label: string): AssetLedger {
+    openLedger(owner: IEconomicActor, label: string): AssetLedger {
         const ledger = new AssetLedger(owner, label);
         this.ledgers.push(ledger);
         return ledger;
