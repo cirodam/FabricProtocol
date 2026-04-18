@@ -1,39 +1,46 @@
 import { randomUUID } from "crypto";
-import { PostSide } from "./ItemPost.js";
 
-export enum PricingUnit {
-    PER_HOUR = "PER_HOUR",
-    IN_TOTAL = "IN_TOTAL",
-}
+export type PostSide = "offer" | "request";
+export type PostType = "item" | "service";
+export type PricingUnit = "per_hour" | "in_total";
 
-export class ServicePost {
+export class Post {
     readonly id: string;
-    readonly posterId: string;  // member or commons
+    readonly posterId: string;
+    readonly type: PostType;
     readonly side: PostSide;
     readonly category: string;
     title: string;
     description: string;
     price: number;
-    unit: PricingUnit;
     readonly createdAt: Date;
+
+    /** Items only: remaining quantity available. Undefined for service posts. */
+    quantity?: number;
+
+    /** Services only: how the price is denominated. Undefined for item posts. */
+    pricingUnit?: PricingUnit;
 
     constructor(
         posterId: string,
+        type: PostType,
         side: PostSide,
         category: string,
         title: string,
         description: string,
         price: number,
-        unit: PricingUnit,
+        options: { quantity?: number; pricingUnit?: PricingUnit } = {}
     ) {
         this.id = randomUUID();
         this.posterId = posterId;
+        this.type = type;
         this.side = side;
         this.category = category;
         this.title = title;
         this.description = description;
         this.price = price;
-        this.unit = unit;
         this.createdAt = new Date();
+        this.quantity = options.quantity;
+        this.pricingUnit = options.pricingUnit;
     }
 }

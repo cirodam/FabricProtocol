@@ -1,6 +1,8 @@
 import { IAccountOwner } from "../IAccountOwner.js";
 import { Account } from "./Account.js";
+import { AccountLoader } from "./AccountLoader.js";
 import { BankTransaction, Currency } from "./BankTransaction.js";
+import { TransactionLoader } from "./TransactionLoader.js";
 
 // The Bank is pure infrastructure. All balances live here.
 // Members, Commons, and CentralBank are agents that interface with the Bank —
@@ -10,9 +12,25 @@ export class Bank {
 
     private accounts: Map<string, Account> = new Map();        // keyed by accountId
     private ownerIndex: Map<string, string[]> = new Map();     // ownerId → accountId[]
-    private transactions: BankTransaction[] = [];
+    private accountLoader: AccountLoader | null = null;
+    private transactionLoader: TransactionLoader | null = null;
 
     private constructor() {}
+
+    /**
+     * Set the persistence layers and load all accounts and transactions from disk.
+     * Call once at app startup before any other operations.
+     */
+    init(accountLoader: AccountLoader, transactionLoader: TransactionLoader): void {
+        this.accountLoader = accountLoader;
+        this.transactionLoader = transactionLoader;
+        for (const account of accountLoader.loadAll()) {
+            this.accounts.set(account.id, account);
+            const list = this.ownerIndex.get(account.ownerId) ?? [];
+            list.push(account.id);
+            this.ownerIndex.set(account.ownerId, list);
+        }
+    }
 
     static getInstance(): Bank {
         if (!Bank.instance) {
@@ -30,6 +48,7 @@ export class Bank {
         const ownerAccounts = this.ownerIndex.get(owner.getId()) ?? [];
         ownerAccounts.push(account.id);
         this.ownerIndex.set(owner.getId(), ownerAccounts);
+        this.accountLoader?.save(account);
 
         return account;
     }
@@ -85,17 +104,16 @@ export class Bank {
         (to as Record<Currency, number>)[currency] = Math.round(((to as Record<Currency, number>)[currency] + amount) * 100) / 100;
 
         const tx = new BankTransaction(fromAccountId, toAccountId, currency, amount, memo);
-        this.transactions.push(tx);
+        this.accountLoader?.save(from);
+        this.accountLoader?.save(to);
+        this.transactionLoader?.save(tx);
         return tx;
     }
 
     // --- Transaction history ---
 
-    getTransactions(accountId?: string): BankTransaction[] {
-        if (!accountId) return [...this.transactions];
-        return this.transactions.filter(
-            (tx) => tx.fromAccountId === accountId || tx.toAccountId === accountId
-        );
+    getTransactions(accountId?: string, month?: string): BankTransaction[] {
+        return this.transactionLoader?.query({ accountId, month }) ?? [];
     }
 
     // Convert credits to foodVouchers (or vice versa) within a single account, 1:1.
@@ -108,5 +126,6 @@ export class Bank {
         if (balance < amount) throw new Error(`Insufficient ${from}: has ${balance}, needs ${amount}`);
         (account as Record<Currency, number>)[from] = Math.round((balance - amount) * 100) / 100;
         (account as Record<Currency, number>)[to]   = Math.round(((account as Record<Currency, number>)[to] + amount) * 100) / 100;
+        this.accountLoader?.save(account);
     }
 }

@@ -5,6 +5,15 @@ import { MemberLoader } from "./member/MemberLoader.js";
 import { Member } from "./member/Member.js";
 import { Commons } from "./commons/Commons.js";
 import { CommunityRole } from "./commons/CommunityRole.js";
+import { Bank } from "./bank/Bank.js";
+import { AccountLoader } from "./bank/AccountLoader.js";
+import { TransactionLoader } from "./bank/TransactionLoader.js";
+import { EndowmentProfileLoader } from "./central_bank/EndowmentProfileLoader.js";
+import { Marketplace } from "./marketplace/Marketplace.js";
+import { PostLoader } from "./marketplace/PostLoader.js";
+import { TraderProfileLoader } from "./marketplace/TraderProfileLoader.js";
+import { Scheduler, every } from "./scheduler/Scheduler.js";
+import { PayrollService } from "./commons/PayrollService.js";
 
 
 const community = Community.getInstance();
@@ -12,7 +21,16 @@ const bank = CentralBank.getInstance();
 const memberService = MemberService.getInstance();
 const commons = Commons.getInstance();
 
+Bank.getInstance().init(
+  new AccountLoader("data/accounts"),
+  new TransactionLoader("data/transactions")
+);
+CentralBank.getInstance().init(new EndowmentProfileLoader("data/endowment-profiles"));
 memberService.init(new MemberLoader("data/members"));
+Marketplace.getInstance().init(
+  new PostLoader("data/posts"),
+  new TraderProfileLoader("data/trader-profiles")
+);
 
 commons.addPosition(new CommunityRole("Medical Officer"));
 
@@ -36,3 +54,25 @@ console.log(`${community.name} bootstrapped`);
 console.log(`Currency: ${community.currencyName}`);
 console.log(`Members: ${memberService.count()}`);
 console.log(`Money in circulation: ${bank.moneyInCirculation}`);
+
+const scheduler = new Scheduler("data/scheduler");
+
+scheduler.register({
+  name: "anniversaries",
+  intervalMs: every.days(1),
+  run: () => memberService.checkAnniversaries(),
+});
+
+scheduler.register({
+  name: "demurrage",
+  intervalMs: every.months(1),
+  run: () => CentralBank.getInstance().assessDemurrage(0.02),
+});
+
+scheduler.register({
+  name: "payroll",
+  intervalMs: every.months(1),
+  run: () => PayrollService.getInstance().payMonthly(),
+});
+
+void scheduler.start();

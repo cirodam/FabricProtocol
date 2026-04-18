@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { IAccountOwner } from "../IAccountOwner.js";
 import { Bank } from "../bank/Bank.js";
 import { MemberEndowmentProfile } from "./MemberEndowmentProfile.js";
+import { EndowmentProfileLoader } from "./EndowmentProfileLoader.js";
 
 /**
  * The CentralBank is the sole issuer of currency in the community.
@@ -17,6 +18,7 @@ export class CentralBank implements IAccountOwner {
 
     /** One profile per member, keyed by memberId. */
     private profiles: Map<string, MemberEndowmentProfile> = new Map();
+    private profileLoader: EndowmentProfileLoader | null = null;
 
     private constructor() {
         this.id = randomUUID();
@@ -28,6 +30,17 @@ export class CentralBank implements IAccountOwner {
         CentralBank.instance = new CentralBank();
         }
         return CentralBank.instance;
+    }
+
+    /**
+     * Set the persistence layer and load all endowment profiles from disk.
+     * Call once at app startup before any other operations.
+     */
+    init(loader: EndowmentProfileLoader): void {
+        this.profileLoader = loader;
+        for (const profile of loader.loadAll()) {
+            this.profiles.set(profile.memberId, profile);
+        }
     }
 
     /** Returns the unique identifier for this account owner. */
@@ -75,6 +88,7 @@ export class CentralBank implements IAccountOwner {
         if (!bankAccount) throw new Error("CentralBank has no primary account");
         if (!memberAccount) throw new Error(`Member ${member.getId()} has no primary account`);
         Bank.getInstance().transfer(bankAccount.id, memberAccount.id, "credits", amount, "endowment issuance");
+        this.profileLoader?.save(profile);
     }
 
     /**
@@ -97,6 +111,7 @@ export class CentralBank implements IAccountOwner {
         }
         profile.shortfall = profile.endowment - reclaim;
         profile.departed = true;
+        this.profileLoader?.save(profile);
     }
 
     /**
