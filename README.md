@@ -4,6 +4,16 @@ A TypeScript implementation of a local money system for communities.
 
 ## What is it?
 
+In 1977, David Werner published *Where There Is No Doctor* — a practical guide for communities in rural and under-resourced areas to care for their own sick when no physician was available. It has been translated into more than 100 languages. It is one of the most widely distributed books in the world. It exists because communities needed it.
+
+The premise was not that medicine was simple. It was that communities could learn enough to do most of what needed doing — and that waiting for a professional system to arrive was not a plan.
+
+The Fabric Protocol is built on the same premise, applied to everything else.
+
+Where there is no functioning food supply chain. Where there is no affordable housing market. Where there is no healthcare system that will see you without insurance. Where there is no childcare you can afford. Where there is no institution that will compensate the neighbor who has been caring for your elderly mother for three years without pay.
+
+This is where there is no anything.
+
 The Fabric Protocol is a set of primitives for communities to collectively identify and meet their own needs. It is designed to operate at the scale of a neighborhood, town, or rural county — anywhere a shared identity and enough trust already exist to make collective decisions.
 
 It is not a replacement for the broader economy. It is a substrate communities can build on top of — filling the gaps the market ignores and compensating the labor that conventional systems render invisible.
@@ -65,13 +75,18 @@ src/
   bank/               Money, food vouchers, and FEM accounts
   central_bank/       Currency issuance and endowments
   commons/            Governance, payroll, positions, proposals
-    domain/           FunctionalDomain base class
+    domain/           FunctionalDomain and FunctionalUnit base classes
   member/             Member registry
-  food/               Food domain and nutritional profiles
+  agriculture/        Food production, soil fertility, seed sovereignty
+  food/               Food processing, storage, and distribution
   housing/            Housing domain and unit registry
-  healthcare/         Healthcare domain
-  child_care/         Childcare domain
-  dependency_care/    Dependency care profiles and domain
+  healthcare/         Primary care, emergency, dental, mental health, pharmacy
+  child_care/         Childcare domain and home childcare
+  dependency_care/    Elder and disability care, shared households
+  education/          School, library, vocational training, adult education
+  sanitation/         Waste, water, sewage, and hygiene
+  portering/          Delivery, transport, and logistics
+  fire/               Fire suppression and emergency first response
   marketplace/        Offers, requests, and fulfillment
   federation/         Inter-community links and FEM clearing
   ledger/             Physical asset tracking
