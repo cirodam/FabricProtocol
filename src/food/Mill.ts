@@ -10,7 +10,7 @@ import { FunctionalUnit } from "../commons/domain/FunctionalUnit.js";
  *
  * A mill at community scale is an operation, not an appliance. It requires dedicated
  * space (flour dust is a fire hazard), trained operators, and regular maintenance.
- * It should be staffed with positions and funded by the Agriculture domain.
+ * It should be staffed with positions and funded by the Food domain.
  *
  * At minimum, a community should have:
  * - One electric or mechanized mill for daily throughput
