@@ -108,11 +108,11 @@ export class MemberService {
         member.joinDate.getMonth() === mm && member.joinDate.getDate() === dd;
       let changed = false;
       if (isBirthday) {
-        member.trustScore = Math.min(1.0, Math.round((member.trustScore + 0.01) * 100) / 100);
+        member.trustScore = Math.round((member.trustScore + 0.01) * 100) / 100;
         changed = true;
       }
       if (isJoinAnniversary) {
-        member.trustScore = Math.min(1.0, Math.round((member.trustScore + 0.01) * 100) / 100);
+        member.trustScore = Math.round((member.trustScore + 0.01) * 100) / 100;
         changed = true;
       }
       if (changed) this.loader?.save(member);

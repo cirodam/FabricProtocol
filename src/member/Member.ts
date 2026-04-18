@@ -13,7 +13,7 @@ export class Member implements IEconomicActor {
     handle: string;              // lowercase alphanumeric + underscores, unique in community
     physicalCapacity: number;    // 0.0–1.0
     cognitiveCapacity: number;   // 0.0–1.0
-    trustScore: number;          // 0.0–1.0
+    trustScore: number;          // starts at 1.0, increases by 0.01 on each birthday and join anniversary
     guardianId: string | null;
     phone: string | null;        // E.164, e.g. "+15551234567". null if no phone.
     pinHash: string | null;      // SHA-256 hex of PIN. null until set.
