@@ -1,4 +1,5 @@
 import { Member } from "./Member.js";
+import { MemberLoader } from "./MemberLoader.js";
 import { DEFAULT_NUTRITIONAL_PROFILES, NutritionalProfile } from "../food/NutritionalProfile.js";
 import { CentralBank } from "../central_bank/CentralBank.js";
 import { Commons } from "../commons/Commons.js";
@@ -10,8 +11,20 @@ export class MemberService {
   private static instance: MemberService;
 
   private members: Map<string, Member> = new Map();
+  private loader: MemberLoader | null = null;
 
   private constructor() {}
+
+  /**
+   * Set the persistence layer and load all members from disk.
+   * Call once at app startup before any other operations.
+   */
+  init(loader: MemberLoader): void {
+    this.loader = loader;
+    for (const member of loader.loadAll()) {
+      this.members.set(member.id, member);
+    }
+  }
 
   static getInstance(): MemberService {
     if (!MemberService.instance) {
@@ -23,6 +36,7 @@ export class MemberService {
   add(member: Member): void {
     this.members.set(member.id, member);
     Bank.getInstance().openAccount(member, "primary");
+    this.loader?.save(member);
   }
 
   get(id: string): Member | undefined {
@@ -30,6 +44,7 @@ export class MemberService {
   }
 
   remove(id: string): boolean {
+    this.loader?.delete(id);
     return this.members.delete(id);
   }
 
@@ -65,12 +80,16 @@ export class MemberService {
         member.birthDate.getMonth() === mm && member.birthDate.getDate() === dd;
       const isJoinAnniversary =
         member.joinDate.getMonth() === mm && member.joinDate.getDate() === dd;
+      let changed = false;
       if (isBirthday) {
         member.trustScore = Math.min(1.0, Math.round((member.trustScore + 0.01) * 100) / 100);
+        changed = true;
       }
       if (isJoinAnniversary) {
         member.trustScore = Math.min(1.0, Math.round((member.trustScore + 0.01) * 100) / 100);
+        changed = true;
       }
+      if (changed) this.loader?.save(member);
     }
   }
 
@@ -102,6 +121,7 @@ export class MemberService {
       }
     }
 
+    this.loader?.delete(member.getId());
     this.members.delete(member.getId());
   }
 }

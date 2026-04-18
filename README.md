@@ -92,6 +92,29 @@ src/
   ledger/             Physical asset tracking
 ```
 
+## What this is and what it isn't
+
+The failure mode of most alternative community projects is asking people to give up too much that's familiar all at once — the governance, the culture, the social organization, the economics, everything simultaneously. That's not a community. It's a commune, and communes have a poor track record because the selection pressure is too high. Only true believers join, and true believers fracture over doctrine.
+
+This project keeps what works and replaces what doesn't.
+
+**What stays:**
+- Juries — people already trust them more than they trust judges
+- Local elected accountability — sheriffs, town councils, justices of the peace
+- Private property in the meaningful sense — farmers keep their farms, families keep their homes
+- Cultural familiarity — a community built on this protocol looks like a rural American community, not a collective farm
+
+**What changes:**
+- Wage labor as the only way to eat — replaced by membership endowments and funded positions
+- Housing as a speculative asset — replaced by community-managed, stable housing
+- Care work as invisible and uncompensated — replaced by funded positions anyone can hold
+- Healthcare rationed by insurance — replaced by a community-funded domain
+- Money that flows out of communities to distant shareholders — replaced by local currency with demurrage
+
+That's a surgical intervention, not a revolution. The familiar institutions survive. The extractive mechanisms are replaced. Most people living in this community would recognize their daily life as American. The difference is that the system is working for them rather than against them.
+
+The positions stated here are not radical on American terms. Local self-government, compensating people for their work, community members caring for each other, keeping money in the local economy — these are apple pie positions. The radicalism, such as it is, is in the implementation: taking those values seriously enough to actually build for them.
+
 ## Philosophy
 
 Communities self-organize. The Fabric Protocol provides primitives — accounts, governance, care profiles, housing records — and gets out of the way. Where to draw boundaries, who to elect, how much to fund each domain: those are social questions answered by the people living inside the system, not by the software.

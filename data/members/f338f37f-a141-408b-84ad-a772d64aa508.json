@@ -1,0 +1,13 @@
+{
+  "id": "f338f37f-a141-408b-84ad-a772d64aa508",
+  "firstName": "David",
+  "lastName": "Marsh",
+  "birthDate": "2001-01-30T00:00:00.000Z",
+  "joinDate": "2026-04-18T13:06:59.508Z",
+  "memberType": "ADULT",
+  "physicalCapacity": 1,
+  "cognitiveCapacity": 1,
+  "trustScore": 1,
+  "guardianId": null,
+  "dependencyCareId": null
+}
