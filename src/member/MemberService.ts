@@ -44,6 +44,11 @@ export class MemberService {
     return this.members.get(id);
   }
 
+  /** Persist any in-place mutations to an existing member. */
+  save(member: Member): void {
+    this.loader?.save(member);
+  }
+
   getByPhone(phone: string): Member | undefined {
     return Array.from(this.members.values()).find(m => m.phone === phone);
   }

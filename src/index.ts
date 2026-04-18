@@ -14,6 +14,7 @@ import { PostLoader } from "./marketplace/PostLoader.js";
 import { TraderProfileLoader } from "./marketplace/TraderProfileLoader.js";
 import { Scheduler, every } from "./scheduler/Scheduler.js";
 import { PayrollService } from "./commons/PayrollService.js";
+import { HttpServer } from "./http/HttpServer.js";
 
 
 const community = Community.getInstance();
@@ -76,3 +77,5 @@ scheduler.register({
 });
 
 void scheduler.start();
+
+new HttpServer().start();

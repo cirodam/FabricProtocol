@@ -107,7 +107,7 @@ export function updateMember(req: Request, res: Response): void {
     }
 
     // Persist the changes
-    MemberService.getInstance()["loader"]?.save(member);
+    MemberService.getInstance().save(member);
 
     res.json(toDto(member));
 }

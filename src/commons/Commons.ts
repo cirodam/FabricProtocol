@@ -1,7 +1,6 @@
 import { randomUUID } from "crypto";
 import { IAccountOwner, OwnerType } from "../bank/IAccountOwner.js";
 import { Bank } from "../bank/Bank.js";
-import { Asset } from "../Asset.js";
 import { CommunityRole } from "./CommunityRole.js";
 import { FunctionalDomain } from "./domain/FunctionalDomain.js";
 import { LedgerService } from "../ledger/LedgerService.js";
@@ -34,14 +33,6 @@ export class Commons implements IAccountOwner {
     }
 
     getId(): string { return this.id; }
-
-    addAsset(asset: Asset): void {
-        this.ledger.add(asset);
-    }
-
-    getAssets(): Asset[] {
-        return this.ledger.getAll();
-    }
 
     addPosition(position: CommunityRole): void {
         this.positions.push(position);

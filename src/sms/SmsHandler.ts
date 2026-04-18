@@ -12,7 +12,7 @@ import { Post } from "../marketplace/Post.js";
  * Supported commands (case-insensitive):
  *   BAL                              — account balance
  *   SEND <amount> <handle> [memo]    — transfer credits
- *   POST OFFER|REQUEST <title> <price> [qty] [category]  — create marketplace post
+ *   POST OFFER|REQUEST <category> <title> <price> [qty]  — create marketplace post
  *   POSTS [category]                 — list active posts
  *   PIN <pin>                        — authenticate session
  *   HELP                             — command list
@@ -79,8 +79,7 @@ export class SmsHandler {
         }
       }
 
-      case "POST": {
-        // POST OFFER|REQUEST <category> <title> <price> [qty]
+      case "POSTS": {
         // POSTS [category]
         const category = tokens[1]?.toLowerCase();
         const posts = Marketplace.getInstance().getPosts({ category });
