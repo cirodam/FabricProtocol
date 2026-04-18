@@ -43,6 +43,10 @@ export class MemberService {
     return this.members.get(id);
   }
 
+  getByPhone(phone: string): Member | undefined {
+    return Array.from(this.members.values()).find(m => m.phone === phone);
+  }
+
   remove(id: string): boolean {
     this.loader?.delete(id);
     return this.members.delete(id);

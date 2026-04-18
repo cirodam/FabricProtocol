@@ -13,8 +13,9 @@ export class Member implements IAccountOwner {
     physicalCapacity: number;    // 0.0–1.0
     cognitiveCapacity: number;   // 0.0–1.0
     trustScore: number;          // 0.0–1.0
-    guardianId: string | null;   // memberId of guardian, e.g. parent for a child
-    dependencyCareId: string | null; // id of DependencyCareProfile, if enrolled
+    guardianId: string | null;
+    dependencyCareId: string | null;
+    phone: string | null;        // E.164, e.g. "+15551234567". null if no phone.
 
     constructor(
         firstName: string,
@@ -36,6 +37,7 @@ export class Member implements IAccountOwner {
         this.trustScore = trustScore;
         this.guardianId = null;
         this.dependencyCareId = null;
+        this.phone = null;
     }
 
     getId(): string { return this.id; }

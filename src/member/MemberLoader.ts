@@ -15,6 +15,7 @@ interface MemberRecord {
   trustScore: number;
   guardianId: string | null;
   dependencyCareId: string | null;
+  phone: string | null;
 }
 
 export class MemberLoader {
@@ -37,6 +38,7 @@ export class MemberLoader {
       trustScore: member.trustScore,
       guardianId: member.guardianId,
       dependencyCareId: member.dependencyCareId,
+      phone: member.phone,
     };
     this.store.write(member.id, record);
   }
@@ -64,6 +66,7 @@ export class MemberLoader {
     (m as unknown as Record<string, unknown>)["joinDate"] = new Date(r.joinDate);
     m.guardianId = r.guardianId;
     m.dependencyCareId = r.dependencyCareId;
+    m.phone = r.phone;
     return m;
   }
 }
