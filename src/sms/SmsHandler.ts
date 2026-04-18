@@ -2,6 +2,8 @@ import { IncomingMessage, OutgoingMessage } from "./SmsMessage.js";
 import { MemberService } from "../member/MemberService.js";
 import { Bank } from "../bank/Bank.js";
 import { Marketplace } from "../marketplace/Marketplace.js";
+import { SessionStore } from "./SessionStore.js";
+import { Post } from "../marketplace/Post.js";
 
 /**
  * Parses inbound SMS commands and dispatches to the appropriate service.
@@ -26,7 +28,7 @@ export class SmsHandler {
     // Commands that do not require a known member
     if (upper === "HELP") {
       return reply(
-        "Commands:\nBAL\nSEND <amt> <handle> [memo]\nPOST OFFER|REQUEST <title> <price> [qty]\nPOSTS [category]\nPIN <pin>"
+        "Commands:\nBAL\nSEND <amt> <handle> [memo]\nPOST OFFER|REQUEST <cat> <title> <price> [qty]\nPOSTS [category]\nPIN <code>"
       );
     }
 
@@ -36,43 +38,106 @@ export class SmsHandler {
 
     const tokens = body.split(/\s+/);
     const cmd = tokens[0].toUpperCase();
-
-    // TODO: implement PIN session check for write operations
-    // TODO: implement each command below
+    const sessions = SessionStore.getInstance();
 
     switch (cmd) {
       case "BAL": {
         const account = Bank.getInstance().getPrimaryAccount(member.getId());
         if (!account) return reply("No account found.");
-        return reply(`Balance: ${account.credits} credits`);
+        const parts = [`Credits: ${account.credits}`];
+        if (account.foodVouchers > 0) parts.push(`Food vouchers: ${account.foodVouchers}`);
+        if (account.fec > 0) parts.push(`FEC: ${account.fec}`);
+        return reply(parts.join("\n"));
       }
 
       case "SEND": {
         // SEND <amount> <handle> [memo]
-        // TODO: require PIN session
-        return reply("SEND not yet implemented.");
+        if (!sessions.isAuthenticated(msg.from)) return reply("PIN required. Text: PIN <your-pin>");
+
+        const amount = parseFloat(tokens[1]);
+        const handle = tokens[2];
+        const memo   = tokens.slice(3).join(" ") || "";
+
+        if (!amount || amount <= 0) return reply("Usage: SEND <amount> <handle> [memo]");
+        if (!handle)                return reply("Usage: SEND <amount> <handle> [memo]");
+
+        const fromAccount = Bank.getInstance().getPrimaryAccount(member.getId());
+        if (!fromAccount) return reply("No account found.");
+
+        const recipientTrader = Marketplace.getInstance().getTraderByHandle(handle);
+        if (!recipientTrader) return reply(`Unknown handle: ${handle}`);
+
+        const toAccount = Bank.getInstance().getPrimaryAccount(recipientTrader.ownerId);
+        if (!toAccount) return reply(`No account found for ${handle}`);
+
+        try {
+          Bank.getInstance().transfer(fromAccount.id, toAccount.id, "credits", amount, memo);
+          const updated = Bank.getInstance().getPrimaryAccount(member.getId())!;
+          return reply(`Sent ${amount} credits to ${handle}. New balance: ${updated.credits}`);
+        } catch (err) {
+          return reply((err as Error).message);
+        }
       }
 
       case "POST": {
-        // POST OFFER|REQUEST <title> <price> [qty] [category]
-        // TODO: require PIN session
-        return reply("POST not yet implemented.");
-      }
-
-      case "POSTS": {
+        // POST OFFER|REQUEST <category> <title> <price> [qty]
         // POSTS [category]
         const category = tokens[1]?.toLowerCase();
         const posts = Marketplace.getInstance().getPosts({ category });
         if (posts.length === 0) return reply("No active posts.");
-        const lines = posts.slice(0, 5).map(p =>
-          `${p.side.toUpperCase()} ${p.title} ${p.price}cr (@${p.posterId})`
-        );
+        const lines = posts.slice(0, 5).map(p => {
+          const trader = Marketplace.getInstance().getTraderByOwnerId(p.posterId);
+          const who = trader ? `@${trader.handle}` : p.posterId.slice(0, 8);
+          const qty = p.quantity !== undefined ? ` (qty: ${p.quantity})` : "";
+          return `${p.side.toUpperCase()} ${p.title} ${p.price}cr${qty} ${who}`;
+        });
         return reply(lines.join("\n"));
       }
 
       case "PIN": {
-        // TODO: implement session store
-        return reply("PIN not yet implemented.");
+        // PIN <code>
+        const code = tokens[1];
+        if (!code) return reply("Usage: PIN <code>");
+        if (!member.pinHash) return reply("No PIN set on your account. Contact an administrator.");
+        if (!MemberService.getInstance().verifyPin(member.id, code)) return reply("Incorrect PIN.");
+        sessions.authenticate(msg.from);
+        return reply("Authenticated. Session valid for 15 minutes.");
+      }
+
+      case "POST": {
+        // POST OFFER|REQUEST <category> <title> <price> [qty]
+        if (!sessions.isAuthenticated(msg.from)) return reply("PIN required. Text: PIN <your-pin>");
+
+        const side = tokens[1]?.toUpperCase();
+        const category = tokens[2]?.toLowerCase();
+        const title = tokens[3];
+        const price = parseFloat(tokens[4]);
+        const qty = tokens[5] !== undefined ? parseFloat(tokens[5]) : undefined;
+
+        if (side !== "OFFER" && side !== "REQUEST")
+            return reply("Usage: POST OFFER|REQUEST <category> <title> <price> [qty]");
+        if (!category || !title)
+            return reply("Usage: POST OFFER|REQUEST <category> <title> <price> [qty]");
+        if (isNaN(price) || price < 0)
+            return reply("price must be a non-negative number");
+        if (qty !== undefined && (isNaN(qty) || qty <= 0))
+            return reply("qty must be a positive number");
+
+        const trader = Marketplace.getInstance().getTraderByOwnerId(member.id);
+        if (!trader) return reply("You need a trader profile to post. Contact an administrator.");
+
+        const post = new Post(
+            member.id,
+            qty !== undefined ? "item" : "service",
+            side === "OFFER" ? "offer" : "request",
+            category,
+            title,
+            "",
+            price,
+            qty !== undefined ? { quantity: qty } : { pricingUnit: "in_total" }
+        );
+        Marketplace.getInstance().addPost(post);
+        return reply(`Posted: ${side} ${title} at ${price} credits${qty !== undefined ? `, qty ${qty}` : ""}.`);
       }
 
       default:

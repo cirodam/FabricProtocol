@@ -4,6 +4,7 @@ import { DEFAULT_NUTRITIONAL_PROFILES, NutritionalProfile } from "../domains/foo
 import { CentralBank } from "../central_bank/CentralBank.js";
 import { Commons } from "../commons/Commons.js";
 import { Bank } from "../bank/Bank.js";
+import { createHash } from "crypto";
 
 export type ExitReason = "DEPARTURE" | "DEATH";
 
@@ -72,6 +73,21 @@ export class MemberService {
 
   count(): number {
     return this.members.size;
+  }
+
+  /** Hash and store a PIN for a member. Persists immediately. */
+  setPin(memberId: string, pin: string): void {
+    const member = this.members.get(memberId);
+    if (!member) throw new Error(`Member ${memberId} not found`);
+    member.pinHash = createHash("sha256").update(pin).digest("hex");
+    this.loader?.save(member);
+  }
+
+  /** Returns true if the given plain-text PIN matches the member's stored hash. */
+  verifyPin(memberId: string, pin: string): boolean {
+    const member = this.members.get(memberId);
+    if (!member?.pinHash) return false;
+    return member.pinHash === createHash("sha256").update(pin).digest("hex");
   }
 
   // Call once per day. Increments trustScore by 0.01 (capped at 1.0) on a

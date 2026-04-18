@@ -54,6 +54,10 @@ export class Marketplace {
         return Array.from(this.traders.values()).find(t => t.handle === normalized);
     }
 
+    getTraderByOwnerId(ownerId: string): TraderProfile | undefined {
+        return Array.from(this.traders.values()).find(t => t.ownerId === ownerId);
+    }
+
     getTraders(): TraderProfile[] {
         return Array.from(this.traders.values());
     }

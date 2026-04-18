@@ -16,6 +16,7 @@ interface MemberRecord {
   guardianId: string | null;
   dependencyCareId: string | null;
   phone: string | null;
+  pinHash: string | null;
 }
 
 export class MemberLoader {
@@ -39,6 +40,7 @@ export class MemberLoader {
       guardianId: member.guardianId,
       dependencyCareId: member.dependencyCareId,
       phone: member.phone,
+      pinHash: member.pinHash,
     };
     this.store.write(member.id, record);
   }
@@ -67,6 +69,7 @@ export class MemberLoader {
     m.guardianId = r.guardianId;
     m.dependencyCareId = r.dependencyCareId;
     m.phone = r.phone;
+    m.pinHash = r.pinHash ?? null;
     return m;
   }
 }

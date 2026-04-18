@@ -17,7 +17,7 @@ export class Member implements IAccountOwner {
     guardianId: string | null;
     dependencyCareId: string | null;
     phone: string | null;        // E.164, e.g. "+15551234567". null if no phone.
-
+    pinHash: string | null;      // SHA-256 hex of PIN. null until set.
     constructor(
         firstName: string,
         lastName: string,
@@ -39,6 +39,7 @@ export class Member implements IAccountOwner {
         this.guardianId = null;
         this.dependencyCareId = null;
         this.phone = null;
+        this.pinHash = null;
     }
 
     getId(): string { return this.id; }
