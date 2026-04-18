@@ -1,9 +1,11 @@
 import { Account } from "./Account.js";
 import { FileStore } from "../storage/FileStore.js";
+import { OwnerType } from "../IAccountOwner.js";
 
 interface AccountRecord {
   id: string;
   ownerId: string;
+  ownerType: OwnerType;
   label: string;
   credits: number;
   foodVouchers: number;
@@ -24,6 +26,7 @@ export class AccountLoader {
     const record: AccountRecord = {
       id: account.id,
       ownerId: account.ownerId,
+      ownerType: account.ownerType,
       label: account.label,
       credits: account.credits,
       foodVouchers: account.foodVouchers,
@@ -40,8 +43,7 @@ export class AccountLoader {
   }
 
   private fromRecord(r: AccountRecord): Account {
-    // Construct with a dummy owner stub — ownerId is restored directly.
-    const stub = { getId: () => r.ownerId };
+    const stub = { getId: () => r.ownerId, ownerType: r.ownerType };
     const account = new Account(stub, r.label, r.allowNegativeCredits, r.exemptFromDemurrage);
     const a = account as unknown as Record<string, unknown>;
     a["id"] = r.id;

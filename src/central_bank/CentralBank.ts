@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner } from "../IAccountOwner.js";
+import { IAccountOwner, OwnerType } from "../IAccountOwner.js";
 import { Bank } from "../bank/Bank.js";
 import { MemberEndowmentProfile } from "./MemberEndowmentProfile.js";
 import { EndowmentProfileLoader } from "./EndowmentProfileLoader.js";
@@ -15,6 +15,7 @@ export class CentralBank implements IAccountOwner {
     private static instance: CentralBank;
 
     readonly id: string;
+    readonly ownerType: OwnerType = "central_bank";
 
     /** One profile per member, keyed by memberId. */
     private profiles: Map<string, MemberEndowmentProfile> = new Map();

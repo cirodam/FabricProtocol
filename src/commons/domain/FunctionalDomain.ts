@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner } from "../../IAccountOwner.js";
+import { IAccountOwner, OwnerType } from "../../IAccountOwner.js";
 import { Bank } from "../../bank/Bank.js";
 import { FunctionalUnit } from "./FunctionalUnit.js";
 
@@ -9,6 +9,7 @@ import { FunctionalUnit } from "./FunctionalUnit.js";
 // do the actual work (a mill, a clinic, a grain store, a community kitchen).
 export abstract class FunctionalDomain implements IAccountOwner {
     readonly id: string;
+    readonly ownerType: OwnerType = "domain";
     readonly name: string;
     readonly description: string;
 

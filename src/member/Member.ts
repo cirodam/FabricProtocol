@@ -1,10 +1,11 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner } from "../IAccountOwner.js";
+import { IAccountOwner, OwnerType } from "../IAccountOwner.js";
 import { MemberType } from "../domains/food/NutritionalProfile.js";
 
 export class Member implements IAccountOwner {
 
     readonly id: string;
+    readonly ownerType: OwnerType = "member";
     firstName: string;
     lastName: string;
     birthDate: Date;

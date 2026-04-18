@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner } from "../../IAccountOwner.js";
+import { IAccountOwner, OwnerType } from "../../IAccountOwner.js";
 import { Bank } from "../../bank/Bank.js";
 import { CommunityRole } from "../CommunityRole.js";
 
@@ -14,6 +14,7 @@ import { CommunityRole } from "../CommunityRole.js";
  */
 export abstract class FunctionalUnit implements IAccountOwner {
     readonly id: string;
+    readonly ownerType: OwnerType = "unit";
     readonly name: string;
     readonly description: string;
 

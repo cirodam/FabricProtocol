@@ -2,12 +2,14 @@ import { Request, Response } from "express";
 import { Marketplace } from "../../marketplace/Marketplace.js";
 import { Post, PostSide, PostType, PricingUnit } from "../../marketplace/Post.js";
 import { TraderProfile } from "../../marketplace/TraderProfile.js";
+import { OwnerType } from "../../IAccountOwner.js";
 
 const market = () => Marketplace.getInstance();
 
-const POST_TYPES:  PostType[]  = ["item", "service"];
-const POST_SIDES:  PostSide[]  = ["offer", "request"];
+const POST_TYPES:    PostType[]    = ["item", "service"];
+const POST_SIDES:    PostSide[]    = ["offer", "request"];
 const PRICING_UNITS: PricingUnit[] = ["per_hour", "in_total"];
+const OWNER_TYPES:   OwnerType[]   = ["member", "commons", "domain", "unit", "central_bank"];
 
 // GET /posts?type=&side=&category=
 export function listPosts(req: Request, res: Response): void {
@@ -124,9 +126,9 @@ export function getTrader(req: Request, res: Response): void {
 }
 
 // POST /traders
-// Body: { displayName, handle, accountId }
+// Body: { displayName, handle, ownerId, ownerType }
 export function registerTrader(req: Request, res: Response): void {
-    const { displayName, handle, accountId } = req.body ?? {};
+    const { displayName, handle, ownerId, ownerType } = req.body ?? {};
 
     if (typeof displayName !== "string" || !displayName) {
         res.status(400).json({ error: "displayName is required" }); return;
@@ -134,12 +136,15 @@ export function registerTrader(req: Request, res: Response): void {
     if (typeof handle !== "string" || !handle) {
         res.status(400).json({ error: "handle is required" }); return;
     }
-    if (typeof accountId !== "string" || !accountId) {
-        res.status(400).json({ error: "accountId is required" }); return;
+    if (typeof ownerId !== "string" || !ownerId) {
+        res.status(400).json({ error: "ownerId is required" }); return;
+    }
+    if (!OWNER_TYPES.includes(ownerType)) {
+        res.status(400).json({ error: `ownerType must be one of: ${OWNER_TYPES.join(", ")}` }); return;
     }
 
     try {
-        const profile = new TraderProfile(displayName, handle, accountId);
+        const profile = new TraderProfile(displayName, handle, ownerId, ownerType as OwnerType);
         market().registerTrader(profile);
         res.status(201).json(toTraderDto(profile));
     } catch (err) {
@@ -168,7 +173,8 @@ function toTraderDto(t: TraderProfile) {
         id:           t.id,
         displayName:  t.displayName,
         handle:       t.handle,
-        accountId:    t.accountId,
+        ownerId:      t.ownerId,
+        ownerType:    t.ownerType,
         registeredAt: t.registeredAt,
     };
 }

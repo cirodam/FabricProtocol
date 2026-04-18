@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { IAccountOwner } from "../IAccountOwner.js";
+import { IAccountOwner, OwnerType } from "../IAccountOwner.js";
 import { Bank } from "../bank/Bank.js";
 import { Asset } from "../Asset.js";
 import { CommunityRole } from "./CommunityRole.js";
@@ -14,6 +14,7 @@ export class Commons implements IAccountOwner {
     private static instance: Commons;
 
     readonly id: string;
+    readonly ownerType: OwnerType = "commons";
 
     private positions: CommunityRole[] = [];
     private domains: FunctionalDomain[] = [];
