@@ -56,10 +56,10 @@ export class CentralBank implements IAccountOwner {
     }
 
     /** Total credits that could not be reclaimed on member exit (recovered gradually via demurrage). */
-    get totalShortfall(): number {
+    get unrecoveredCredits(): number {
         let total = 0;
         for (const profile of this.profiles.values()) {
-            total += profile.shortfall;
+            total += profile.unrecoveredCredits;
         }
         return total;
     }
@@ -109,7 +109,7 @@ export class CentralBank implements IAccountOwner {
         if (reclaim > 0 && memberAccount && bankAccount) {
             bankInst.transfer(memberAccount.id, bankAccount.id, "credits", reclaim, "endowment reclaim on exit");
         }
-        profile.shortfall = profile.endowment - reclaim;
+        profile.unrecoveredCredits = profile.endowment - reclaim;
         profile.departed = true;
         this.profileLoader?.save(profile);
     }

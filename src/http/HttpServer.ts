@@ -1,67 +1,72 @@
 
+import express, { Application } from "express";
+import { Server } from "http";
+import { MemberService } from "../member/MemberService.js";
+import { CentralBank } from "../central_bank/CentralBank.js";
+import memberRoutes from "./routes/memberRoutes.js";
+import bankRoutes from "./routes/bankRoutes.js";
+import centralBankRoutes from "./routes/centralBankRoutes.js";
+import marketplaceRoutes from "./routes/marketplaceRoutes.js";
 
 /**
  * HTTP REST API server.
  * Provides a JSON interface for the web portal and admin tools.
  *
- * Requires: npm install express @types/express
+ * Mounted routes:
+ *   GET    /status                            — community summary
+ *   GET    /money-supply                      — credits in circulation
  *
- * Planned routes:
+ *   GET    /members                           — list all members
+ *   GET    /members/:id                       — get member by ID
+ *   POST   /members                           — register new member
+ *   PATCH  /members/:id                       — update member fields
  *
- *   GET  /status                  — community summary (member count, money in circulation)
+ *   GET    /accounts/:ownerId                 — all accounts for an owner
+ *   GET    /accounts/:accountId/transactions  — transaction history (?month=YYYY-MM)
+ *   POST   /transfers                         — transfer between accounts
  *
- *   GET  /members                 — list all members
- *   GET  /members/:id             — get member by ID
- *   POST /members                 — register new member (admin)
+ *   GET    /marketplace/posts                 — list posts (?type=&side=&category=)
+ *   POST   /marketplace/posts                 — create post
+ *   POST   /marketplace/posts/fulfill         — settle a trade
+ *   GET    /marketplace/posts/:id             — get post by ID
+ *   DELETE /marketplace/posts/:id             — remove post
+ *   GET    /marketplace/traders               — list traders
+ *   POST   /marketplace/traders               — register trader
+ *   GET    /marketplace/traders/:id           — get trader by ID
  *
- *   GET  /accounts/:ownerId       — get accounts for owner
- *   GET  /accounts/:id/transactions — transaction history
- *
- *   POST /transfers               — create a transfer { from, to, amount, currency, memo }
- *
- *   GET  /marketplace/posts       — list active posts (?type=&side=&category=)
- *   POST /marketplace/posts       — create a post
- *   DELETE /marketplace/posts/:id — remove a post
- *   POST /marketplace/fulfill     — fulfill a trade { offerId, requestId, quantity? }
- *
- *   GET  /marketplace/traders     — list trader profiles
- *   POST /marketplace/traders     — register a trader profile
- *
- * All write endpoints require authentication (PIN + session token — TODO).
+ * All write endpoints require authentication (TODO: PIN + session token).
  */
 export class HttpServer {
-  // TODO: replace with: import express, { Request, Response } from "express";
-  private app: unknown = null;
+    private app: Application;
+    private server: Server | null = null;
 
-  constructor(private readonly port: number = 3000) {}
+    constructor(private readonly port: number = 3000) {
+        this.app = express();
+        this.app.use(express.json());
+        this.registerRoutes();
+    }
 
-  start(): void {
-    // TODO:
-    // this.app = express();
-    // this.app.use(express.json());
-    //
-    // this.app.get("/status", (_req, res) => {
-    //   const memberService = MemberService.getInstance();
-    //   const bank = CentralBank.getInstance();
-    //   res.json({
-    //     members: memberService.count(),
-    //     moneyInCirculation: bank.moneyInCirculation,
-    //   });
-    // });
-    //
-    // this.app.get("/members", (_req, res) => {
-    //   res.json(MemberService.getInstance().getAll());
-    // });
-    //
-    // ... (see planned routes above)
-    //
-    // this.app.listen(this.port, () =>
-    //   console.log(`[http] API listening on port ${this.port}`)
-    // );
-    console.log(`[http] TODO: start REST API on port ${this.port}`);
-  }
+    private registerRoutes(): void {
+        this.app.get("/status", (_req, res) => {
+            res.json({
+                members: MemberService.getInstance().count(),
+                moneyInCirculation: CentralBank.getInstance().moneyInCirculation,
+            });
+        });
 
-  stop(): void {
-    // TODO: close server
-  }
+        this.app.use("/members", memberRoutes);
+        this.app.use("/", bankRoutes);
+        this.app.use("/", centralBankRoutes);
+        this.app.use("/marketplace", marketplaceRoutes);
+    }
+
+    start(): void {
+        this.server = this.app.listen(this.port, () => {
+            console.log(`[http] API listening on port ${this.port}`);
+        });
+    }
+
+    stop(): void {
+        this.server?.close();
+    }
 }

@@ -11,7 +11,7 @@ export class MemberEndowmentProfile {
     endowment: number;
 
     /** Set on member exit: credits that could not be reclaimed (left in circulation). */
-    shortfall: number;
+    unrecoveredCredits: number;
 
     /** True once the member has departed or died. */
     departed: boolean;
@@ -19,7 +19,7 @@ export class MemberEndowmentProfile {
     constructor(memberId: string) {
         this.memberId = memberId;
         this.endowment = 0;
-        this.shortfall = 0;
+        this.unrecoveredCredits = 0;
         this.departed = false;
     }
 }
