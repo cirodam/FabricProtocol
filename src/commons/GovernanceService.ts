@@ -1,7 +1,7 @@
 import { Proposal, ProposalStatus, VoteThreshold } from "./Proposal.js";
 import { Constitution } from "./Constitution.js";
 import { Commons } from "./Commons.js";
-import { Position } from "./Position.js";
+import { CommunityRole } from "./CommunityRole.js";
 import { MemberService } from "../member/MemberService.js";
 
 export class GovernanceService {
@@ -61,7 +61,7 @@ export class GovernanceService {
     }
 
     // Elect a member to a position — requires a passed proposal
-    electToPosition(position: Position, memberId: string, proposalId: string): void {
+    electToPosition(position: CommunityRole, memberId: string, proposalId: string): void {
         const proposal = this.proposals.get(proposalId);
         if (!proposal || proposal.status !== ProposalStatus.PASSED) {
             throw new Error(`A passed proposal is required to elect a member to a position`);
@@ -71,7 +71,7 @@ export class GovernanceService {
     }
 
     // Fund a position at a given monthly rate — requires a passed proposal
-    fundPosition(position: Position, creditsPerMonth: number, proposalId: string): void {
+    fundPosition(position: CommunityRole, creditsPerMonth: number, proposalId: string): void {
         const proposal = this.proposals.get(proposalId);
         if (!proposal || proposal.status !== ProposalStatus.PASSED) {
             throw new Error(`A passed proposal is required to fund a position`);
@@ -81,7 +81,7 @@ export class GovernanceService {
     }
 
     // Defund a position — requires a passed proposal
-    defundPosition(position: Position, proposalId: string): void {
+    defundPosition(position: CommunityRole, proposalId: string): void {
         const proposal = this.proposals.get(proposalId);
         if (!proposal || proposal.status !== ProposalStatus.PASSED) {
             throw new Error(`A passed proposal is required to defund a position`);

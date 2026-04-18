@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { IAccountOwner } from "../IAccountOwner.js";
 import { Bank } from "../bank/Bank.js";
 import { Asset } from "../Asset.js";
-import { Position } from "./Position.js";
+import { CommunityRole } from "./CommunityRole.js";
 import { FunctionalDomain } from "./domain/FunctionalDomain.js";
 import { LedgerService } from "../ledger/LedgerService.js";
 import { AssetLedger } from "../ledger/AssetLedger.js";
@@ -15,7 +15,7 @@ export class Commons implements IAccountOwner {
 
     readonly id: string;
 
-    private positions: Position[] = [];
+    private positions: CommunityRole[] = [];
     private domains: FunctionalDomain[] = [];
     readonly ledger: AssetLedger;
 
@@ -42,11 +42,11 @@ export class Commons implements IAccountOwner {
         return this.ledger.getAll();
     }
 
-    addPosition(position: Position): void {
+    addPosition(position: CommunityRole): void {
         this.positions.push(position);
     }
 
-    getPositions(): Position[] {
+    getPositions(): CommunityRole[] {
         return this.positions;
     }
 

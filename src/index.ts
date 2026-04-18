@@ -3,7 +3,7 @@ import { CentralBank } from "./central_bank/CentralBank.js";
 import { MemberService } from "./member/MemberService.js";
 import { Member } from "./member/Member.js";
 import { Commons } from "./commons/Commons.js";
-import { Position } from "./commons/Position.js";
+import { CommunityRole } from "./commons/CommunityRole.js";
 
 
 const community = Community.getInstance();
@@ -11,7 +11,7 @@ const bank = CentralBank.getInstance();
 const memberService = MemberService.getInstance();
 const commons = Commons.getInstance();
 
-commons.addPosition(new Position("Medical Officer"));
+commons.addPosition(new CommunityRole("Medical Officer"));
 
 const seedMembers = [
   new Member("Alice", "Flores", new Date("1985-03-12")),

@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 
-export class Position {
+export class CommunityRole {
     readonly id: string;
     title: string;
     description: string;

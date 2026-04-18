@@ -25,10 +25,6 @@ export class PayrollService {
         // Pay Commons-level positions (governance officers, etc.)
         this.payPositions(commons.getPositions(), commons.id, bankInst);
 
-        // Pay positions in each registered functional domain
-        for (const domain of commons.getDomains()) {
-            this.payPositions(domain.getPositions(), domain.id, bankInst);
-        }
     }
 
     private payPositions(
