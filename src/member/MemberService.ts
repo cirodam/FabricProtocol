@@ -6,8 +6,6 @@ import { Commons } from "../commons/Commons.js";
 import { Bank } from "../bank/Bank.js";
 import { createHash } from "crypto";
 
-export type ExitReason = "DEPARTURE" | "DEATH";
-
 export class MemberService {
   private static instance: MemberService;
 
@@ -37,6 +35,8 @@ export class MemberService {
   add(member: Member): void {
     this.members.set(member.id, member);
     Bank.getInstance().openAccount(member, "primary");
+    const endowment = Math.round(CentralBank.BASE_ENDOWMENT * member.trustScore);
+    CentralBank.getInstance().issueEndowment(member, endowment);
     this.loader?.save(member);
   }
 
@@ -51,11 +51,6 @@ export class MemberService {
 
   getByPhone(phone: string): Member | undefined {
     return Array.from(this.members.values()).find(m => m.phone === phone);
-  }
-
-  remove(id: string): boolean {
-    this.loader?.delete(id);
-    return this.members.delete(id);
   }
 
   getAll(): Member[] {
@@ -119,12 +114,12 @@ export class MemberService {
   }
 
   /**
-   * Discharge a member on departure or death.
+   * Discharge a member.
    * 1. Balance up to the endowment amount → returned to CentralBank
    * 2. Any surplus above the endowment → transferred to Commons
-   * 3. Member removed from the active roster
+   * 3. Member and accounts removed
    */
-  discharge(member: Member, reason: ExitReason): void {
+  discharge(member: Member): void {
     const bankInst = Bank.getInstance();
     const centralBank = CentralBank.getInstance();
     const commons = Commons.getInstance();
@@ -138,15 +133,16 @@ export class MemberService {
     if (memberAccount && memberAccount.credits > 0) {
       const toBank = Math.min(memberAccount.credits, endowment);
       if (toBank > 0 && bankAccount) {
-        bankInst.transfer(memberAccount.id, bankAccount.id, "credits", toBank, `endowment reclaim on ${reason.toLowerCase()}`);
+        bankInst.transfer(memberAccount.id, bankAccount.id, "credits", toBank, "endowment reclaim");
       }
       const surplus = memberAccount.credits;
       if (surplus > 0 && commonsAccount) {
-        bankInst.transfer(memberAccount.id, commonsAccount.id, "credits", surplus, `exit surplus on ${reason.toLowerCase()}`);
+        bankInst.transfer(memberAccount.id, commonsAccount.id, "credits", surplus, "exit surplus");
       }
     }
 
     this.loader?.delete(member.getId());
     this.members.delete(member.getId());
+    Bank.getInstance().closeAccounts(member.getId());
   }
 }

@@ -42,6 +42,10 @@ export class AccountLoader {
     return this.store.readAll<AccountRecord>().map(r => this.fromRecord(r));
   }
 
+  delete(accountId: string): boolean {
+    return this.store.delete(accountId);
+  }
+
   private fromRecord(r: AccountRecord): Account {
     const stub = { getId: () => r.ownerId, ownerType: r.ownerType };
     const account = new Account(stub, r.label, r.allowNegativeCredits, r.exemptFromDemurrage);

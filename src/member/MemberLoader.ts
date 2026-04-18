@@ -1,5 +1,4 @@
 import { Member } from "./Member.js";
-import { MemberType } from "../domains/food/NutritionalProfile.js";
 import { FileStore } from "../storage/FileStore.js";
 
 /** Shape of a Member record on disk. All Dates stored as ISO strings. */
@@ -9,12 +8,10 @@ interface MemberRecord {
   lastName: string;
   birthDate: string;
   joinDate: string;
-  memberType: MemberType;
   physicalCapacity: number;
   cognitiveCapacity: number;
   trustScore: number;
   guardianId: string | null;
-  dependencyCareId: string | null;
   phone: string | null;
   pinHash: string | null;
 }
@@ -33,12 +30,10 @@ export class MemberLoader {
       lastName: member.lastName,
       birthDate: member.birthDate.toISOString(),
       joinDate: member.joinDate.toISOString(),
-      memberType: member.memberType,
       physicalCapacity: member.physicalCapacity,
       cognitiveCapacity: member.cognitiveCapacity,
       trustScore: member.trustScore,
       guardianId: member.guardianId,
-      dependencyCareId: member.dependencyCareId,
       phone: member.phone,
       pinHash: member.pinHash,
     };
@@ -58,16 +53,14 @@ export class MemberLoader {
       r.firstName,
       r.lastName,
       new Date(r.birthDate),
-      r.memberType,
       r.physicalCapacity,
       r.cognitiveCapacity,
-      r.trustScore
     );
     // Restore persisted identity fields — bypass readonly via cast
     (m as unknown as Record<string, unknown>)["id"] = r.id;
     (m as unknown as Record<string, unknown>)["joinDate"] = new Date(r.joinDate);
+    m.trustScore = r.trustScore;
     m.guardianId = r.guardianId;
-    m.dependencyCareId = r.dependencyCareId;
     m.phone = r.phone;
     m.pinHash = r.pinHash ?? null;
     return m;

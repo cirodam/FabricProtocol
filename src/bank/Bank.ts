@@ -71,6 +71,16 @@ export class Bank {
         return Array.from(this.accounts.values());
     }
 
+    /** Close all accounts for an owner. Accounts must have zero balances. */
+    closeAccounts(ownerId: string): void {
+        const ids = this.ownerIndex.get(ownerId) ?? [];
+        for (const id of ids) {
+            this.accounts.delete(id);
+            this.accountLoader?.delete(id);
+        }
+        this.ownerIndex.delete(ownerId);
+    }
+
     // --- Transfers ---
 
     transfer(

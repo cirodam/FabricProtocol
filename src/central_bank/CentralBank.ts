@@ -14,6 +14,9 @@ import { EndowmentProfileLoader } from "./EndowmentProfileLoader.js";
 export class CentralBank implements IAccountOwner {
     private static instance: CentralBank;
 
+    /** Base endowment issued to a fully-trusted member (trustScore = 1.0). */
+    static readonly BASE_ENDOWMENT = 1000;
+
     readonly id: string;
     readonly ownerType: OwnerType = "central_bank";
 

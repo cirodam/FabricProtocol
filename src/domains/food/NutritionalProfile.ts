@@ -5,6 +5,15 @@ export enum MemberType {
     INFANT = "INFANT",     // under ~2 years
 }
 
+/** Derive MemberType from a birthDate at the time of the call. */
+export function getMemberType(birthDate: Date): MemberType {
+    const ageYears = (Date.now() - birthDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
+    if (ageYears < 2)  return MemberType.INFANT;
+    if (ageYears < 13) return MemberType.CHILD;
+    if (ageYears >= 65) return MemberType.ELDERLY;
+    return MemberType.ADULT;
+}
+
 export interface NutritionalProfile {
     calories: number;      // kcal
     proteinG: number;      // grams

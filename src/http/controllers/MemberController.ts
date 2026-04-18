@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { Member } from "../../member/Member.js";
 import { MemberService } from "../../member/MemberService.js";
-import { MemberType } from "../../domains/food/NutritionalProfile.js";
 
 const service = () => MemberService.getInstance();
 
@@ -22,9 +21,9 @@ export function getMember(req: Request, res: Response): void {
 }
 
 // POST /members
-// Body: { firstName, lastName, birthDate, memberType?, phone? }
+// Body: { firstName, lastName, birthDate, physicalCapacity, cognitiveCapacity, guardianId?, phone? }
 export function createMember(req: Request, res: Response): void {
-    const { firstName, lastName, birthDate, memberType, phone } = req.body ?? {};
+    const { firstName, lastName, birthDate, physicalCapacity, cognitiveCapacity, guardianId, phone } = req.body ?? {};
 
     if (typeof firstName !== "string" || !firstName.trim()) {
         res.status(400).json({ error: "firstName is required" });
@@ -38,8 +37,16 @@ export function createMember(req: Request, res: Response): void {
         res.status(400).json({ error: "birthDate must be a valid ISO date string" });
         return;
     }
-    if (memberType !== undefined && !Object.values(MemberType).includes(memberType)) {
-        res.status(400).json({ error: `memberType must be one of: ${Object.values(MemberType).join(", ")}` });
+    if (typeof physicalCapacity !== "number" || physicalCapacity < 0 || physicalCapacity > 1) {
+        res.status(400).json({ error: "physicalCapacity must be a number between 0 and 1" });
+        return;
+    }
+    if (typeof cognitiveCapacity !== "number" || cognitiveCapacity < 0 || cognitiveCapacity > 1) {
+        res.status(400).json({ error: "cognitiveCapacity must be a number between 0 and 1" });
+        return;
+    }
+    if (guardianId !== undefined && typeof guardianId !== "string") {
+        res.status(400).json({ error: "guardianId must be a string" });
         return;
     }
     if (phone !== undefined && typeof phone !== "string") {
@@ -51,8 +58,10 @@ export function createMember(req: Request, res: Response): void {
         firstName.trim(),
         lastName.trim(),
         new Date(birthDate),
-        memberType ?? MemberType.ADULT,
+        physicalCapacity,
+        cognitiveCapacity,
     );
+    if (guardianId) member.guardianId = guardianId;
     if (phone) member.phone = phone;
 
     service().add(member);
@@ -124,7 +133,18 @@ function toDto(m: Member) {
         physicalCapacity:   m.physicalCapacity,
         cognitiveCapacity:  m.cognitiveCapacity,
         guardianId:         m.guardianId,
-        dependencyCareId:   m.dependencyCareId,
         phone:              m.phone,
     };
+}
+
+// DELETE /members/:id
+export function deleteMember(req: Request, res: Response): void {
+    const member = service().get(req.params.id as string);
+    if (!member) {
+        res.status(404).json({ error: "Member not found" });
+        return;
+    }
+
+    service().discharge(member);
+    res.status(204).end();
 }
