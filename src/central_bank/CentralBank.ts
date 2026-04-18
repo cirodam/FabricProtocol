@@ -30,6 +30,7 @@ export class CentralBank implements IAccountOwner {
         return CentralBank.instance;
     }
 
+    /** Returns the unique identifier for this account owner. */
     getId(): string { return this.id; }
 
     /** Total credits currently in circulation (sum of active endowments). */
@@ -50,6 +51,7 @@ export class CentralBank implements IAccountOwner {
         return total;
     }
 
+    /** Returns the endowment profile for a given member, or undefined if none exists. */
     getProfile(memberId: string): MemberEndowmentProfile | undefined {
         return this.profiles.get(memberId);
     }
@@ -97,8 +99,13 @@ export class CentralBank implements IAccountOwner {
         profile.departed = true;
     }
 
-    // Collect bank recovery demurrage from all non-exempt accounts.
-    // Only runs when money is in circulation (i.e. the bank account is negative).
+    /**
+     * Collect demurrage from all non-exempt accounts and return it to the bank.
+     * Demurrage is assessed as a percentage of each account's current balance.
+     * Only runs when money is in circulation (i.e. the bank account is negative).
+     * This is the mechanism by which the money supply gradually contracts after
+     * member exits result in shortfalls.
+     */
     assessDemurrage(rate: number): void {
         if (this.moneyInCirculation <= 0) return;
 

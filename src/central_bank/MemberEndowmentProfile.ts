@@ -1,3 +1,9 @@
+/**
+ * Tracks the monetary relationship between the CentralBank and a single member.
+ * The endowment is money issued to the member on joining — a grant, not a loan.
+ * On exit, up to the endowment amount is reclaimed; any shortfall is left as a
+ * negative bank balance and recovered gradually through demurrage.
+ */
 export class MemberEndowmentProfile {
     readonly memberId: string;
 
