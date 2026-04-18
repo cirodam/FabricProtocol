@@ -1,6 +1,6 @@
 import { Member } from "./Member.js";
 import { MemberLoader } from "./MemberLoader.js";
-import { DEFAULT_NUTRITIONAL_PROFILES, NutritionalProfile } from "../food/NutritionalProfile.js";
+import { DEFAULT_NUTRITIONAL_PROFILES, NutritionalProfile } from "../domains/food/NutritionalProfile.js";
 import { CentralBank } from "../central_bank/CentralBank.js";
 import { Commons } from "../commons/Commons.js";
 import { Bank } from "../bank/Bank.js";

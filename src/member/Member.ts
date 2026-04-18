@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { IAccountOwner } from "../IAccountOwner.js";
-import { MemberType } from "../food/NutritionalProfile.js";
+import { MemberType } from "../domains/food/NutritionalProfile.js";
 
 export class Member implements IAccountOwner {
 

@@ -1,5 +1,5 @@
 import { Member } from "./Member.js";
-import { MemberType } from "../food/NutritionalProfile.js";
+import { MemberType } from "../domains/food/NutritionalProfile.js";
 import { FileStore } from "../storage/FileStore.js";
 
 /** Shape of a Member record on disk. All Dates stored as ISO strings. */
