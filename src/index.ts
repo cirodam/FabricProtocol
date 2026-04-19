@@ -8,6 +8,8 @@ import { TransactionLoader } from "./bank/TransactionLoader.js";
 import { MemberEndowmentLoader } from "./central_bank/MemberEndowmentLoader.js";
 import { Marketplace } from "./marketplace/Marketplace.js";
 import { PostLoader } from "./marketplace/PostLoader.js";
+import { GroupService } from "./group/GroupService.js";
+import { GroupLoader } from "./group/GroupLoader.js";
 import { Scheduler, every } from "./scheduler/Scheduler.js";
 import { PayrollService } from "./commons/PayrollService.js";
 import { HttpServer } from "./http/HttpServer.js";
@@ -26,6 +28,7 @@ async function init(): Promise<void> {
   Marketplace.getInstance().init(
     new PostLoader("data/posts")
   );
+  GroupService.getInstance().init(new GroupLoader("data/groups"));
 
   // ── Scheduler ────────────────────────────────────────────────────────────────
   const scheduler = new Scheduler("data/scheduler");
