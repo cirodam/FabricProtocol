@@ -1,6 +1,10 @@
 
 import express, { Application } from "express";
 import { Server } from "http";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 import { MemberService } from "../member/MemberService.js";
 import { CentralBank } from "../central_bank/CentralBank.js";
 import memberRoutes from "./routes/memberRoutes.js";
@@ -52,18 +56,25 @@ export class HttpServer {
     }
 
     private registerRoutes(): void {
-        this.app.get("/status", (_req, res) => {
+        this.app.get("/api/status", (_req, res) => {
             res.json({
                 members: MemberService.getInstance().count(),
                 moneyInCirculation: CentralBank.getInstance().moneyInCirculation,
             });
         });
 
-        this.app.use("/members", memberRoutes);
-        this.app.use("/", bankRoutes);
-        this.app.use("/", centralBankRoutes);
-        this.app.use("/marketplace", marketplaceRoutes);
-        this.app.use("/node", networkRoutes);
+        this.app.use("/api/members", memberRoutes);
+        this.app.use("/api", bankRoutes);
+        this.app.use("/api", centralBankRoutes);
+        this.app.use("/api/marketplace", marketplaceRoutes);
+        this.app.use("/api/node", networkRoutes);
+
+        // Serve the Svelte frontend (production build)
+        const frontendDist = join(__dirname, "../../frontend/dist");
+        this.app.use(express.static(frontendDist));
+        this.app.get("*splat", (_req, res) => {
+            res.sendFile(join(frontendDist, "index.html"));
+        });
     }
 
     start(): void {
