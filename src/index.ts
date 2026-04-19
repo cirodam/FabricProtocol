@@ -1,4 +1,5 @@
 import { Community } from "./Community.js";
+import { Commons } from "./commons/Commons.js";
 import { CentralBank } from "./central_bank/CentralBank.js";
 import { MemberService } from "./member/MemberService.js";
 import { MemberLoader } from "./member/MemberLoader.js";
@@ -11,7 +12,6 @@ import { PostLoader } from "./marketplace/PostLoader.js";
 import { GroupService } from "./group/GroupService.js";
 import { GroupLoader } from "./group/GroupLoader.js";
 import { Scheduler, every } from "./scheduler/Scheduler.js";
-import { PayrollService } from "./commons/PayrollService.js";
 import { HttpServer } from "./http/HttpServer.js";
 import { NodeService } from "./network/NodeService.js";
 import { type NodeType } from "./network/NodeIdentity.js";
@@ -46,7 +46,7 @@ async function init(): Promise<void> {
   scheduler.register({
     name: "payroll",
     intervalMs: every.months(1),
-    run: () => PayrollService.getInstance().payMonthly(),
+    run: () => Commons.getInstance().payMonthly(),
   });
 
   await scheduler.start();

@@ -2,9 +2,11 @@ import { randomUUID } from "crypto";
 import { IEconomicActor } from "../../IEconomicActor.js";
 import { Bank } from "../../bank/Bank.js";
 import { FunctionalUnit } from "./FunctionalUnit.js";
+import { CommunityRole } from "../CommunityRole.js";
 
 // Base class for all functional domains (Food, Healthcare, Childcare, etc.).
 // Each domain has its own Bank account, funded by the Commons via fundDomain().
+// The domain is responsible for paying its own role-holders and those of its units.
 // Domains may contain one or more FunctionalUnits — the operational bodies that
 // do the actual work (a mill, a clinic, a grain store, a community kitchen).
 export abstract class FunctionalDomain implements IEconomicActor {
@@ -12,6 +14,7 @@ export abstract class FunctionalDomain implements IEconomicActor {
     readonly name: string;
     readonly description: string;
 
+    private roles: CommunityRole[] = [];
     private units: FunctionalUnit[] = [];
 
     constructor(name: string, description: string = "") {
@@ -25,6 +28,34 @@ export abstract class FunctionalDomain implements IEconomicActor {
     getDisplayName(): string { return this.name; }
     getHandle(): string { return this.name.toLowerCase().replace(/[^a-z0-9_]/g, "_"); }
 
+    addRole(role: CommunityRole): void { this.roles.push(role); }
+    getRoles(): CommunityRole[] { return this.roles; }
+
     addUnit(unit: FunctionalUnit): void { this.units.push(unit); }
     getUnits(): FunctionalUnit[] { return this.units; }
+
+    // Pay domain-level roles from this domain's account, then delegate to each unit.
+    payMonthly(): void {
+        const bankInst = Bank.getInstance();
+        const payerAccount = bankInst.getPrimaryAccount(this.id);
+        if (!payerAccount) return;
+        for (const role of this.roles) {
+            if (!role.isActive()) continue;
+            const amount = Math.round(role.creditsPerMonth * 100) / 100;
+            if (amount <= 0) continue;
+            if (payerAccount.credits < amount) {
+                console.warn(`Domain "${this.name}" cannot afford payroll for "${role.title}" (needs ${amount}, has ${payerAccount.credits})`);
+                continue;
+            }
+            const memberAccount = bankInst.getPrimaryAccount(role.memberId!);
+            if (!memberAccount) {
+                console.warn(`No primary account for role holder ${role.memberId} ("${role.title}")`);
+                continue;
+            }
+            bankInst.transfer(payerAccount.id, memberAccount.id, "credits", amount, `payroll: ${role.title}`);
+        }
+        for (const unit of this.units) {
+            unit.payMonthly(bankInst);
+        }
+    }
 }

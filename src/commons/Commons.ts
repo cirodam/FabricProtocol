@@ -77,6 +77,32 @@ export class Commons implements IEconomicActor {
         }
     }
 
+    // Pay Commons-level roles, then delegate payroll to each registered domain.
+    payMonthly(): void {
+        const bankInst = Bank.getInstance();
+        const payerAccount = bankInst.getPrimaryAccount(this.id);
+        if (payerAccount) {
+            for (const position of this.positions) {
+                if (!position.isActive()) continue;
+                const amount = Math.round(position.creditsPerMonth * 100) / 100;
+                if (amount <= 0) continue;
+                if (payerAccount.credits < amount) {
+                    console.warn(`Commons cannot afford payroll for "${position.title}" (needs ${amount}, has ${payerAccount.credits})`);
+                    continue;
+                }
+                const memberAccount = bankInst.getPrimaryAccount(position.memberId!);
+                if (!memberAccount) {
+                    console.warn(`No primary account for position holder ${position.memberId} ("${position.title}")`);
+                    continue;
+                }
+                bankInst.transfer(payerAccount.id, memberAccount.id, "credits", amount, `payroll: ${position.title}`);
+            }
+        }
+        for (const domain of this.domains) {
+            domain.payMonthly();
+        }
+    }
+
     // Collect demurrage from all non-exempt accounts into the Commons primary account.
     // Always runs — commons levy is unconditional.
     assessDemurrage(rate: number): void {

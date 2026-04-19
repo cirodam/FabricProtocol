@@ -37,4 +37,25 @@ export abstract class FunctionalUnit implements IEconomicActor {
     addMember(memberId: string): void { this.memberIds.add(memberId); }
     removeMember(memberId: string): void { this.memberIds.delete(memberId); }
     getMembers(): string[] { return Array.from(this.memberIds); }
+
+    // Pay all active roles from this unit's account.
+    payMonthly(bankInst: Bank): void {
+        const payerAccount = bankInst.getPrimaryAccount(this.id);
+        if (!payerAccount) return;
+        for (const role of this.roles) {
+            if (!role.isActive()) continue;
+            const amount = Math.round(role.creditsPerMonth * 100) / 100;
+            if (amount <= 0) continue;
+            if (payerAccount.credits < amount) {
+                console.warn(`Unit "${this.name}" cannot afford payroll for "${role.title}" (needs ${amount}, has ${payerAccount.credits})`);
+                continue;
+            }
+            const memberAccount = bankInst.getPrimaryAccount(role.memberId!);
+            if (!memberAccount) {
+                console.warn(`No primary account for role holder ${role.memberId} ("${role.title}")`);
+                continue;
+            }
+            bankInst.transfer(payerAccount.id, memberAccount.id, "credits", amount, `payroll: ${role.title}`);
+        }
+    }
 }
