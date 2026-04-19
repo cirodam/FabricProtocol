@@ -34,15 +34,31 @@ The federation server warrants better hardware than a community Pi — it is ser
 
 ## Federation currency
 
+### The kWh anchor
+
+All trade settlement above the community level — between communities within a federation, and between federations — is denominated in **FEC (Federation Exchange Credits), where 1 FEC = 1 kWh of verified energy production**.
+
+The kWh anchor is chosen because:
+- Energy is physically universal — a kWh is identical everywhere, unlike a commodity whose quality and transport cost vary
+- It is not controlled by any single actor or geography
+- It is the common denominator of all production — food, manufacturing, and transport all reduce to energy cost at some level
+- Communities that invest in renewable generation increase their trade capacity as a direct byproduct
+
+This single standard applies at both the federation layer (inter-community) and the inter-federation layer (inter-federation). There is no separate currency above the federation level, no conversion step, and no exchange rate between layers. The clearing engine is the same at every scale — only the participants differ.
+
 ### How it is issued
 
-The federation central bank issues federation currency algorithmically, with no human discretion:
+The federation central bank issues FEC algorithmically, with no human discretion:
 
-$$\text{Federation money supply} = \sum_{c \in \text{communities}} \text{population}(c) \times \text{endowment per person}$$
+$$\text{Federation FEC supply} = \sum_{c \in \text{communities}} \text{population}(c) \times \text{FEC per person}$$
 
 When a community joins the federation, the supply expands proportionally. When a community's population shrinks, the supply contracts. No committee decides this. No vote is required. The algorithm runs.
 
-Federation currency is **a medium of exchange for inter-community trade only**. It is not a local currency replacement. Ordinary members use local currency for daily life. Federation currency lives at the community-to-community layer — a member buys goods with local currency, the food domain sources grain from another community, that settlement happens in federation currency. The member never sees it.
+FEC is **a clearing instrument for inter-community trade only**. It is not a local currency replacement. Ordinary members use local currency for daily life. FEC lives at the community-to-community layer — a member buys goods with local currency, the food domain sources grain from another community, that settlement happens in FEC. The member never sees it.
+
+### The local credit exchange rate
+
+Each community sets its own exchange rate between local credits and FEC independently. This rate floats based on the community's productive output relative to its energy consumption. A highly productive community's credits are worth more kWh; a struggling community's credits are worth fewer. This is a real-time signal of community economic health — no committee computes it, it emerges from the exchange.
 
 ### Demurrage
 
@@ -112,7 +128,9 @@ Most resource pool allocation happens automatically by formula — communities b
 
 ## Tradeoffs worth resisting
 
-**Any single community's currency becoming the federation reserve currency.** Whoever issues the reserve currency runs deficits everyone else finances. The federation currency must be issued by the federation bank collectively, pegged to total network population.
+**Any single community's currency becoming the federation reserve currency.** Whoever issues the reserve currency runs deficits everyone else finances. FEC must be issued by the federation bank collectively, algorithmic and pegged to total network population.
+
+**A separate inter-federation currency.** The kWh anchor already applies above the federation level. Adding a second clearing unit above FEC introduces conversion friction, governance complexity, and a new capture surface. The Congress of Federations runs the same FEC clearing system with federations as participants — not a new currency.
 
 **Voting weight proportional to economic size.** Large productive communities will push for this. It is the path to federation capture by the strongest member.
 
