@@ -1,0 +1,20 @@
+{
+  "id": "258d0fc4-190d-4c7a-84c6-0cdfe7511665",
+  "firstName": "Tyler",
+  "lastName": "Teague",
+  "birthDate": "1995-11-16T00:00:00.000Z",
+  "joinDate": "2026-04-20T19:57:56.834Z",
+  "handle": "tylerdteague",
+  "disabled": false,
+  "guardianId": null,
+  "phone": "7624368761",
+  "pinHash": null,
+  "languages": [
+    {
+      "language": "en",
+      "reading": true,
+      "writing": true,
+      "speaking": true
+    }
+  ]
+}

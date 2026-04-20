@@ -1,4 +1,6 @@
 <script lang="ts">
+  const { navigate } = $props<{ navigate: (to: string) => void }>();
+
   interface Member {
     id: string;
     firstName: string;
@@ -90,7 +92,9 @@
                   <span class="handle">@{member.handle}</span>
                 </td>
               {/if}
-              <td class="label">{acct.label}</td>
+              <td class="label">
+                <button class="link-btn" onclick={() => navigate(`/accounts/${acct.id}`)}>{acct.label}</button>
+              </td>
               <td class="num">{fmt(acct.credits)}</td>
               <td class="num">{fmt(acct.fec)}</td>
               <td class="flags">
@@ -155,6 +159,17 @@
   .name { display: block; font-weight: 500; }
   .handle { display: block; font-size: 12px; color: var(--text-muted); font-family: monospace; }
   .label { color: var(--text-muted); font-size: 13px; }
+
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--accent);
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+  }
+  .link-btn:hover { text-decoration: underline; }
 
   .num { text-align: right; font-variant-numeric: tabular-nums; }
 

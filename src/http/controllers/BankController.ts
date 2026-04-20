@@ -15,6 +15,16 @@ export function getAccounts(req: Request, res: Response): void {
     res.json(accounts.map(toAccountDto));
 }
 
+// GET /account/:accountId
+export function getAccountById(req: Request, res: Response): void {
+    const account = bank().getAccount(req.params.accountId as string);
+    if (!account) {
+        res.status(404).json({ error: "Account not found" });
+        return;
+    }
+    res.json(toAccountDto(account));
+}
+
 // GET /accounts/:accountId/transactions?month=YYYY-MM
 export function getTransactions(req: Request, res: Response): void {
     const accountId = req.params.accountId as string;

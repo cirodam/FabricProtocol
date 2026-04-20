@@ -3,7 +3,9 @@ import { getRequirements, getSettings, updateSettings,
     listKitchens, getKitchen, createKitchen, deleteKitchen,
     addKitchenStaff, removeKitchenStaff,
     listMills, getMill, createMill, deleteMill,
-    addMillStaff, removeMillStaff } from "../controllers/FoodController.js";
+    addMillStaff, removeMillStaff,
+    listFoodPurchasing, getFoodPurchasingById, createFoodPurchasing, deleteFoodPurchasing,
+    recordPurchase, addFoodPurchasingStaff, removeFoodPurchasingStaff } from "../controllers/FoodController.js";
 
 const router = Router();
 
@@ -24,5 +26,13 @@ router.post("/mills",                                   createMill);
 router.delete("/mills/:id",                             deleteMill);
 router.post("/mills/:id/staff",                         addMillStaff);
 router.delete("/mills/:id/staff/:memberId",             removeMillStaff);
+
+router.get("/purchasing",                               listFoodPurchasing);
+router.get("/purchasing/:id",                           getFoodPurchasingById);
+router.post("/purchasing",                              createFoodPurchasing);
+router.delete("/purchasing/:id",                        deleteFoodPurchasing);
+router.post("/purchasing/:id/purchase",                 recordPurchase);
+router.post("/purchasing/:id/staff",                    addFoodPurchasingStaff);
+router.delete("/purchasing/:id/staff/:memberId",        removeFoodPurchasingStaff);
 
 export default router;

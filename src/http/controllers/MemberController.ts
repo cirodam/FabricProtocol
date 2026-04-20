@@ -4,9 +4,9 @@ import { MemberService } from "../../member/MemberService.js";
 
 const service = () => MemberService.getInstance();
 
-/** Elapsed years since joinDate, rounded to 2 decimal places. */
-function personYears(joinDate: Date): number {
-    const ms = Date.now() - joinDate.getTime();
+/** Elapsed years since birthDate, rounded to 2 decimal places. */
+function personYears(birthDate: Date): number {
+    const ms = Date.now() - birthDate.getTime();
     return Math.round((ms / (365.25 * 24 * 60 * 60 * 1000)) * 100) / 100;
 }
 
@@ -137,7 +137,7 @@ function toDto(m: Member) {
         birthDate:          m.birthDate.toISOString(),
         joinDate:           m.joinDate.toISOString(),
         handle:             m.handle,
-        personYears:        personYears(m.joinDate),
+        personYears:        personYears(m.birthDate),
         disabled:           m.disabled,
         guardianId:         m.guardianId,
         phone:              m.phone,

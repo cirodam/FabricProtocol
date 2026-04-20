@@ -60,6 +60,7 @@
           <th>Age</th>
           <th>Handle</th>
           <th>Joined</th>
+          <th class="num">Person-years</th>
         </tr>
       </thead>
       <tbody>
@@ -69,6 +70,7 @@
             <td class="muted">{age(m.birthDate)}</td>
             <td class="handle">@{m.handle}</td>
             <td class="muted">{formatDate(m.joinDate)}</td>
+            <td class="num muted">{m.personYears.toFixed(2)}</td>
           </tr>
         {/each}
       </tbody>
@@ -157,4 +159,5 @@
 
   .muted { color: var(--text-muted); }
   .error { color: #ef4444; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
 </style>

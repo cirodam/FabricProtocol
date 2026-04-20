@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { getAccounts, getTransactions, createTransfer } from "../controllers/BankController.js";
+import { getAccounts, getAccountById, getTransactions, createTransfer } from "../controllers/BankController.js";
 
 const router = Router();
 
 // Account routes — keyed by ownerId (member, domain, etc.)
 router.get("/accounts/:ownerId",                    getAccounts);
+router.get("/account/:accountId",                   getAccountById);
 router.get("/accounts/:accountId/transactions",     getTransactions);
 
 // Transfer route

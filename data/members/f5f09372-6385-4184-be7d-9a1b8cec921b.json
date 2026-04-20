@@ -1,0 +1,20 @@
+{
+  "id": "f5f09372-6385-4184-be7d-9a1b8cec921b",
+  "firstName": "Emily",
+  "lastName": "Teague",
+  "birthDate": "1994-12-30T00:00:00.000Z",
+  "joinDate": "2026-04-20T19:58:56.691Z",
+  "handle": "emilyteague",
+  "disabled": false,
+  "guardianId": null,
+  "phone": "8472849528",
+  "pinHash": null,
+  "languages": [
+    {
+      "language": "en",
+      "reading": true,
+      "writing": true,
+      "speaking": true
+    }
+  ]
+}

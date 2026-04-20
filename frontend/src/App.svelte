@@ -2,6 +2,7 @@
   import MembersPage from './lib/pages/MembersPage.svelte';
   import MemberPage from './lib/pages/MemberPage.svelte';
   import AccountsPage from './lib/pages/AccountsPage.svelte';
+  import AccountPage from './lib/pages/AccountPage.svelte';
   import AddMemberPage from './lib/pages/AddMemberPage.svelte';
   import MarketplacePage from './lib/pages/MarketplacePage.svelte';
   import AddPostPage from './lib/pages/AddPostPage.svelte';
@@ -68,7 +69,9 @@
   {#if path === '/members'}
     <MembersPage {navigate} />
   {:else if path === '/accounts'}
-    <AccountsPage />
+    <AccountsPage {navigate} />
+  {:else if path.startsWith('/accounts/')}
+    <AccountPage id={path.slice('/accounts/'.length)} {navigate} />
   {:else if path === '/members/add'}
     <AddMemberPage />
   {:else if path.startsWith('/members/')}

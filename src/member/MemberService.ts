@@ -36,7 +36,8 @@ export class MemberService {
   add(member: Member): void {
     this.members.set(member.id, member);
     Bank.getInstance().openAccount(member, "primary");
-    CentralBank.getInstance().issueEndowment(member, CentralBank.CREDITS_PER_PERSON_YEAR);
+    const age = Math.floor((Date.now() - member.birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+    CentralBank.getInstance().issueEndowment(member, age * CentralBank.CREDITS_PER_PERSON_YEAR);
     this.loader?.save(member);
   }
 
@@ -95,15 +96,16 @@ export class MemberService {
     return member.pinHash === createHash("sha256").update(pin).digest("hex");
   }
 
-  // Call once per day. On each member's join anniversary, issues one person-year
-  // of credits (CREDITS_PER_PERSON_YEAR) via the CentralBank.
+  // Call once per day. On each member's birthday, issues one person-year
+  // of credits (CREDITS_PER_PERSON_YEAR) via the CentralBank — a birthday check
+  // from the community recognizing another year of the member's life.
   checkAnniversaries(today: Date = new Date()): void {
     const mm = today.getMonth();
     const dd = today.getDate();
     for (const member of this.members.values()) {
-      const isJoinAnniversary =
-        member.joinDate.getMonth() === mm && member.joinDate.getDate() === dd;
-      if (isJoinAnniversary) {
+      const isBirthday =
+        member.birthDate.getMonth() === mm && member.birthDate.getDate() === dd;
+      if (isBirthday) {
         CentralBank.getInstance().issueEndowment(member, CentralBank.CREDITS_PER_PERSON_YEAR);
       }
     }

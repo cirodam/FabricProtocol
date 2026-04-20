@@ -17,6 +17,7 @@ import { FoodDomain } from "./domains/food/FoodDomain.js";
 import { FoodDomainLoader } from "./domains/food/FoodDomainLoader.js";
 import { CommunityKitchenLoader } from "./domains/food/CommunityKitchenLoader.js";
 import { MillLoader } from "./domains/food/MillLoader.js";
+import { FoodPurchasingLoader } from "./domains/food/FoodPurchasingLoader.js";
 import { HealthcareDomain } from "./domains/healthcare/HealthcareDomain.js";
 import { ClinicLoader } from "./domains/healthcare/ClinicLoader.js";
 import { DentalClinicLoader } from "./domains/healthcare/DentalClinicLoader.js";
@@ -39,6 +40,8 @@ async function init(): Promise<void> {
     new TransactionLoader("data/transactions")
   );
   CentralBank.getInstance().init(new MemberEndowmentLoader("data/endowment-profiles"));
+  CentralBank.getInstance().demurrageRate = BANK_DEMURRAGE_RATE;
+  Commonwealth.getInstance().levyRate = COMMONS_DEMURRAGE_RATE;
   MemberService.getInstance().init(new MemberLoader("data/members"));
   Marketplace.getInstance().init(
     new PostLoader("data/posts")
@@ -48,6 +51,7 @@ async function init(): Promise<void> {
   FoodDomain.getInstance().init(new FoodDomainLoader("data/food"));
   FoodDomain.getInstance().initKitchens(new CommunityKitchenLoader("data/food/kitchens"));
   FoodDomain.getInstance().initMills(new MillLoader("data/food/mills"));
+  FoodDomain.getInstance().initFoodPurchasing(new FoodPurchasingLoader("data/food/purchasing"));
   HealthcareDomain.getInstance().init(new ClinicLoader("data/healthcare/clinics"));
   HealthcareDomain.getInstance().initDentalClinics(new DentalClinicLoader("data/healthcare/dental-clinics"));
   EducationDomain.getInstance().initSchools(new SchoolLoader("data/education/schools"));
@@ -71,7 +75,10 @@ async function init(): Promise<void> {
   scheduler.register({
     name: "demurrage",
     intervalMs: every.months(1),
-    run: () => CentralBank.getInstance().assessDemurrage(BANK_DEMURRAGE_RATE),
+    run: () => {
+      if (CentralBank.getInstance().unrecoveredCredits > 0)
+        CentralBank.getInstance().assessDemurrage(BANK_DEMURRAGE_RATE);
+    },
   });
   scheduler.register({
     name: "commons-levy",

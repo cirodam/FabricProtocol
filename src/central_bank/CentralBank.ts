@@ -18,6 +18,9 @@ export class CentralBank implements IEconomicActor {
 
     readonly id: string;
 
+    /** The rate used for periodic bank demurrage. Set at startup by index.ts. */
+    demurrageRate: number = 0;
+
     /** One endowment record per member, keyed by memberId. */
     private endowments: Map<string, MemberEndowment> = new Map();
     private endowmentLoader: MemberEndowmentLoader | null = null;

@@ -7,6 +7,8 @@ import { CommunityKitchen } from "./CommunityKitchen.js";
 import { CommunityKitchenLoader } from "./CommunityKitchenLoader.js";
 import { Mill } from "./Mill.js";
 import { MillLoader } from "./MillLoader.js";
+import { FoodPurchasing } from "./FoodPurchasing.js";
+import { FoodPurchasingLoader } from "./FoodPurchasingLoader.js";
 
 export class FoodDomain extends FunctionalDomain {
     private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000003";
@@ -16,6 +18,7 @@ export class FoodDomain extends FunctionalDomain {
     private loader: FoodDomainLoader | null = null;
     private kitchenLoader: CommunityKitchenLoader | null = null;
     private millLoader: MillLoader | null = null;
+    private foodPurchasingLoader: FoodPurchasingLoader | null = null;
 
     private constructor() {
         super("Food", "Responsible for feeding all community members.", FoodDomain.DOMAIN_ID);
@@ -90,6 +93,35 @@ export class FoodDomain extends FunctionalDomain {
     removeMill(id: string): void {
         this.removeUnit(id);
         this.millLoader?.delete(id);
+    }
+
+    initFoodPurchasing(loader: FoodPurchasingLoader): void {
+        this.foodPurchasingLoader = loader;
+        for (const unit of loader.loadAll()) {
+            this.addUnit(unit);
+        }
+    }
+
+    addFoodPurchasing(unit: FoodPurchasing): void {
+        this.addUnit(unit);
+        this.foodPurchasingLoader?.save(unit);
+    }
+
+    saveFoodPurchasing(unit: FoodPurchasing): void {
+        this.foodPurchasingLoader?.save(unit);
+    }
+
+    getFoodPurchasing(id: string): FoodPurchasing | undefined {
+        return this.getUnits().find(u => u.id === id) as FoodPurchasing | undefined;
+    }
+
+    getAllFoodPurchasing(): FoodPurchasing[] {
+        return this.getUnitsByType<FoodPurchasing>("food-purchasing");
+    }
+
+    removeFoodPurchasing(id: string): void {
+        this.removeUnit(id);
+        this.foodPurchasingLoader?.delete(id);
     }
 
     setMonthlyAllowance(amount: number): void {

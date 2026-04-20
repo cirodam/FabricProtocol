@@ -13,6 +13,9 @@ export class Commonwealth implements IEconomicActor {
 
     readonly id: string;
 
+    /** The commons levy rate applied monthly to all non-exempt accounts. Set at startup. */
+    levyRate: number = 0;
+
     private positions: CommunityRole[] = [];
     private domains: FunctionalDomain[] = [];
     readonly ledger: AssetLedger;
