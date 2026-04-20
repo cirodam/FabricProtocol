@@ -27,8 +27,11 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
  * Staffing per household: 3–5 FTEs (day, evening, and overnight coverage)
  */
 export class SharedHousehold extends FunctionalUnit {
+    readonly createdAt: Date;
+
     constructor(name: string) {
         super(name, "A small residential care home providing supported living for dependent community members.");
+        this.createdAt = new Date();
     }
 
     getType(): string { return "shared-household"; }

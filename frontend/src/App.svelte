@@ -16,6 +16,10 @@
   import HousingUnitPage from './lib/pages/HousingUnitPage.svelte';
   import AddHousingUnitPage from './lib/pages/AddHousingUnitPage.svelte';
   import DependencyCarePage from './lib/pages/DependencyCarePage.svelte';
+  import SharedHouseholdPage from './lib/pages/SharedHouseholdPage.svelte';
+  import AddSharedHouseholdPage from './lib/pages/AddSharedHouseholdPage.svelte';
+  import MedicalCareUnitPage from './lib/pages/MedicalCareUnitPage.svelte';
+  import AddMedicalCareUnitPage from './lib/pages/AddMedicalCareUnitPage.svelte';
   import ChildCarePage from './lib/pages/ChildCarePage.svelte';
   import HealthcarePage from './lib/pages/HealthcarePage.svelte';
   import ClinicPage from './lib/pages/ClinicPage.svelte';
@@ -58,7 +62,7 @@
   <button class:active={path === '/demographics'} onclick={() => navigate('/demographics')}>Demographics</button>
   <button class:active={path === '/food'} onclick={() => navigate('/food')}>Food</button>
   <button class:active={path.startsWith('/housing')} onclick={() => navigate('/housing')}>Housing</button>
-  <button class:active={path === '/dependency-care'} onclick={() => navigate('/dependency-care')}>Dependency Care</button>
+  <button class:active={path.startsWith('/dependency-care')} onclick={() => navigate('/dependency-care')}>Dependency Care</button>
   <button class:active={path === '/child-care'} onclick={() => navigate('/child-care')}>Child Care</button>
   <button class:active={path.startsWith('/healthcare')} onclick={() => navigate('/healthcare')}>Healthcare</button>
   <button class:active={path.startsWith('/education')} onclick={() => navigate('/education')}>Education</button>
@@ -107,7 +111,15 @@
   {:else if path.startsWith('/housing/')}
     <HousingUnitPage id={path.slice('/housing/'.length)} {navigate} />
   {:else if path === '/dependency-care'}
-    <DependencyCarePage />
+    <DependencyCarePage {navigate} />
+  {:else if path === '/dependency-care/households/new'}
+    <AddSharedHouseholdPage {navigate} />
+  {:else if path.startsWith('/dependency-care/households/')}
+    <SharedHouseholdPage id={path.slice('/dependency-care/households/'.length)} {navigate} />
+  {:else if path === '/dependency-care/medical-care-units/new'}
+    <AddMedicalCareUnitPage {navigate} />
+  {:else if path.startsWith('/dependency-care/medical-care-units/')}
+    <MedicalCareUnitPage id={path.slice('/dependency-care/medical-care-units/'.length)} {navigate} />
   {:else if path === '/child-care'}
     <ChildCarePage />
   {:else if path === '/healthcare'}

@@ -20,6 +20,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import externalReserveRoutes from "./routes/externalReserveRoutes.js";
 import locationRoutes from "./routes/locationRoutes.js";
 import courierRoutes from "./routes/courierRoutes.js";
+import dependencyCareRoutes from "./routes/dependencyCareRoutes.js";
 import networkRoutes from "../network/networkRoutes.js";
 
 /**
@@ -85,6 +86,7 @@ export class HttpServer {
         this.app.use("/api/external-reserve", externalReserveRoutes);
         this.app.use("/api/locations", locationRoutes);
         this.app.use("/api/courier", courierRoutes);
+        this.app.use("/api/dependency-care", dependencyCareRoutes);
         this.app.use("/api/node", networkRoutes);
 
         // Serve the Svelte frontend (production build)

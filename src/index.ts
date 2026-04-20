@@ -32,6 +32,9 @@ import { LocationRegistry } from "./location/LocationRegistry.js";
 import { LocationLoader } from "./location/LocationLoader.js";
 import { CourierDomain } from "./domains/courier/CourierDomain.js";
 import { DeliveryRequestLoader } from "./domains/courier/DeliveryRequestLoader.js";
+import { DependencyCareDomain } from "./domains/dependency_care/DependencyCareDomain.js";
+import { SharedHouseholdLoader } from "./domains/dependency_care/SharedHouseholdLoader.js";
+import { MedicalCareUnitLoader } from "./domains/dependency_care/MedicalCareUnitLoader.js";
 
 
 async function init(): Promise<void> {
@@ -62,6 +65,8 @@ async function init(): Promise<void> {
   EducationDomain.getInstance().initLibraries(new LibraryLoader("data/education/libraries"));
   LocationRegistry.getInstance().init(new LocationLoader("data/locations"));
   CourierDomain.getInstance().initRequests(new DeliveryRequestLoader("data/courier/requests"));
+  DependencyCareDomain.getInstance().initHouseholds(new SharedHouseholdLoader("data/dependency-care/households"));
+  DependencyCareDomain.getInstance().initMedicalCareUnits(new MedicalCareUnitLoader("data/dependency-care/medical-care-units"));
 
   // ── Register domains with Commonwealth ──────────────────────────────────────
   const commonwealth = Commonwealth.getInstance();
@@ -70,6 +75,7 @@ async function init(): Promise<void> {
   commonwealth.addDomain(HealthcareDomain.getInstance());
   commonwealth.addDomain(EducationDomain.getInstance());
   commonwealth.addDomain(CourierDomain.getInstance());
+  commonwealth.addDomain(DependencyCareDomain.getInstance());
 
   // ── Scheduler ────────────────────────────────────────────────────────────────
   const scheduler = new Scheduler("data/scheduler");

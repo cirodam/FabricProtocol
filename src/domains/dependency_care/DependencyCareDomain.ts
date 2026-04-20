@@ -1,12 +1,92 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
 import { DependencyCareProfile, CareNeeds } from "./DependencyCareProfile.js";
+import { SharedHousehold } from "./SharedHousehold.js";
+import { SharedHouseholdLoader } from "./SharedHouseholdLoader.js";
+import { MedicalCareUnit } from "./MedicalCareUnit.js";
+import { MedicalCareUnitLoader } from "./MedicalCareUnitLoader.js";
 
 export class DependencyCareDomain extends FunctionalDomain {
-    private profiles: Map<string, DependencyCareProfile> = new Map();
+    private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000011";
+    private static instance: DependencyCareDomain;
 
-    constructor() {
-        super("DependencyCare", "Supports members with chronic illness, disability, or other ongoing care needs.");
+    private profiles: Map<string, DependencyCareProfile> = new Map();
+    private householdLoader: SharedHouseholdLoader | null = null;
+    private medicalCareUnitLoader: MedicalCareUnitLoader | null = null;
+
+    private constructor() {
+        super("DependencyCare", "Supports members with chronic illness, disability, or other ongoing care needs.", DependencyCareDomain.DOMAIN_ID);
     }
+
+    static getInstance(): DependencyCareDomain {
+        if (!DependencyCareDomain.instance) {
+            DependencyCareDomain.instance = new DependencyCareDomain();
+        }
+        return DependencyCareDomain.instance;
+    }
+
+    // ── Shared Households ───────────────────────────────────────────────────
+
+    initHouseholds(loader: SharedHouseholdLoader): void {
+        this.householdLoader = loader;
+        for (const h of loader.loadAll()) {
+            this.addUnit(h);
+        }
+    }
+
+    addHousehold(household: SharedHousehold): void {
+        this.addUnit(household);
+        this.householdLoader?.save(household);
+    }
+
+    saveHousehold(household: SharedHousehold): void {
+        this.householdLoader?.save(household);
+    }
+
+    getHousehold(id: string): SharedHousehold | undefined {
+        return this.getUnitsByType<SharedHousehold>("shared-household").find(h => h.id === id);
+    }
+
+    getAllHouseholds(): SharedHousehold[] {
+        return this.getUnitsByType<SharedHousehold>("shared-household");
+    }
+
+    removeHousehold(id: string): void {
+        this.removeUnit(id);
+        this.householdLoader?.delete(id);
+    }
+
+    // ── Medical Care Units ───────────────────────────────────────────────────
+
+    initMedicalCareUnits(loader: MedicalCareUnitLoader): void {
+        this.medicalCareUnitLoader = loader;
+        for (const u of loader.loadAll()) {
+            this.addUnit(u);
+        }
+    }
+
+    addMedicalCareUnit(unit: MedicalCareUnit): void {
+        this.addUnit(unit);
+        this.medicalCareUnitLoader?.save(unit);
+    }
+
+    saveMedicalCareUnit(unit: MedicalCareUnit): void {
+        this.medicalCareUnitLoader?.save(unit);
+    }
+
+    getMedicalCareUnit(id: string): MedicalCareUnit | undefined {
+        return this.getUnitsByType<MedicalCareUnit>("medical-care-unit").find(u => u.id === id);
+    }
+
+    getAllMedicalCareUnits(): MedicalCareUnit[] {
+        return this.getUnitsByType<MedicalCareUnit>("medical-care-unit");
+    }
+
+    removeMedicalCareUnit(id: string): void {
+        this.removeUnit(id);
+        this.medicalCareUnitLoader?.delete(id);
+    }
+
+    // ── Care Profiles ────────────────────────────────────────────────────────
 
     addProfile(memberId: string, careNeeds: CareNeeds, notes: string = ""): DependencyCareProfile {
         const profile = new DependencyCareProfile(memberId, careNeeds, notes);

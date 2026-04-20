@@ -29,8 +29,11 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
  * Total staffing: ~40–60 FTEs (clinical and care staff combined)
  */
 export class MedicalCareUnit extends FunctionalUnit {
-    constructor() {
-        super("Medical Care Unit", "Provides continuous clinical care for community members with complex or end-of-life needs.");
+    readonly createdAt: Date;
+
+    constructor(name: string = "Medical Care Unit") {
+        super(name, "Provides continuous clinical care for community members with complex or end-of-life needs.");
+        this.createdAt = new Date();
     }
 
     getType(): string { return "medical-care-unit"; }
