@@ -18,7 +18,14 @@
   import HealthcarePage from './lib/pages/HealthcarePage.svelte';
   import ClinicPage from './lib/pages/ClinicPage.svelte';
   import AddHealthcareClinicPage from './lib/pages/AddHealthcareClinicPage.svelte';
+  import DentalClinicPage from './lib/pages/DentalClinicPage.svelte';
+  import AddDentalClinicPage from './lib/pages/AddDentalClinicPage.svelte';
   import SettingsPage from './lib/pages/SettingsPage.svelte';
+  import EducationPage from './lib/pages/EducationPage.svelte';
+  import SchoolPage from './lib/pages/SchoolPage.svelte';
+  import AddSchoolPage from './lib/pages/AddSchoolPage.svelte';
+  import LibraryPage from './lib/pages/LibraryPage.svelte';
+  import AddLibraryPage from './lib/pages/AddLibraryPage.svelte';
   import CommunityKitchenPage from './lib/pages/CommunityKitchenPage.svelte';
   import AddCommunityKitchenPage from './lib/pages/AddCommunityKitchenPage.svelte';
   import MillPage from './lib/pages/MillPage.svelte';
@@ -53,6 +60,7 @@
   <button class:active={path === '/dependency-care'} onclick={() => navigate('/dependency-care')}>Dependency Care</button>
   <button class:active={path === '/child-care'} onclick={() => navigate('/child-care')}>Child Care</button>
   <button class:active={path.startsWith('/healthcare')} onclick={() => navigate('/healthcare')}>Healthcare</button>
+  <button class:active={path.startsWith('/education')} onclick={() => navigate('/education')}>Education</button>
   <button class:active={path === '/settings'} onclick={() => navigate('/settings')}>Settings</button>
 </nav>
 
@@ -103,7 +111,21 @@
     <AddHealthcareClinicPage {navigate} />
   {:else if path.startsWith('/healthcare/clinics/')}
     <ClinicPage id={path.slice('/healthcare/clinics/'.length)} {navigate} />
+  {:else if path === '/healthcare/dental-clinics/new'}
+    <AddDentalClinicPage {navigate} />
+  {:else if path.startsWith('/healthcare/dental-clinics/')}
+    <DentalClinicPage id={path.slice('/healthcare/dental-clinics/'.length)} {navigate} />
   {:else if path === '/settings'}
     <SettingsPage {navigate} />
+  {:else if path === '/education'}
+    <EducationPage {navigate} />
+  {:else if path === '/education/schools/new'}
+    <AddSchoolPage {navigate} />
+  {:else if path.startsWith('/education/schools/')}
+    <SchoolPage id={path.slice('/education/schools/'.length)} {navigate} />
+  {:else if path === '/education/libraries/new'}
+    <AddLibraryPage {navigate} />
+  {:else if path.startsWith('/education/libraries/')}
+    <LibraryPage id={path.slice('/education/libraries/'.length)} {navigate} />
   {/if}
 </main>

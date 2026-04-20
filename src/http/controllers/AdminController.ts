@@ -12,6 +12,8 @@ const DATA_DIRS = [
     "data/food",
     "data/food/kitchens",
     "data/food/mills",
+    "data/education/schools",
+    "data/education/libraries",
     "data/groups",
     "data/healthcare/clinics",
     "data/healthcare/dental-clinics",

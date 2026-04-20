@@ -25,10 +25,13 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
  * hold positions in other domains.
  */
 export class School extends FunctionalUnit {
-    constructor() {
-        super("School", "Provides formal instruction for children, scaled to community capacity.");
+    readonly createdAt: Date;
+
+    constructor(name: string, description: string = "Provides formal instruction for children, scaled to community capacity.") {
+        super(name, description);
+        this.createdAt = new Date();
     }
 
     getType(): string { return "school"; }
-
 }
+

@@ -1,41 +1,39 @@
 <script lang="ts">
   const { navigate }: { navigate: (path: string) => void } = $props();
 
-  interface ClinicDto {
+  interface SchoolDto {
     id: string;
     name: string;
     description: string;
     staffCount: number;
-    createdAt: string;
   }
 
-  interface DentalClinicDto {
+  interface LibraryDto {
     id: string;
     name: string;
     description: string;
     staffCount: number;
-    createdAt: string;
   }
 
-  let clinics       = $state<ClinicDto[]>([]);
-  let dentalClinics = $state<DentalClinicDto[]>([]);
-  let loading       = $state(true);
-  let error         = $state("");
+  let schools   = $state<SchoolDto[]>([]);
+  let libraries = $state<LibraryDto[]>([]);
+  let loading   = $state(true);
+  let error     = $state("");
 
   async function load() {
     try {
-      const [clinicsRes, dentalRes] = await Promise.all([
-        fetch("/api/healthcare/clinics"),
-        fetch("/api/healthcare/dental-clinics"),
+      const [schoolsRes, librariesRes] = await Promise.all([
+        fetch("/api/education/schools"),
+        fetch("/api/education/libraries"),
       ]);
-      if (!clinicsRes.ok) throw new Error(`HTTP ${clinicsRes.status}`);
-      if (!dentalRes.ok)  throw new Error(`HTTP ${dentalRes.status}`);
-      const clinicsData = await clinicsRes.json();
-      const dentalData  = await dentalRes.json();
-      clinics       = clinicsData.clinics;
-      dentalClinics = dentalData.dentalClinics;
+      if (!schoolsRes.ok)   throw new Error(`HTTP ${schoolsRes.status}`);
+      if (!librariesRes.ok) throw new Error(`HTTP ${librariesRes.status}`);
+      const schoolData   = await schoolsRes.json();
+      const libraryData  = await librariesRes.json();
+      schools   = schoolData.schools;
+      libraries = libraryData.libraries;
     } catch (e: unknown) {
-      error = e instanceof Error ? e.message : "Failed to load healthcare";
+      error = e instanceof Error ? e.message : "Failed to load education";
     } finally {
       loading = false;
     }
@@ -47,8 +45,8 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <h1>Healthcare</h1>
-      <p class="subtitle">Community clinics and health services</p>
+      <h1>Education</h1>
+      <p class="subtitle">Schools, vocational training, and knowledge infrastructure</p>
     </div>
   </div>
 
@@ -59,22 +57,22 @@
   {:else}
     <section class="section">
       <div class="section-header">
-        <h2>Primary Care Clinics</h2>
-        <button class="new-btn" onclick={() => navigate("/healthcare/clinics/new")}>+ New clinic</button>
+        <h2>Schools</h2>
+        <button class="new-btn" onclick={() => navigate("/education/schools/new")}>+ New school</button>
       </div>
-      {#if clinics.length === 0}
-        <p class="muted">No clinics yet.</p>
+      {#if schools.length === 0}
+        <p class="muted">No schools yet.</p>
       {:else}
         <div class="unit-grid">
-          {#each clinics as clinic (clinic.id)}
+          {#each schools as school (school.id)}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div class="unit-card" role="button" tabindex="0"
-              onclick={() => navigate(`/healthcare/clinics/${clinic.id}`)}
-              onkeydown={(e) => e.key === 'Enter' && navigate(`/healthcare/clinics/${clinic.id}`)}>
-              <div class="badge badge-primary">Primary Care</div>
-              <h3>{clinic.name}</h3>
-              <p class="card-desc">{clinic.description}</p>
-              <div class="card-meta">{clinic.staffCount} staff member{clinic.staffCount === 1 ? "" : "s"}</div>
+              onclick={() => navigate(`/education/schools/${school.id}`)}
+              onkeydown={(e) => e.key === 'Enter' && navigate(`/education/schools/${school.id}`)}>
+              <div class="badge">School</div>
+              <h3>{school.name}</h3>
+              <p class="card-desc">{school.description}</p>
+              <div class="card-meta">{school.staffCount} staff member{school.staffCount === 1 ? "" : "s"}</div>
             </div>
           {/each}
         </div>
@@ -83,22 +81,23 @@
 
     <section class="section">
       <div class="section-header">
-        <h2>Dental Clinics</h2>
-        <button class="new-btn" onclick={() => navigate("/healthcare/dental-clinics/new")}>+ New dental clinic</button>
+        <h2>Libraries</h2>
+        <button class="new-btn" onclick={() => navigate("/education/libraries/new")}>+ New library</button>
       </div>
-      {#if dentalClinics.length === 0}
-        <p class="muted">No dental clinics yet.</p>
+      {#if libraries.length === 0}
+        <p class="muted">No libraries yet.</p>
       {:else}
         <div class="unit-grid">
-          {#each dentalClinics as dc (dc.id)}
+          {#each libraries as library (library.id)}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div class="unit-card" role="button" tabindex="0"
-              onclick={() => navigate(`/healthcare/dental-clinics/${dc.id}`)}
-              onkeydown={(e) => e.key === 'Enter' && navigate(`/healthcare/dental-clinics/${dc.id}`)}>
-              <div class="badge badge-dental">Dental Clinic</div>
-              <h3>{dc.name}</h3>
-              <p class="card-desc">{dc.description}</p>
-              <div class="card-meta">{dc.staffCount} staff member{dc.staffCount === 1 ? "" : "s"}</div>
+              onclick={() => navigate(`/education/libraries/${library.id}`)}
+              onkeydown={(e) => e.key === 'Enter' && navigate(`/education/libraries/${library.id}`)}
+            >
+              <div class="badge badge-library">Library</div>
+              <h3>{library.name}</h3>
+              <p class="card-desc">{library.description}</p>
+              <div class="card-meta">{library.staffCount} staff member{library.staffCount === 1 ? "" : "s"}</div>
             </div>
           {/each}
         </div>
@@ -146,10 +145,10 @@
     display: inline-block;
     font-size: 0.75rem; font-weight: 600; letter-spacing: 0.03em;
     padding: 0.2rem 0.6rem; border-radius: 999px;
+    background: #d1fae5; color: #065f46;
     margin-bottom: 0.75rem;
   }
-  .badge-primary { background: var(--color-primary-light, #dbeafe); color: var(--color-primary, #1d4ed8); }
-  .badge-dental  { background: #e0f2fe; color: #0369a1; }
+  .badge-library { background: #fef3c7; color: #92400e; }
 
   .card-desc { margin: 0 0 1rem; font-size: 0.875rem; color: var(--color-muted, #666); line-height: 1.5; }
   .card-meta { font-size: 0.85rem; color: var(--color-muted, #888); }

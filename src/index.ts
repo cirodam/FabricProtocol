@@ -20,6 +20,9 @@ import { MillLoader } from "./domains/food/MillLoader.js";
 import { HealthcareDomain } from "./domains/healthcare/HealthcareDomain.js";
 import { ClinicLoader } from "./domains/healthcare/ClinicLoader.js";
 import { DentalClinicLoader } from "./domains/healthcare/DentalClinicLoader.js";
+import { EducationDomain } from "./domains/education/EducationDomain.js";
+import { SchoolLoader } from "./domains/education/SchoolLoader.js";
+import { LibraryLoader } from "./domains/education/LibraryLoader.js";
 import { Scheduler, every } from "./scheduler/Scheduler.js";
 import { HttpServer } from "./http/HttpServer.js";
 import { NodeService } from "./network/NodeService.js";
@@ -47,12 +50,15 @@ async function init(): Promise<void> {
   FoodDomain.getInstance().initMills(new MillLoader("data/food/mills"));
   HealthcareDomain.getInstance().init(new ClinicLoader("data/healthcare/clinics"));
   HealthcareDomain.getInstance().initDentalClinics(new DentalClinicLoader("data/healthcare/dental-clinics"));
+  EducationDomain.getInstance().initSchools(new SchoolLoader("data/education/schools"));
+  EducationDomain.getInstance().initLibraries(new LibraryLoader("data/education/libraries"));
 
   // ── Register domains with Commonwealth ──────────────────────────────────────
   const commonwealth = Commonwealth.getInstance();
   commonwealth.addDomain(HousingDomain.getInstance());
   commonwealth.addDomain(FoodDomain.getInstance());
   commonwealth.addDomain(HealthcareDomain.getInstance());
+  commonwealth.addDomain(EducationDomain.getInstance());
 
   // ── Scheduler ────────────────────────────────────────────────────────────────
   const scheduler = new Scheduler("data/scheduler");

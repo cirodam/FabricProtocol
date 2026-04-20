@@ -22,10 +22,12 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
  * maintaining the systems that make knowledge accessible.
  */
 export class Library extends FunctionalUnit {
-    constructor() {
-        super("Library", "Maintains the community's knowledge commons, records, and reference collections.");
+    readonly createdAt: Date;
+
+    constructor(name: string, description: string = "Maintains the community's knowledge commons, records, and reference collections.") {
+        super(name, description);
+        this.createdAt = new Date();
     }
 
     getType(): string { return "library"; }
-
 }
