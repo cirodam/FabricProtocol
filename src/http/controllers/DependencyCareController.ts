@@ -3,6 +3,7 @@ import { MemberService } from "../../member/MemberService.js";
 import { DependencyCareDomain } from "../../domains/dependency_care/DependencyCareDomain.js";
 import { SharedHousehold } from "../../domains/dependency_care/SharedHousehold.js";
 import { MedicalCareUnit } from "../../domains/dependency_care/MedicalCareUnit.js";
+import { HomeCaregiving } from "../../domains/dependency_care/HomeCaregiving.js";
 import { CommunityRole } from "../../commons/CommunityRole.js";
 
 function householdToDto(h: SharedHousehold) {
@@ -213,3 +214,82 @@ export function removeMedicalCareUnitStaff(req: Request, res: Response): void {
     domain.saveMedicalCareUnit(unit);
     res.status(204).send();
 }
+
+// ── Home Caregiving endpoints (singleton) ─────────────────────────────────────
+
+function hcgToDto(u: HomeCaregiving) {
+    return {
+        id:          u.id,
+        name:        u.name,
+        description: u.description,
+        staffIds:    u.getMembers(),
+        staffCount:  u.getMembers().length,
+        createdAt:   u.createdAt.toISOString(),
+    };
+}
+
+// GET /dependency-care/home-caregiving
+export function getHomeCaregivingUnit(_req: Request, res: Response): void {
+    const unit = DependencyCareDomain.getInstance().getHomeCaregiving();
+    if (!unit) { res.status(503).json({ error: "Home caregiving not initialised" }); return; }
+    const memberService = MemberService.getInstance();
+    const rolesByMember = new Map(unit.getRoles().map(r => [r.memberId, r]));
+    const staff = unit.getMembers().map(id => {
+        const m = memberService.get(id);
+        const role = rolesByMember.get(id);
+        return {
+            id:              m?.id ?? id,
+            firstName:       m?.firstName ?? "Unknown",
+            lastName:        m?.lastName ?? "",
+            handle:          m?.handle ?? "",
+            roleTitle:       role?.title ?? "",
+            creditsPerMonth: role?.creditsPerMonth ?? 0,
+        };
+    });
+    res.json({ ...hcgToDto(unit), staff });
+}
+
+// POST /dependency-care/home-caregiving/staff  — body: { memberId, title, creditsPerMonth }
+export function addHomeCaregivingStaff(req: Request, res: Response): void {
+    const domain = DependencyCareDomain.getInstance();
+    const unit = domain.getHomeCaregiving();
+    if (!unit) { res.status(503).json({ error: "Home caregiving not initialised" }); return; }
+
+    const { memberId, title, creditsPerMonth } = req.body ?? {};
+    if (typeof memberId !== "string" || !memberId.trim()) {
+        res.status(400).json({ error: "memberId is required" }); return;
+    }
+    if (typeof title !== "string" || !title.trim()) {
+        res.status(400).json({ error: "title is required" }); return;
+    }
+    const salary = typeof creditsPerMonth === "number" ? creditsPerMonth : Number(creditsPerMonth ?? 0);
+    if (!Number.isFinite(salary) || salary < 0) {
+        res.status(400).json({ error: "creditsPerMonth must be a non-negative number" }); return;
+    }
+    if (!MemberService.getInstance().get(memberId)) {
+        res.status(404).json({ error: "Member not found" }); return;
+    }
+    const role = new CommunityRole(title.trim(), "", salary);
+    role.memberId      = memberId;
+    role.termStartDate = new Date();
+    unit.addRole(role);
+    unit.addMember(memberId);
+    domain.saveHomeCaregiving();
+    res.status(204).send();
+}
+
+// DELETE /dependency-care/home-caregiving/staff/:memberId
+export function removeHomeCaregivingStaff(req: Request, res: Response): void {
+    const domain = DependencyCareDomain.getInstance();
+    const unit = domain.getHomeCaregiving();
+    if (!unit) { res.status(503).json({ error: "Home caregiving not initialised" }); return; }
+
+    const memberId = req.params.memberId as string;
+    const roles = unit.getRoles().filter(r => r.memberId !== memberId);
+    unit.clearRoles();
+    for (const r of roles) unit.addRole(r);
+    unit.removeMember(memberId);
+    domain.saveHomeCaregiving();
+    res.status(204).send();
+}
+

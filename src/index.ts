@@ -35,12 +35,13 @@ import { DeliveryRequestLoader } from "./domains/courier/DeliveryRequestLoader.j
 import { DependencyCareDomain } from "./domains/dependency_care/DependencyCareDomain.js";
 import { SharedHouseholdLoader } from "./domains/dependency_care/SharedHouseholdLoader.js";
 import { MedicalCareUnitLoader } from "./domains/dependency_care/MedicalCareUnitLoader.js";
+import { HomeCaregivingLoader } from "./domains/dependency_care/HomeCaregivingLoader.js";
 
 
 async function init(): Promise<void> {
   // ── Demurrage rates ──────────────────────────────────────────────────────────
   const BANK_DEMURRAGE_RATE    = 0.02; // shrinks money supply (bank recovery)
-  const COMMONS_DEMURRAGE_RATE = 0.01; // commons levy (taxation)
+  const COMMONS_DEMURRAGE_RATE = 0.02; // commons levy (taxation)
   // ── Persistence ─────────────────────────────────────────────────────────────
   Bank.getInstance().init(
     new AccountLoader("data/accounts"),
@@ -67,6 +68,7 @@ async function init(): Promise<void> {
   CourierDomain.getInstance().initRequests(new DeliveryRequestLoader("data/courier/requests"));
   DependencyCareDomain.getInstance().initHouseholds(new SharedHouseholdLoader("data/dependency-care/households"));
   DependencyCareDomain.getInstance().initMedicalCareUnits(new MedicalCareUnitLoader("data/dependency-care/medical-care-units"));
+  DependencyCareDomain.getInstance().initHomeCaregiving(new HomeCaregivingLoader("data/dependency-care/home-caregiving"));
 
   // ── Register domains with Commonwealth ──────────────────────────────────────
   const commonwealth = Commonwealth.getInstance();

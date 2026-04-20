@@ -4,6 +4,7 @@ import {
     addHouseholdStaff, removeHouseholdStaff,
     listMedicalCareUnits, getMedicalCareUnit, createMedicalCareUnit, deleteMedicalCareUnit,
     addMedicalCareUnitStaff, removeMedicalCareUnitStaff,
+    getHomeCaregivingUnit, addHomeCaregivingStaff, removeHomeCaregivingStaff,
 } from "../controllers/DependencyCareController.js";
 
 const router = Router();
@@ -21,5 +22,9 @@ router.post("/medical-care-units",                          createMedicalCareUni
 router.delete("/medical-care-units/:id",                    deleteMedicalCareUnit);
 router.post("/medical-care-units/:id/staff",                addMedicalCareUnitStaff);
 router.delete("/medical-care-units/:id/staff/:memberId",    removeMedicalCareUnitStaff);
+
+router.get("/home-caregiving",                          getHomeCaregivingUnit);
+router.post("/home-caregiving/staff",                   addHomeCaregivingStaff);
+router.delete("/home-caregiving/staff/:memberId",       removeHomeCaregivingStaff);
 
 export default router;

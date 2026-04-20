@@ -20,6 +20,7 @@
   import AddSharedHouseholdPage from './lib/pages/AddSharedHouseholdPage.svelte';
   import MedicalCareUnitPage from './lib/pages/MedicalCareUnitPage.svelte';
   import AddMedicalCareUnitPage from './lib/pages/AddMedicalCareUnitPage.svelte';
+  import HomeCaregivingPage from './lib/pages/HomeCaregivingPage.svelte';
   import ChildCarePage from './lib/pages/ChildCarePage.svelte';
   import HealthcarePage from './lib/pages/HealthcarePage.svelte';
   import ClinicPage from './lib/pages/ClinicPage.svelte';
@@ -120,6 +121,8 @@
     <AddMedicalCareUnitPage {navigate} />
   {:else if path.startsWith('/dependency-care/medical-care-units/')}
     <MedicalCareUnitPage id={path.slice('/dependency-care/medical-care-units/'.length)} {navigate} />
+  {:else if path === '/dependency-care/home-caregiving'}
+    <HomeCaregivingPage {navigate} />
   {:else if path === '/child-care'}
     <ChildCarePage />
   {:else if path === '/healthcare'}

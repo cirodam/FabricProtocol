@@ -27,8 +27,11 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
  * consistently produces better outcomes than institutional care.
  */
 export class HomeCaregiving extends FunctionalUnit {
+    readonly createdAt: Date;
+
     constructor() {
         super("Home Caregiving", "Provides paid positions for community members caring for dependent relatives at home.");
+        this.createdAt = new Date();
     }
 
     getType(): string { return "home-caregiving"; }

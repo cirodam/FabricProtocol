@@ -4,6 +4,8 @@ import { SharedHousehold } from "./SharedHousehold.js";
 import { SharedHouseholdLoader } from "./SharedHouseholdLoader.js";
 import { MedicalCareUnit } from "./MedicalCareUnit.js";
 import { MedicalCareUnitLoader } from "./MedicalCareUnitLoader.js";
+import { HomeCaregiving } from "./HomeCaregiving.js";
+import { HomeCaregivingLoader } from "./HomeCaregivingLoader.js";
 
 export class DependencyCareDomain extends FunctionalDomain {
     private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000011";
@@ -12,6 +14,8 @@ export class DependencyCareDomain extends FunctionalDomain {
     private profiles: Map<string, DependencyCareProfile> = new Map();
     private householdLoader: SharedHouseholdLoader | null = null;
     private medicalCareUnitLoader: MedicalCareUnitLoader | null = null;
+    private homeCaregivingLoader: HomeCaregivingLoader | null = null;
+    private homeCaregivingUnit: HomeCaregiving | null = null;
 
     private constructor() {
         super("DependencyCare", "Supports members with chronic illness, disability, or other ongoing care needs.", DependencyCareDomain.DOMAIN_ID);
@@ -84,6 +88,32 @@ export class DependencyCareDomain extends FunctionalDomain {
     removeMedicalCareUnit(id: string): void {
         this.removeUnit(id);
         this.medicalCareUnitLoader?.delete(id);
+    }
+
+    // ── Home Caregiving ──────────────────────────────────────────────────────
+
+    initHomeCaregiving(loader: HomeCaregivingLoader): void {
+        this.homeCaregivingLoader = loader;
+        const existing = loader.load();
+        if (existing) {
+            this.homeCaregivingUnit = existing;
+            this.addUnit(existing);
+        } else {
+            const unit = new HomeCaregiving();
+            this.homeCaregivingUnit = unit;
+            this.addUnit(unit);
+            loader.save(unit);
+        }
+    }
+
+    getHomeCaregiving(): HomeCaregiving | null {
+        return this.homeCaregivingUnit;
+    }
+
+    saveHomeCaregiving(): void {
+        if (this.homeCaregivingUnit) {
+            this.homeCaregivingLoader?.save(this.homeCaregivingUnit);
+        }
     }
 
     // ── Care Profiles ────────────────────────────────────────────────────────

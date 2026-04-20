@@ -4,7 +4,7 @@ import { Bank } from "../../bank/Bank.js";
 import { Scheduler } from "../../scheduler/Scheduler.js";
 import { CentralBank } from "../../central_bank/CentralBank.js";
 
-const COMMONS_DEMURRAGE_RATE = 0.01;
+const COMMONS_DEMURRAGE_RATE = 0.02;
 
 // GET /commonwealth/summary
 export function getSummary(_req: Request, res: Response): void {
