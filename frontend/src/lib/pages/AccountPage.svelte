@@ -68,12 +68,14 @@
     });
   }
 
-  const demurrageAmount = $derived(
-    account && schedule ? account.credits * schedule.rate : 0
-  );
-  const balanceAfter = $derived(
-    account && schedule ? account.credits - demurrageAmount : 0
-  );
+  const demurrageAmount = $derived.by(() => {
+    if (!account || !schedule) return 0;
+    return account.credits * schedule.rate;
+  });
+  const balanceAfter = $derived.by(() => {
+    if (!account || !schedule) return 0;
+    return account.credits - demurrageAmount;
+  });
 </script>
 
 <div class="page-header">

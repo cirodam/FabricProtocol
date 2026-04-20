@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { LocationRegistry } from "../../location/LocationRegistry.js";
 import { Location, LocationType } from "../../location/Location.js";
 import { Address } from "../../location/Address.js";
+import { computeGeographicAnalytics, GeoPoint } from "../../location/GeoAnalytics.js";
 
 function locationToDto(loc: Location) {
     return {
@@ -108,4 +109,20 @@ export function deleteLocation(req: Request, res: Response): void {
     const existed = LocationRegistry.getInstance().remove(req.params.id as string);
     if (!existed) { res.status(404).json({ error: "Location not found" }); return; }
     res.status(204).send();
+}
+
+// GET /locations/analytics?type=community|residential|external
+// Omit type to include all locations.
+export function getAnalytics(req: Request, res: Response): void {
+    const type = req.query.type as string | undefined;
+    const VALID: Set<LocationType> = new Set(["community", "residential", "external"]);
+    const locs = type && VALID.has(type as LocationType)
+        ? LocationRegistry.getInstance().getByType(type as LocationType)
+        : LocationRegistry.getInstance().getAll();
+
+    const points: GeoPoint[] = locs
+        .filter(l => l.latitude !== 0 || l.longitude !== 0)
+        .map(l => ({ id: l.id, label: l.label, lat: l.latitude, lng: l.longitude }));
+
+    res.json(computeGeographicAnalytics(points));
 }

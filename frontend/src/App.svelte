@@ -1,4 +1,5 @@
 <script lang="ts">
+  import HomePage from './lib/pages/HomePage.svelte';
   import MembersPage from './lib/pages/MembersPage.svelte';
   import MemberPage from './lib/pages/MemberPage.svelte';
   import AccountsPage from './lib/pages/AccountsPage.svelte';
@@ -33,9 +34,7 @@
   import AddMillPage from './lib/pages/AddMillPage.svelte';
 
   function getPath() {
-    const p = window.location.pathname;
-    if (p === '/') { history.pushState({}, '', '/members'); return '/members'; }
-    return p;
+    return window.location.pathname;
   }
 
   let path = $state(getPath());
@@ -50,6 +49,7 @@
 
 <nav>
   <span class="brand">LocalCommunity</span>
+  <button class:active={path === '/'} onclick={() => navigate('/')}>Home</button>
   <button class:active={path === '/members'} onclick={() => navigate('/members')}>Members</button>
   <button class:active={path === '/accounts'} onclick={() => navigate('/accounts')}>Accounts</button>
   <button class:active={path.startsWith('/marketplace')} onclick={() => navigate('/marketplace')}>Marketplace</button>
@@ -66,7 +66,9 @@
 </nav>
 
 <main>
-  {#if path === '/members'}
+  {#if path === '/'}
+    <HomePage />
+  {:else if path === '/members'}
     <MembersPage {navigate} />
   {:else if path === '/accounts'}
     <AccountsPage {navigate} />
