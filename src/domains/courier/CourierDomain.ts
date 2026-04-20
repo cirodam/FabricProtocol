@@ -1,85 +1,86 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
-import { DeliveryRoute } from "./DeliveryRoute.js";
-import { Parcel } from "./Parcel.js";
+import { DeliveryRequest } from "./DeliveryRequest.js";
+import { DeliveryRequestLoader } from "./DeliveryRequestLoader.js";
 
 /**
- * The Courier domain handles the movement of physical goods within the community.
+ * The Courier domain handles the movement of physical goods and documents within
+ * the community using salaried couriers in personal vehicles.
  *
- * Rather than depending on individual car ownership or commercial delivery services,
- * the community employs carriers who walk or bike fixed routes on a regular schedule.
- * This makes last-mile logistics a public service — visible, compensable through payroll,
- * and governed by the community.
+ * There are no fixed routes. Instead, the domain maintains an open request queue.
+ * Couriers pick up pending requests and mark them completed when delivered.
+ * Urgent requests (same-day) are surfaced above regular ones in the queue.
  *
- * Routes are sized to fill one carrier's working day and are walked in the same order
- * each cycle, matching the USPS carrier route model. All carriers are community members.
- *
- * Scope includes: Marketplace item delivery, inter-domain goods movement, official
- * Commons notices and documents, and accessibility transport coordination with the
- * Dependency Care domain for members who cannot self-transport.
- *
- * In a federation context, carriers may also run inter-community routes for physical
- * goods and documents exchanged between Commons nodes.
+ * Couriers are community members paid a monthly credit salary — the community pays
+ * for readiness and reliability, not per-delivery throughput.
  */
 export class CourierDomain extends FunctionalDomain {
-    private routes: Map<string, DeliveryRoute> = new Map();
-    private parcels: Map<string, Parcel> = new Map();
+    private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000010";
+    private static instance: CourierDomain;
 
-    constructor() {
-        super("Courier", "Handles the movement of physical goods and documents within the community.");
+    private requests: Map<string, DeliveryRequest> = new Map();
+    private requestLoader: DeliveryRequestLoader | null = null;
+
+    private constructor() {
+        super("Courier", "Moves physical goods and documents within the community on demand.", CourierDomain.DOMAIN_ID);
     }
 
-    // ── Routes ─────────────────────────────────────────────────────────────────
-
-    addRoute(name: string, description: string = ""): DeliveryRoute {
-        const route = new DeliveryRoute(name, description);
-        this.routes.set(route.id, route);
-        return route;
+    static getInstance(): CourierDomain {
+        if (!CourierDomain.instance) {
+            CourierDomain.instance = new CourierDomain();
+        }
+        return CourierDomain.instance;
     }
 
-    assignCarrier(routeId: string, carrierId: string): void {
-        const route = this.routes.get(routeId);
-        if (!route) throw new Error(`Route ${routeId} not found`);
-        route.carrierId = carrierId;
+    initRequests(loader: DeliveryRequestLoader): void {
+        this.requestLoader = loader;
+        for (const r of loader.loadAll()) {
+            this.requests.set(r.id, r);
+        }
     }
 
-    getRoutes(): DeliveryRoute[] {
-        return Array.from(this.routes.values());
+    addRequest(request: DeliveryRequest): void {
+        this.requests.set(request.id, request);
+        this.requestLoader?.save(request);
     }
 
-    getUnassignedRoutes(): DeliveryRoute[] {
-        return this.getRoutes().filter(r => r.carrierId === null);
+    saveRequest(request: DeliveryRequest): void {
+        this.requestLoader?.save(request);
     }
 
-    // ── Parcels ────────────────────────────────────────────────────────────────
-
-    createParcel(senderId: string, recipientId: string, description: string, routeId: string | null = null): Parcel {
-        const parcel = new Parcel(senderId, recipientId, description, routeId);
-        this.parcels.set(parcel.id, parcel);
-        return parcel;
+    getRequest(id: string): DeliveryRequest | undefined {
+        return this.requests.get(id);
     }
 
-    assignParcelToRoute(parcelId: string, routeId: string): void {
-        const parcel = this.parcels.get(parcelId);
-        if (!parcel) throw new Error(`Parcel ${parcelId} not found`);
-        if (!this.routes.has(routeId)) throw new Error(`Route ${routeId} not found`);
-        parcel.routeId = routeId;
+    getAllRequests(): DeliveryRequest[] {
+        return Array.from(this.requests.values());
     }
 
-    markDelivered(parcelId: string): void {
-        const parcel = this.parcels.get(parcelId);
-        if (!parcel) throw new Error(`Parcel ${parcelId} not found`);
-        parcel.deliveredAt = new Date();
+    getPendingRequests(): DeliveryRequest[] {
+        return this.getAllRequests().filter(r => r.isPending);
     }
 
-    getPendingParcels(): Parcel[] {
-        return Array.from(this.parcels.values()).filter(p => p.isPending);
+    getUrgentPendingRequests(): DeliveryRequest[] {
+        return this.getPendingRequests().filter(r => r.isUrgent);
     }
 
-    getParcelsByRoute(routeId: string): Parcel[] {
-        return Array.from(this.parcels.values()).filter(p => p.routeId === routeId);
+    completeRequest(requestId: string): void {
+        const req = this.requests.get(requestId);
+        if (!req) throw new Error(`Request ${requestId} not found`);
+        req.status      = "completed";
+        req.completedAt = new Date();
+        this.requestLoader?.save(req);
     }
 
-    getParcel(parcelId: string): Parcel | undefined {
-        return this.parcels.get(parcelId);
+    cancelRequest(requestId: string): void {
+        const req = this.requests.get(requestId);
+        if (!req) throw new Error(`Request ${requestId} not found`);
+        req.status = "cancelled";
+        this.requestLoader?.save(req);
+    }
+
+    removeRequest(id: string): void {
+        this.requests.delete(id);
+        this.requestLoader?.delete(id);
     }
 }
+

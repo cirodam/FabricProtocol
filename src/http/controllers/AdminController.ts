@@ -8,6 +8,7 @@ import { join } from "path";
  */
 const DATA_DIRS = [
     "data/accounts",
+    "data/courier/requests",
     "data/endowment-profiles",
     "data/food",
     "data/food/kitchens",

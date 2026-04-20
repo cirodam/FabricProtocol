@@ -30,6 +30,8 @@ import { NodeService } from "./network/NodeService.js";
 import { type NodeType } from "./network/NodeIdentity.js";
 import { LocationRegistry } from "./location/LocationRegistry.js";
 import { LocationLoader } from "./location/LocationLoader.js";
+import { CourierDomain } from "./domains/courier/CourierDomain.js";
+import { DeliveryRequestLoader } from "./domains/courier/DeliveryRequestLoader.js";
 
 
 async function init(): Promise<void> {
@@ -59,6 +61,7 @@ async function init(): Promise<void> {
   EducationDomain.getInstance().initSchools(new SchoolLoader("data/education/schools"));
   EducationDomain.getInstance().initLibraries(new LibraryLoader("data/education/libraries"));
   LocationRegistry.getInstance().init(new LocationLoader("data/locations"));
+  CourierDomain.getInstance().initRequests(new DeliveryRequestLoader("data/courier/requests"));
 
   // ── Register domains with Commonwealth ──────────────────────────────────────
   const commonwealth = Commonwealth.getInstance();
@@ -66,6 +69,7 @@ async function init(): Promise<void> {
   commonwealth.addDomain(FoodDomain.getInstance());
   commonwealth.addDomain(HealthcareDomain.getInstance());
   commonwealth.addDomain(EducationDomain.getInstance());
+  commonwealth.addDomain(CourierDomain.getInstance());
 
   // ── Scheduler ────────────────────────────────────────────────────────────────
   const scheduler = new Scheduler("data/scheduler");
