@@ -1,5 +1,5 @@
 import { Community } from "./Community.js";
-import { Commons } from "./commons/Commons.js";
+import { Commonwealth } from "./commons/Commonwealth.js";
 import { CentralBank } from "./central_bank/CentralBank.js";
 import { MemberService } from "./member/MemberService.js";
 import { MemberLoader } from "./member/MemberLoader.js";
@@ -46,7 +46,7 @@ async function init(): Promise<void> {
   scheduler.register({
     name: "payroll",
     intervalMs: every.months(1),
-    run: () => Commons.getInstance().payMonthly(),
+    run: () => Commonwealth.getInstance().payMonthly(),
   });
 
   await scheduler.start();

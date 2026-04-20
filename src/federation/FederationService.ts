@@ -1,4 +1,4 @@
-import { Commons } from "../commons/Commons.js";
+import { Commonwealth } from "../commons/Commonwealth.js";
 import { CommunityLink } from "./CommunityLink.js";
 import { FECTransaction } from "./FECTransaction.js";
 
@@ -51,7 +51,7 @@ export class FederationService {
 
         link.balanceFEC = newBalance;
 
-        const localId = Commons.getInstance().id;
+        const localId = Commonwealth.getInstance().id;
         const tx = new FECTransaction(localId, remoteCommunityId, amount, memo);
         this.transactions.push(tx);
         return tx;
@@ -64,7 +64,7 @@ export class FederationService {
 
         link.balanceFEC += amount;
 
-        const localId = Commons.getInstance().id;
+        const localId = Commonwealth.getInstance().id;
         const tx = new FECTransaction(remoteCommunityId, localId, amount, memo);
         this.transactions.push(tx);
         return tx;
@@ -74,7 +74,7 @@ export class FederationService {
 
     getTransactions(remoteCommunityId?: string): FECTransaction[] {
         if (!remoteCommunityId) return [...this.transactions];
-        const localId = Commons.getInstance().id;
+        const localId = Commonwealth.getInstance().id;
         return this.transactions.filter(
             (tx) => tx.fromCommunityId === remoteCommunityId || tx.toCommunityId === remoteCommunityId
                  || tx.fromCommunityId === localId || tx.toCommunityId === localId

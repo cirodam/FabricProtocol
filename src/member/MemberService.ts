@@ -2,7 +2,7 @@ import { Member } from "./Member.js";
 import { MemberLoader } from "./MemberLoader.js";
 import { DEFAULT_NUTRITIONAL_PROFILES, NutritionalProfile } from "../domains/food/NutritionalProfile.js";
 import { CentralBank } from "../central_bank/CentralBank.js";
-import { Commons } from "../commons/Commons.js";
+import { Commonwealth } from "../commons/Commonwealth.js";
 import { Bank } from "../bank/Bank.js";
 import { Marketplace } from "../marketplace/Marketplace.js";
 import { createHash } from "crypto";
@@ -129,7 +129,7 @@ export class MemberService {
   discharge(member: Member): void {
     Marketplace.getInstance().removePostsByPoster(member.getId());
     CentralBank.getInstance().reclaimEndowment(member);
-    Commons.getInstance().collect(member);
+    Commonwealth.getInstance().collect(member);
 
     Bank.getInstance().closeAccounts(member.getId());
     this.loader?.delete(member.getId());

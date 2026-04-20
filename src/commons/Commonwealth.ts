@@ -9,8 +9,8 @@ import { AssetLedger } from "../ledger/AssetLedger.js";
 // The Commons represents the community's collective investment in itself.
 // It holds pooled credits used to meet basic needs, provide care for dependents,
 // fund insurance, and support members who cannot fully participate in the credit system.
-export class Commons implements IEconomicActor {
-    private static instance: Commons;
+export class Commonwealth implements IEconomicActor {
+    private static instance: Commonwealth;
 
     readonly id: string;
 
@@ -24,11 +24,11 @@ export class Commons implements IEconomicActor {
         this.ledger = LedgerService.getInstance().openLedger(this, "primary");
     }
 
-    static getInstance(): Commons {
-        if (!Commons.instance) {
-        Commons.instance = new Commons();
+    static getInstance(): Commonwealth {
+        if (!Commonwealth.instance) {
+        Commonwealth.instance = new Commonwealth();
         }
-        return Commons.instance;
+        return Commonwealth.instance;
     }
 
     getId(): string { return this.id; }
