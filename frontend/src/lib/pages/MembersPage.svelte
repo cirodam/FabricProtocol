@@ -6,6 +6,7 @@
     firstName: string;
     lastName: string;
     handle: string;
+    birthDate: string;
     joinDate: string;
     trustScore: number;
     phone: string | null;
@@ -32,6 +33,10 @@
   function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
   }
+
+  function age(iso: string) {
+    return Math.floor((Date.now() - new Date(iso).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+  }
 </script>
 
 <div class="page-header">
@@ -52,6 +57,7 @@
       <thead>
         <tr>
           <th>Name</th>
+          <th>Age</th>
           <th>Handle</th>
           <th>Joined</th>
           <th>Trust</th>
@@ -61,6 +67,7 @@
         {#each members as m (m.id)}
           <tr>
             <td><button class="link-btn" onclick={() => navigate(`/members/${m.id}`)}>{m.firstName} {m.lastName}</button></td>
+            <td class="muted">{age(m.birthDate)}</td>
             <td class="handle">@{m.handle}</td>
             <td class="muted">{formatDate(m.joinDate)}</td>
             <td>{m.trustScore.toFixed(2)}</td>
