@@ -28,6 +28,8 @@ import { Scheduler, every } from "./scheduler/Scheduler.js";
 import { HttpServer } from "./http/HttpServer.js";
 import { NodeService } from "./network/NodeService.js";
 import { type NodeType } from "./network/NodeIdentity.js";
+import { LocationRegistry } from "./location/LocationRegistry.js";
+import { LocationLoader } from "./location/LocationLoader.js";
 
 
 async function init(): Promise<void> {
@@ -56,6 +58,7 @@ async function init(): Promise<void> {
   HealthcareDomain.getInstance().initDentalClinics(new DentalClinicLoader("data/healthcare/dental-clinics"));
   EducationDomain.getInstance().initSchools(new SchoolLoader("data/education/schools"));
   EducationDomain.getInstance().initLibraries(new LibraryLoader("data/education/libraries"));
+  LocationRegistry.getInstance().init(new LocationLoader("data/locations"));
 
   // ── Register domains with Commonwealth ──────────────────────────────────────
   const commonwealth = Commonwealth.getInstance();

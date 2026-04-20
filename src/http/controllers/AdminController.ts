@@ -19,6 +19,7 @@ const DATA_DIRS = [
     "data/healthcare/clinics",
     "data/healthcare/dental-clinics",
     "data/housing",
+    "data/locations",
     "data/members",
     "data/posts",
     "data/scheduler",
