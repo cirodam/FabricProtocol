@@ -1,0 +1,10 @@
+{
+  "id": "6cc427ec-0df6-44ce-bdb5-b7d3ee976e0c",
+  "ownerId": "57b0d73c-fe79-4631-89f4-9a938037ef7c",
+  "label": "primary",
+  "credits": 0,
+  "fec": 0,
+  "allowNegativeCredits": false,
+  "exemptFromDemurrage": true,
+  "createdAt": "2026-04-20T17:16:40.613Z"
+}

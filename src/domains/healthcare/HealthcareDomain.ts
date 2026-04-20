@@ -1,10 +1,13 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
 import { Clinic } from "./Clinic.js";
 import { ClinicLoader } from "./ClinicLoader.js";
+import { DentalClinic } from "./DentalClinic.js";
+import { DentalClinicLoader } from "./DentalClinicLoader.js";
 
 export class HealthcareDomain extends FunctionalDomain {
     private static instance: HealthcareDomain;
     private loader: ClinicLoader | null = null;
+    private dentalLoader: DentalClinicLoader | null = null;
 
     constructor() {
         super("Healthcare", "Provides medical care and health services to community members.",
@@ -45,5 +48,36 @@ export class HealthcareDomain extends FunctionalDomain {
     removeClinic(id: string): void {
         this.removeUnit(id);
         this.loader?.delete(id);
+    }
+
+    // ── Dental clinics ───────────────────────────────────────────────────────
+
+    initDentalClinics(loader: DentalClinicLoader): void {
+        this.dentalLoader = loader;
+        for (const clinic of loader.loadAll()) {
+            this.addUnit(clinic);
+        }
+    }
+
+    addDentalClinic(clinic: DentalClinic): void {
+        this.addUnit(clinic);
+        this.dentalLoader?.save(clinic);
+    }
+
+    saveDentalClinic(clinic: DentalClinic): void {
+        this.dentalLoader?.save(clinic);
+    }
+
+    getDentalClinic(id: string): DentalClinic | undefined {
+        return this.getUnitsByType<DentalClinic>("dental-clinic").find(u => u.id === id);
+    }
+
+    getAllDentalClinics(): DentalClinic[] {
+        return this.getUnitsByType<DentalClinic>("dental-clinic");
+    }
+
+    removeDentalClinic(id: string): void {
+        this.removeUnit(id);
+        this.dentalLoader?.delete(id);
     }
 }

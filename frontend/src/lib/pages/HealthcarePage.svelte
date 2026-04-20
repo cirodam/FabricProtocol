@@ -1,7 +1,6 @@
 <script lang="ts">
   const { navigate }: { navigate: (path: string) => void } = $props();
 
-
   interface ClinicDto {
     id: string;
     name: string;
@@ -10,18 +9,33 @@
     createdAt: string;
   }
 
-  let clinics = $state<ClinicDto[]>([]);
-  let loading = $state(true);
-  let error   = $state("");
+  interface DentalClinicDto {
+    id: string;
+    name: string;
+    description: string;
+    staffCount: number;
+    createdAt: string;
+  }
+
+  let clinics       = $state<ClinicDto[]>([]);
+  let dentalClinics = $state<DentalClinicDto[]>([]);
+  let loading       = $state(true);
+  let error         = $state("");
 
   async function load() {
     try {
-      const res = await fetch("/api/healthcare/clinics");
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      clinics = data.clinics;
+      const [clinicsRes, dentalRes] = await Promise.all([
+        fetch("/api/healthcare/clinics"),
+        fetch("/api/healthcare/dental-clinics"),
+      ]);
+      if (!clinicsRes.ok) throw new Error(`HTTP ${clinicsRes.status}`);
+      if (!dentalRes.ok)  throw new Error(`HTTP ${dentalRes.status}`);
+      const clinicsData = await clinicsRes.json();
+      const dentalData  = await dentalRes.json();
+      clinics       = clinicsData.clinics;
+      dentalClinics = dentalData.dentalClinics;
     } catch (e: unknown) {
-      error = e instanceof Error ? e.message : "Failed to load clinics";
+      error = e instanceof Error ? e.message : "Failed to load healthcare";
     } finally {
       loading = false;
     }
@@ -71,20 +85,24 @@
   .page-header h1 { margin: 0; }
   .subtitle { margin: 0.25rem 0 0; color: var(--color-muted, #888); font-size: 0.95rem; }
 
+  .section { margin-bottom: 2.5rem; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .section-header h2 { margin: 0; font-size: 1rem; font-weight: 600; }
+
   .new-btn {
-    padding: 0.5rem 1.1rem;
+    padding: 0.4rem 1rem;
     background: var(--color-primary, #2563eb);
     color: #fff;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
   }
   .new-btn:hover { opacity: 0.85; }
 
-  .clinic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+  .unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
 
-  .clinic-card {
+  .unit-card {
     background: var(--color-surface, #fff);
     border: 1px solid var(--color-border, #e2e8f0);
     border-radius: 10px;
@@ -92,21 +110,18 @@
     cursor: pointer;
     transition: box-shadow 0.15s, border-color 0.15s;
   }
-  .clinic-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-color: var(--color-primary, #2563eb); }
+  .unit-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-color: var(--color-primary, #2563eb); }
+  .unit-card h3 { margin: 0 0 0.5rem; font-size: 1.05rem; }
 
-  .card-badge {
+  .badge {
     display: inline-block;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    padding: 0.2rem 0.6rem;
-    border-radius: 999px;
-    background: var(--color-primary-light, #dbeafe);
-    color: var(--color-primary, #1d4ed8);
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.03em;
+    padding: 0.2rem 0.6rem; border-radius: 999px;
     margin-bottom: 0.75rem;
   }
+  .badge-primary { background: var(--color-primary-light, #dbeafe); color: var(--color-primary, #1d4ed8); }
+  .badge-dental  { background: #e0f2fe; color: #0369a1; }
 
-  .clinic-card h2 { margin: 0 0 0.5rem; font-size: 1.15rem; }
   .card-desc { margin: 0 0 1rem; font-size: 0.875rem; color: var(--color-muted, #666); line-height: 1.5; }
   .card-meta { font-size: 0.85rem; color: var(--color-muted, #888); }
 

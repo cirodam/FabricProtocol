@@ -1,5 +1,7 @@
 import { Router } from "express";
-import { listClinics, getClinic, createClinic, deleteClinic, addStaff, removeStaff } from "../controllers/HealthcareController.js";
+import { listClinics, getClinic, createClinic, deleteClinic, addStaff, removeStaff,
+         listDentalClinics, getDentalClinic, createDentalClinic, deleteDentalClinic,
+         addDentalStaff, removeDentalStaff } from "../controllers/HealthcareController.js";
 
 const router = Router();
 
@@ -9,5 +11,12 @@ router.post("/clinics",                         createClinic);
 router.delete("/clinics/:id",                   deleteClinic);
 router.post("/clinics/:id/staff",               addStaff);
 router.delete("/clinics/:id/staff/:memberId",   removeStaff);
+
+router.get("/dental-clinics",                           listDentalClinics);
+router.get("/dental-clinics/:id",                       getDentalClinic);
+router.post("/dental-clinics",                          createDentalClinic);
+router.delete("/dental-clinics/:id",                    deleteDentalClinic);
+router.post("/dental-clinics/:id/staff",                addDentalStaff);
+router.delete("/dental-clinics/:id/staff/:memberId",    removeDentalStaff);
 
 export default router;

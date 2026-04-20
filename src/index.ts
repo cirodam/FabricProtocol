@@ -19,6 +19,7 @@ import { CommunityKitchenLoader } from "./domains/food/CommunityKitchenLoader.js
 import { MillLoader } from "./domains/food/MillLoader.js";
 import { HealthcareDomain } from "./domains/healthcare/HealthcareDomain.js";
 import { ClinicLoader } from "./domains/healthcare/ClinicLoader.js";
+import { DentalClinicLoader } from "./domains/healthcare/DentalClinicLoader.js";
 import { Scheduler, every } from "./scheduler/Scheduler.js";
 import { HttpServer } from "./http/HttpServer.js";
 import { NodeService } from "./network/NodeService.js";
@@ -45,6 +46,7 @@ async function init(): Promise<void> {
   FoodDomain.getInstance().initKitchens(new CommunityKitchenLoader("data/food/kitchens"));
   FoodDomain.getInstance().initMills(new MillLoader("data/food/mills"));
   HealthcareDomain.getInstance().init(new ClinicLoader("data/healthcare/clinics"));
+  HealthcareDomain.getInstance().initDentalClinics(new DentalClinicLoader("data/healthcare/dental-clinics"));
 
   // ── Register domains with Commonwealth ──────────────────────────────────────
   const commonwealth = Commonwealth.getInstance();
