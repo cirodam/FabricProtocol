@@ -1,16 +1,34 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
 import { HousingUnit } from "./HousingUnit.js";
+import { HousingUnitLoader } from "./HousingUnitLoader.js";
 import { MemberService } from "../../member/MemberService.js";
 
 export class HousingDomain extends FunctionalDomain {
+    private static instance: HousingDomain;
     private housingUnits: Map<string, HousingUnit> = new Map();
+    private loader: HousingUnitLoader | null = null;
 
     constructor() {
         super("Housing", "Manages community housing stock and member accommodation.");
     }
 
+    static getInstance(): HousingDomain {
+        if (!HousingDomain.instance) {
+            HousingDomain.instance = new HousingDomain();
+        }
+        return HousingDomain.instance;
+    }
+
+    init(loader: HousingUnitLoader): void {
+        this.loader = loader;
+        for (const unit of loader.loadAll()) {
+            this.housingUnits.set(unit.id, unit);
+        }
+    }
+
     add(unit: HousingUnit): void {
         this.housingUnits.set(unit.id, unit);
+        this.loader?.save(unit);
     }
 
     get(id: string): HousingUnit | undefined {
@@ -19,6 +37,7 @@ export class HousingDomain extends FunctionalDomain {
 
     remove(id: string): void {
         this.housingUnits.delete(id);
+        this.loader?.delete(id);
     }
 
     getAll(): HousingUnit[] {

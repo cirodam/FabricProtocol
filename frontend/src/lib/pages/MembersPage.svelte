@@ -60,7 +60,6 @@
           <th>Age</th>
           <th>Handle</th>
           <th>Joined</th>
-          <th>Trust</th>
         </tr>
       </thead>
       <tbody>
@@ -70,7 +69,6 @@
             <td class="muted">{age(m.birthDate)}</td>
             <td class="handle">@{m.handle}</td>
             <td class="muted">{formatDate(m.joinDate)}</td>
-            <td>{m.trustScore.toFixed(2)}</td>
           </tr>
         {/each}
       </tbody>

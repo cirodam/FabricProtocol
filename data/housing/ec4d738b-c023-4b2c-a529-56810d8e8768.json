@@ -1,0 +1,15 @@
+{
+  "id": "ec4d738b-c023-4b2c-a529-56810d8e8768",
+  "ownerId": "community",
+  "name": "29 Cherry St",
+  "latitude": 0,
+  "longitude": 0,
+  "hasRunningWater": true,
+  "hasToilet": true,
+  "hasElectricity": true,
+  "hasHeating": true,
+  "hasCooking": true,
+  "isHabitable": true,
+  "memberIds": [],
+  "createdAt": "2026-04-20T02:28:35.841Z"
+}

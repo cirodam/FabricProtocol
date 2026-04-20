@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { IEconomicActor } from "../IEconomicActor.js";
 import { Bank } from "../bank/Bank.js";
 import { MemberEndowment } from "./MemberEndowment.js";
@@ -24,8 +23,10 @@ export class CentralBank implements IEconomicActor {
     private endowmentLoader: MemberEndowmentLoader | null = null;
 
     private constructor() {
-        this.id = randomUUID();
-        Bank.getInstance().openAccount(this, "primary", true, true);
+        this.id = "00000000-0000-0000-0000-000000000001"; // stable singleton ID
+        if (!Bank.getInstance().getPrimaryAccount(this.id)) {
+            Bank.getInstance().openAccount(this, "primary", true, true);
+        }
     }
 
     static getInstance(): CentralBank {

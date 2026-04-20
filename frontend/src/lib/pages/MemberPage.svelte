@@ -158,7 +158,7 @@
     </div>
 
       {#if member.languages.length > 0}
-        <div class="card lang-card">
+        <div class="card lang-card" style="margin-top: 16px;">
           <h2>Languages</h2>
           <table class="lang-table">
             <thead>
@@ -190,7 +190,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 36px;
   }
 
   .back-btn {

@@ -11,6 +11,8 @@ import { Marketplace } from "./marketplace/Marketplace.js";
 import { PostLoader } from "./marketplace/PostLoader.js";
 import { GroupService } from "./group/GroupService.js";
 import { GroupLoader } from "./group/GroupLoader.js";
+import { HousingDomain } from "./domains/housing/HousingDomain.js";
+import { HousingUnitLoader } from "./domains/housing/HousingUnitLoader.js";
 import { Scheduler, every } from "./scheduler/Scheduler.js";
 import { HttpServer } from "./http/HttpServer.js";
 import { NodeService } from "./network/NodeService.js";
@@ -29,6 +31,7 @@ async function init(): Promise<void> {
     new PostLoader("data/posts")
   );
   GroupService.getInstance().init(new GroupLoader("data/groups"));
+  HousingDomain.getInstance().init(new HousingUnitLoader("data/housing"));
 
   // ── Scheduler ────────────────────────────────────────────────────────────────
   const scheduler = new Scheduler("data/scheduler");

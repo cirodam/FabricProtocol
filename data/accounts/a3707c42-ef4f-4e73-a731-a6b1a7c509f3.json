@@ -1,0 +1,11 @@
+{
+  "id": "a3707c42-ef4f-4e73-a731-a6b1a7c509f3",
+  "ownerId": "05e318b1-4884-4379-870f-f53f25e1f71c",
+  "label": "primary",
+  "credits": 0,
+  "foodVouchers": 0,
+  "fec": 0,
+  "allowNegativeCredits": true,
+  "exemptFromDemurrage": true,
+  "createdAt": "2026-04-20T02:03:47.675Z"
+}

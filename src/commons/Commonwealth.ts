@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { IEconomicActor } from "../IEconomicActor.js";
 import { Bank } from "../bank/Bank.js";
 import { CommunityRole } from "./CommunityRole.js";
@@ -19,8 +18,10 @@ export class Commonwealth implements IEconomicActor {
     readonly ledger: AssetLedger;
 
     private constructor() {
-        this.id = randomUUID();
-        Bank.getInstance().openAccount(this, "primary", false, true);
+        this.id = "00000000-0000-0000-0000-000000000002"; // stable singleton ID
+        if (!Bank.getInstance().getPrimaryAccount(this.id)) {
+            Bank.getInstance().openAccount(this, "primary", false, true);
+        }
         this.ledger = LedgerService.getInstance().openLedger(this, "primary");
     }
 
