@@ -19,6 +19,10 @@
   import ClinicPage from './lib/pages/ClinicPage.svelte';
   import AddHealthcareClinicPage from './lib/pages/AddHealthcareClinicPage.svelte';
   import SettingsPage from './lib/pages/SettingsPage.svelte';
+  import CommunityKitchenPage from './lib/pages/CommunityKitchenPage.svelte';
+  import AddCommunityKitchenPage from './lib/pages/AddCommunityKitchenPage.svelte';
+  import MillPage from './lib/pages/MillPage.svelte';
+  import AddMillPage from './lib/pages/AddMillPage.svelte';
 
   function getPath() {
     const p = window.location.pathname;
@@ -74,7 +78,15 @@
   {:else if path === '/demographics'}
     <DemographicsPage />
   {:else if path === '/food'}
-    <FoodPage />
+    <FoodPage {navigate} />
+  {:else if path === '/food/kitchens/new'}
+    <AddCommunityKitchenPage {navigate} />
+  {:else if path.startsWith('/food/kitchens/')}
+    <CommunityKitchenPage id={path.slice('/food/kitchens/'.length)} {navigate} />
+  {:else if path === '/food/mills/new'}
+    <AddMillPage {navigate} />
+  {:else if path.startsWith('/food/mills/')}
+    <MillPage id={path.slice('/food/mills/'.length)} {navigate} />
   {:else if path === '/housing'}
     <HousingPage {navigate} />
   {:else if path === '/housing/new'}

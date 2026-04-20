@@ -15,6 +15,8 @@ import { HousingDomain } from "./domains/housing/HousingDomain.js";
 import { HousingUnitLoader } from "./domains/housing/HousingUnitLoader.js";
 import { FoodDomain } from "./domains/food/FoodDomain.js";
 import { FoodDomainLoader } from "./domains/food/FoodDomainLoader.js";
+import { CommunityKitchenLoader } from "./domains/food/CommunityKitchenLoader.js";
+import { MillLoader } from "./domains/food/MillLoader.js";
 import { HealthcareDomain } from "./domains/healthcare/HealthcareDomain.js";
 import { ClinicLoader } from "./domains/healthcare/ClinicLoader.js";
 import { Scheduler, every } from "./scheduler/Scheduler.js";
@@ -40,6 +42,8 @@ async function init(): Promise<void> {
   GroupService.getInstance().init(new GroupLoader("data/groups"));
   HousingDomain.getInstance().init(new HousingUnitLoader("data/housing"));
   FoodDomain.getInstance().init(new FoodDomainLoader("data/food"));
+  FoodDomain.getInstance().initKitchens(new CommunityKitchenLoader("data/food/kitchens"));
+  FoodDomain.getInstance().initMills(new MillLoader("data/food/mills"));
   HealthcareDomain.getInstance().init(new ClinicLoader("data/healthcare/clinics"));
 
   // ── Register domains with Commonwealth ──────────────────────────────────────

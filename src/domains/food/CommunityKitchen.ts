@@ -13,10 +13,12 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
  * the Cannery, which operates on harvest-cycle rhythms rather than daily service.
  */
 export class CommunityKitchen extends FunctionalUnit {
-    constructor() {
-        super("Community Kitchen", "Produces cooked meals for institutional and communal distribution.");
+    readonly createdAt: Date;
+
+    constructor(name: string, description: string = "Prepares and delivers meals for members who cannot cook for themselves, and for community institutions.") {
+        super(name, description);
+        this.createdAt = new Date();
     }
 
     getType(): string { return "community-kitchen"; }
-
 }

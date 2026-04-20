@@ -17,10 +17,12 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
  * - One manual (hand-cranked) mill as a grid-independent backup
  */
 export class Mill extends FunctionalUnit {
-    constructor() {
-        super("Mill", "Processes whole grain into flour and meal for community consumption.");
+    readonly createdAt: Date;
+
+    constructor(name: string, description: string = "Processes whole grain into flour and meal for community consumption.") {
+        super(name, description);
+        this.createdAt = new Date();
     }
 
     getType(): string { return "mill"; }
-
 }
