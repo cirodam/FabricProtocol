@@ -93,3 +93,35 @@ export function deleteUnit(req: Request, res: Response): void {
     domain.remove(unit.id);
     res.status(204).send();
 }
+
+// POST /housing/units/:id/members  — body: { memberId }
+export function addMember(req: Request, res: Response): void {
+    const domain = HousingDomain.getInstance();
+    const unit = domain.get(req.params.id as string);
+    if (!unit) { res.status(404).json({ error: "Housing unit not found" }); return; }
+
+    const { memberId } = req.body ?? {};
+    if (typeof memberId !== "string" || !memberId.trim()) {
+        res.status(400).json({ error: "memberId is required" });
+        return;
+    }
+    if (!MemberService.getInstance().get(memberId)) {
+        res.status(404).json({ error: "Member not found" });
+        return;
+    }
+
+    unit.addMember(memberId);
+    domain.save(unit);
+    res.status(204).send();
+}
+
+// DELETE /housing/units/:id/members/:memberId
+export function removeMember(req: Request, res: Response): void {
+    const domain = HousingDomain.getInstance();
+    const unit = domain.get(req.params.id as string);
+    if (!unit) { res.status(404).json({ error: "Housing unit not found" }); return; }
+
+    unit.removeMember(req.params.memberId as string);
+    domain.save(unit);
+    res.status(204).send();
+}

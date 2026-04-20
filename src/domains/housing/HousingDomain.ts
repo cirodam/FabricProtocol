@@ -31,6 +31,10 @@ export class HousingDomain extends FunctionalDomain {
         this.loader?.save(unit);
     }
 
+    save(unit: HousingUnit): void {
+        this.loader?.save(unit);
+    }
+
     get(id: string): HousingUnit | undefined {
         return this.housingUnits.get(id);
     }

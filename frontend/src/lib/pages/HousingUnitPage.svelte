@@ -7,6 +7,13 @@
     handle: string;
   }
 
+  interface Member {
+    id: string;
+    firstName: string;
+    lastName: string;
+    handle: string;
+  }
+
   interface HousingUnit {
     id: string;
     name: string;
@@ -25,14 +32,19 @@
   }
 
   let unit: HousingUnit | null = $state(null);
+  let allMembers: Member[] = $state([]);
   let loading = $state(true);
   let error: string | null = $state(null);
 
   async function load() {
     try {
-      const res = await fetch(`/api/housing/units/${id}`);
-      if (!res.ok) throw new Error(res.status === 404 ? 'Unit not found' : `${res.status}`);
-      unit = await res.json();
+      const [unitRes, membersRes] = await Promise.all([
+        fetch(`/api/housing/units/${id}`),
+        fetch('/api/members'),
+      ]);
+      if (!unitRes.ok) throw new Error(unitRes.status === 404 ? 'Unit not found' : `${unitRes.status}`);
+      unit = await unitRes.json();
+      allMembers = membersRes.ok ? await membersRes.json() : [];
     } catch (e) {
       error = (e as Error).message;
     } finally {
@@ -41,6 +53,48 @@
   }
 
   load();
+
+  // Members not already assigned to this unit
+  const unassigned = $derived(
+    unit
+      ? allMembers.filter(m => !unit!.residents.some(r => r.id === m.id))
+      : allMembers
+  );
+
+  let selectedMemberId = $state('');
+  let addingMember = $state(false);
+  let addError: string | null = $state(null);
+
+  async function addMember() {
+    if (!selectedMemberId) return;
+    addingMember = true;
+    addError = null;
+    try {
+      const res = await fetch(`/api/housing/units/${id}/members`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ memberId: selectedMemberId }),
+      });
+      if (!res.ok) { const d = await res.json(); addError = d.error ?? `${res.status}`; return; }
+      await load();
+      selectedMemberId = '';
+    } catch (e) {
+      addError = (e as Error).message;
+    } finally {
+      addingMember = false;
+    }
+  }
+
+  async function removeMember(memberId: string, memberName: string) {
+    if (!confirm(`Remove ${memberName} from this unit?`)) return;
+    try {
+      const res = await fetch(`/api/housing/units/${id}/members/${memberId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`${res.status}`);
+      await load();
+    } catch (e) {
+      error = (e as Error).message;
+    }
+  }
 
   let deleting = $state(false);
 
@@ -121,13 +175,14 @@
   <div class="card full-width">
     <div class="card-title">Residents ({unit.occupancy})</div>
     {#if unit.residents.length === 0}
-      <p class="muted">No residents assigned.</p>
+      <p class="muted no-residents">No residents assigned.</p>
     {:else}
       <table>
         <thead>
           <tr>
             <th>Name</th>
             <th>Handle</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -139,10 +194,28 @@
                 </button>
               </td>
               <td class="muted">@{r.handle}</td>
+              <td class="remove-cell">
+                <button class="remove-btn" onclick={() => removeMember(r.id, r.name)}>Remove</button>
+              </td>
             </tr>
           {/each}
         </tbody>
       </table>
+    {/if}
+
+    {#if unassigned.length > 0}
+      <div class="add-member-row">
+        <select bind:value={selectedMemberId} class="member-select">
+          <option value="">— select member —</option>
+          {#each unassigned as m (m.id)}
+            <option value={m.id}>{m.firstName} {m.lastName} (@{m.handle})</option>
+          {/each}
+        </select>
+        <button class="add-btn" onclick={addMember} disabled={!selectedMemberId || addingMember}>
+          {addingMember ? 'Adding…' : 'Add resident'}
+        </button>
+      </div>
+      {#if addError}<p class="error small">{addError}</p>{/if}
     {/if}
   </div>
 {/if}
@@ -288,6 +361,54 @@
   }
 
   .link-btn:hover { opacity: 0.8; }
+
+  .remove-cell { text-align: right; width: 80px; }
+
+  .remove-btn {
+    background: none;
+    border: 1px solid #ef5350;
+    border-radius: var(--radius);
+    padding: 3px 10px;
+    color: #ef5350;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .remove-btn:hover { background: #3a1b1b; }
+
+  .add-member-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    align-items: center;
+  }
+
+  .member-select {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 7px 10px;
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: inherit;
+  }
+
+  .add-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    padding: 7px 16px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .add-btn:disabled { opacity: 0.5; cursor: default; }
+
+  .no-residents { margin-bottom: 4px; }
+
+  .error.small { font-size: 0.85rem; color: #ef5350; margin-top: 6px; }
 
   .muted { color: var(--text-secondary); }
   .error { color: #ef5350; }
