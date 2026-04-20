@@ -1,10 +1,13 @@
 <script lang="ts">
   import MembersPage from './lib/pages/MembersPage.svelte';
+  import MemberPage from './lib/pages/MemberPage.svelte';
   import AccountsPage from './lib/pages/AccountsPage.svelte';
   import AddMemberPage from './lib/pages/AddMemberPage.svelte';
 
   function getPath() {
-    return window.location.pathname;
+    const p = window.location.pathname;
+    if (p === '/') { history.pushState({}, '', '/members'); return '/members'; }
+    return p;
   }
 
   let path = $state(getPath());
@@ -15,9 +18,6 @@
   }
 
   window.addEventListener('popstate', () => { path = getPath(); });
-
-  // Redirect bare / to /members
-  if (path === '/') navigate('/members');
 </script>
 
 <nav>
@@ -33,5 +33,7 @@
     <AccountsPage />
   {:else if path === '/members/add'}
     <AddMemberPage />
+  {:else if path.startsWith('/members/')}
+    <MemberPage id={path.slice('/members/'.length)} {navigate} />
   {/if}
 </main>

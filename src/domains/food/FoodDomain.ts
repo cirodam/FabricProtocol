@@ -1,7 +1,7 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
 import { Bank } from "../../bank/Bank.js";
 import { MemberService } from "../../member/MemberService.js";
-import { NutritionalProfile, DEFAULT_NUTRITIONAL_PROFILES } from "./NutritionalProfile.js";
+import { NutritionalProfile, DEFAULT_NUTRITIONAL_PROFILES, getMemberType } from "./NutritionalProfile.js";
 
 export class FoodDomain extends FunctionalDomain {
     constructor() {
@@ -43,7 +43,7 @@ export class FoodDomain extends FunctionalDomain {
     getDailyRequirements(): NutritionalProfile {
         const totals: NutritionalProfile = { calories: 0, proteinG: 0, carbsG: 0, fatG: 0, fiberG: 0, waterL: 0 };
         for (const member of MemberService.getInstance().getAll()) {
-            const profile = DEFAULT_NUTRITIONAL_PROFILES[member.memberType];
+            const profile = DEFAULT_NUTRITIONAL_PROFILES[getMemberType(member.birthDate)];
             totals.calories  += profile.calories;
             totals.proteinG  += profile.proteinG;
             totals.carbsG    += profile.carbsG;

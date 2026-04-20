@@ -133,7 +133,6 @@ function toDto(m: Member) {
         lastName:           m.lastName,
         birthDate:          m.birthDate.toISOString(),
         joinDate:           m.joinDate.toISOString(),
-        memberType:         m.memberType,
         handle:             m.handle,
         trustScore:         m.trustScore,
         physicalCapacity:   m.physicalCapacity,

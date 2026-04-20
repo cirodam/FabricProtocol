@@ -1,6 +1,6 @@
 import { Member } from "./Member.js";
 import { MemberLoader } from "./MemberLoader.js";
-import { DEFAULT_NUTRITIONAL_PROFILES, NutritionalProfile } from "../domains/food/NutritionalProfile.js";
+import { DEFAULT_NUTRITIONAL_PROFILES, getMemberType, NutritionalProfile } from "../domains/food/NutritionalProfile.js";
 import { CentralBank } from "../central_bank/CentralBank.js";
 import { Commonwealth } from "../commons/Commonwealth.js";
 import { Bank } from "../bank/Bank.js";
@@ -66,7 +66,7 @@ export class MemberService {
   getDailyNutritionalNeeds(): NutritionalProfile {
     const totals: NutritionalProfile = { calories: 0, proteinG: 0, carbsG: 0, fatG: 0, fiberG: 0, waterL: 0 };
     for (const member of this.members.values()) {
-      const profile = DEFAULT_NUTRITIONAL_PROFILES[member.memberType];
+      const profile = DEFAULT_NUTRITIONAL_PROFILES[getMemberType(member.birthDate)];
       totals.calories  += profile.calories;
       totals.proteinG  += profile.proteinG;
       totals.carbsG    += profile.carbsG;

@@ -1,5 +1,4 @@
 import { randomUUID } from "crypto";
-import { MemberType, getMemberType } from "../domains/food/NutritionalProfile.js";
 import { IEconomicActor } from "../IEconomicActor.js";
 
 export class Member implements IEconomicActor {
@@ -8,7 +7,6 @@ export class Member implements IEconomicActor {
     firstName: string;
     lastName: string;
     birthDate: Date;
-    get memberType(): MemberType { return getMemberType(this.birthDate); }
     readonly joinDate: Date;
     handle: string;              // lowercase alphanumeric + underscores, unique in community
     physicalCapacity: number;    // 0.0–1.0

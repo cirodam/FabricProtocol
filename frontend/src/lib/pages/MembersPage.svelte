@@ -6,7 +6,6 @@
     firstName: string;
     lastName: string;
     handle: string;
-    memberType: string;
     joinDate: string;
     trustScore: number;
     phone: string | null;
@@ -54,7 +53,6 @@
         <tr>
           <th>Name</th>
           <th>Handle</th>
-          <th>Type</th>
           <th>Joined</th>
           <th>Trust</th>
         </tr>
@@ -62,9 +60,8 @@
       <tbody>
         {#each members as m (m.id)}
           <tr>
-            <td>{m.firstName} {m.lastName}</td>
+            <td><button class="link-btn" onclick={() => navigate(`/members/${m.id}`)}>{m.firstName} {m.lastName}</button></td>
             <td class="handle">@{m.handle}</td>
-            <td><span class="badge">{m.memberType}</span></td>
             <td class="muted">{formatDate(m.joinDate)}</td>
             <td>{m.trustScore.toFixed(2)}</td>
           </tr>
@@ -141,14 +138,17 @@
 
   .handle { color: var(--text-muted); font-family: monospace; }
 
-  .badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 12px;
-    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0;
     color: var(--accent);
+    font-size: 14px;
+    cursor: pointer;
+    text-align: left;
   }
+
+  .link-btn:hover { text-decoration: underline; }
 
   .muted { color: var(--text-muted); }
   .error { color: #ef4444; }
