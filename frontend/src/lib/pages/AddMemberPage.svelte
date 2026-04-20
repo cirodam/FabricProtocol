@@ -1,0 +1,208 @@
+<script lang="ts">
+  let firstName = $state('');
+  let lastName = $state('');
+  let birthDate = $state('');
+  let handle = $state('');
+  let phone = $state('');
+  let physicalCapacity = $state(1.0);
+  let cognitiveCapacity = $state(1.0);
+
+  let submitting = $state(false);
+  let error: string | null = $state(null);
+  let success: string | null = $state(null);
+
+  async function submit(e: Event) {
+    e.preventDefault();
+    error = null;
+    success = null;
+    submitting = true;
+
+    try {
+      const body: Record<string, unknown> = {
+        firstName,
+        lastName,
+        birthDate,
+        physicalCapacity,
+        cognitiveCapacity,
+      };
+      if (handle.trim()) body.handle = handle.trim();
+      if (phone.trim()) body.phone = phone.trim();
+
+      const res = await fetch('/api/members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        error = data.error ?? `${res.status} ${res.statusText}`;
+        return;
+      }
+
+      success = `${data.firstName} ${data.lastName} added (${data.id})`;
+      firstName = '';
+      lastName = '';
+      birthDate = '';
+      handle = '';
+      phone = '';
+      physicalCapacity = 1.0;
+      cognitiveCapacity = 1.0;
+    } catch (e) {
+      error = (e as Error).message;
+    } finally {
+      submitting = false;
+    }
+  }
+</script>
+
+<div class="page-header">
+  <h1>Add Member</h1>
+</div>
+
+<form onsubmit={submit}>
+  <div class="grid">
+    <label>
+      First name <span class="req">*</span>
+      <input type="text" bind:value={firstName} required />
+    </label>
+    <label>
+      Last name <span class="req">*</span>
+      <input type="text" bind:value={lastName} required />
+    </label>
+    <label>
+      Date of birth <span class="req">*</span>
+      <input type="date" bind:value={birthDate} required />
+    </label>
+    <label>
+      Handle
+      <input type="text" bind:value={handle} placeholder="auto-generated if blank" />
+    </label>
+    <label>
+      Phone <span class="hint">(E.164, e.g. +15551234567)</span>
+      <input type="tel" bind:value={phone} placeholder="+1…" />
+    </label>
+  </div>
+
+  <div class="capacities">
+    <label>
+      Physical capacity <span class="value">{physicalCapacity.toFixed(2)}</span>
+      <input type="range" min="0" max="1" step="0.05" bind:value={physicalCapacity} />
+    </label>
+    <label>
+      Cognitive capacity <span class="value">{cognitiveCapacity.toFixed(2)}</span>
+      <input type="range" min="0" max="1" step="0.05" bind:value={cognitiveCapacity} />
+    </label>
+  </div>
+
+  {#if error}
+    <p class="error">{error}</p>
+  {/if}
+  {#if success}
+    <p class="success">{success}</p>
+  {/if}
+
+  <button type="submit" disabled={submitting}>
+    {submitting ? 'Adding…' : 'Add member'}
+  </button>
+</form>
+
+<style>
+  .page-header {
+    margin-bottom: 24px;
+  }
+
+  h1 { margin: 0; font-size: 22px; font-weight: 600; }
+
+  form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  input[type="tel"] {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  input:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .capacities {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .capacities label {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .capacities input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+  }
+
+  .value {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+    font-weight: 400;
+    min-width: 3ch;
+  }
+
+  .req { color: #ef4444; }
+
+  .hint {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+
+  button[type="submit"] {
+    align-self: flex-start;
+    padding: 9px 20px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  button[type="submit"]:hover:not(:disabled) { background: var(--accent-hover); }
+  button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .error { color: #ef4444; font-size: 14px; margin: 0; }
+  .success { color: #16a34a; font-size: 14px; margin: 0; }
+</style>

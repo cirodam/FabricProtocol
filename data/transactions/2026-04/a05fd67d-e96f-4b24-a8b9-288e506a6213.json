@@ -1,0 +1,9 @@
+{
+  "id": "a05fd67d-e96f-4b24-a8b9-288e506a6213",
+  "fromAccountId": "9cc464f3-3f47-4152-9f2f-7f14895fe23a",
+  "toAccountId": "3f16438d-4d7e-47e2-8854-00c4cbb5b657",
+  "currency": "credits",
+  "amount": 1000,
+  "memo": "endowment issuance",
+  "timestamp": "2026-04-20T00:46:54.276Z"
+}

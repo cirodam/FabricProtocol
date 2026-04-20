@@ -13,6 +13,45 @@ If query performance becomes a bottleneck at scale, migration to SQLite is strai
 
 ---
 
+## Two-Copy Model
+
+Every write produces two copies of the data:
+
+### Operational Copy (`data/`)
+
+The copy the application reads from. This is the live working state — member records, account balances, proposals, domain configurations. The application loads from here on startup and writes here on every mutation.
+
+This copy may be encrypted at rest in a future version to protect sensitive fields (private keys, personal health information) from physical access to the machine. For now it is plaintext, consistent with the audit copy.
+
+### Audit Copy (`audit/`)
+
+A parallel, always-unencrypted, human-readable copy of every record. Written alongside every operational write. This copy is never encrypted, even if the operational copy is.
+
+The audit copy exists so that:
+- Any member can verify the state of the system by reading files directly, without going through the server
+- External review is always possible — an auditor does not need server access or decryption keys
+- The community retains readable records even if the server software is unavailable
+
+The audit copy mirrors the same directory structure as the operational copy. It is not a diff log — it is a full copy of the current state of each record, updated on every write.
+
+### Write Semantics
+
+Both copies are written on every mutation. The operational copy is written first (atomically via tmp + rename). The audit copy is written immediately after. If the audit write fails, the error is logged but the operational write is not rolled back — the operational copy is authoritative.
+
+```
+write(id, data)
+  → write data/records/{id}.json   (atomic)
+  → write audit/records/{id}.json  (plaintext, non-atomic is acceptable)
+```
+
+### What "Unencrypted" Means
+
+Member PINs are stored as SHA-256 hashes in both copies — the plain-text PIN is never written anywhere. "Unencrypted" means the files are not wrapped in a layer of at-rest encryption. The audit copy will always be readable by anyone with filesystem access to that directory.
+
+This is intentional. The audit copy is a transparency guarantee. If you need to restrict access to it, that is a filesystem permissions concern, not a storage concern.
+
+---
+
 ## Directory structure
 
 ```
