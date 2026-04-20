@@ -7,10 +7,15 @@
   import AddPostPage from './lib/pages/AddPostPage.svelte';
   import PostPage from './lib/pages/PostPage.svelte';
   import CentralBankPage from './lib/pages/CentralBankPage.svelte';
+  import CommonwealthPage from './lib/pages/CommonwealthPage.svelte';
+  import DemographicsPage from './lib/pages/DemographicsPage.svelte';
   import FoodPage from './lib/pages/FoodPage.svelte';
   import HousingPage from './lib/pages/HousingPage.svelte';
   import HousingUnitPage from './lib/pages/HousingUnitPage.svelte';
   import AddHousingUnitPage from './lib/pages/AddHousingUnitPage.svelte';
+  import DependencyCarePage from './lib/pages/DependencyCarePage.svelte';
+  import ChildCarePage from './lib/pages/ChildCarePage.svelte';
+  import HealthcarePage from './lib/pages/HealthcarePage.svelte';
 
   function getPath() {
     const p = window.location.pathname;
@@ -34,8 +39,13 @@
   <button class:active={path === '/accounts'} onclick={() => navigate('/accounts')}>Accounts</button>
   <button class:active={path.startsWith('/marketplace')} onclick={() => navigate('/marketplace')}>Marketplace</button>
   <button class:active={path === '/central-bank'} onclick={() => navigate('/central-bank')}>Central Bank</button>
+  <button class:active={path === '/commonwealth'} onclick={() => navigate('/commonwealth')}>Commonwealth</button>
+  <button class:active={path === '/demographics'} onclick={() => navigate('/demographics')}>Demographics</button>
   <button class:active={path === '/food'} onclick={() => navigate('/food')}>Food</button>
   <button class:active={path.startsWith('/housing')} onclick={() => navigate('/housing')}>Housing</button>
+  <button class:active={path === '/dependency-care'} onclick={() => navigate('/dependency-care')}>Dependency Care</button>
+  <button class:active={path === '/child-care'} onclick={() => navigate('/child-care')}>Child Care</button>
+  <button class:active={path === '/healthcare'} onclick={() => navigate('/healthcare')}>Healthcare</button>
 </nav>
 
 <main>
@@ -55,6 +65,10 @@
     <PostPage id={path.slice('/marketplace/'.length)} {navigate} />
   {:else if path === '/central-bank'}
     <CentralBankPage {navigate} />
+  {:else if path === '/commonwealth'}
+    <CommonwealthPage />
+  {:else if path === '/demographics'}
+    <DemographicsPage />
   {:else if path === '/food'}
     <FoodPage />
   {:else if path === '/housing'}
@@ -63,5 +77,11 @@
     <AddHousingUnitPage {navigate} />
   {:else if path.startsWith('/housing/')}
     <HousingUnitPage id={path.slice('/housing/'.length)} {navigate} />
+  {:else if path === '/dependency-care'}
+    <DependencyCarePage />
+  {:else if path === '/child-care'}
+    <ChildCarePage />
+  {:else if path === '/healthcare'}
+    <HealthcarePage />
   {/if}
 </main>

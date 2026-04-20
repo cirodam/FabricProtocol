@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { listUnits, getUnit, createUnit, deleteUnit, addMember, removeMember } from "../controllers/HousingController.js";
+import { listUnits, getUnit, createUnit, deleteUnit, addMember, removeMember, getUnhoused } from "../controllers/HousingController.js";
 
 const router = Router();
 
+router.get("/unhoused",                           getUnhoused);
 router.get("/units",                              listUnits);
 router.get("/units/:id",                          getUnit);
 router.post("/units",                             createUnit);

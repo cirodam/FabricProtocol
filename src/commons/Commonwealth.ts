@@ -71,8 +71,6 @@ export class Commonwealth implements IEconomicActor {
         for (const account of bankInst.getAccounts(actor.getId())) {
             if (account.credits > 0)
                 bankInst.transfer(account.id, commonsAccount.id, "credits", account.credits, `collect on exit: ${actor.getDisplayName()}`);
-            if (account.foodVouchers > 0)
-                bankInst.transfer(account.id, commonsAccount.id, "foodVouchers", account.foodVouchers, `collect on exit: ${actor.getDisplayName()}`);
             if (account.fec > 0)
                 bankInst.transfer(account.id, commonsAccount.id, "fec", account.fec, `collect on exit: ${actor.getDisplayName()}`);
         }
@@ -118,5 +116,15 @@ export class Commonwealth implements IEconomicActor {
                 bankInst.transfer(account.id, commonsAccount.id, "credits", amount, "demurrage: commons");
             }
         }
+    }
+
+    // Calculate what the commons levy would collect at the given rate without applying it.
+    calculateDemurrage(rate: number): number {
+        let total = 0;
+        for (const account of Bank.getInstance().getAllAccounts()) {
+            if (account.exemptFromDemurrage || account.credits <= 0) continue;
+            total += Math.round(account.credits * rate * 100) / 100;
+        }
+        return total;
     }
 }

@@ -23,7 +23,7 @@ export function getMember(req: Request, res: Response): void {
 // POST /members
 // Body: { firstName, lastName, birthDate, physicalCapacity, cognitiveCapacity, handle?, guardianId?, phone?, languages? }
 export function createMember(req: Request, res: Response): void {
-    const { firstName, lastName, birthDate, physicalCapacity, cognitiveCapacity, handle, guardianId, phone, languages } = req.body ?? {};
+    const { firstName, lastName, birthDate, disabled, handle, guardianId, phone, languages } = req.body ?? {};
 
     if (typeof firstName !== "string" || !firstName.trim()) {
         res.status(400).json({ error: "firstName is required" });
@@ -37,12 +37,8 @@ export function createMember(req: Request, res: Response): void {
         res.status(400).json({ error: "birthDate must be a valid ISO date string" });
         return;
     }
-    if (typeof physicalCapacity !== "number" || physicalCapacity < 0 || physicalCapacity > 1) {
-        res.status(400).json({ error: "physicalCapacity must be a number between 0 and 1" });
-        return;
-    }
-    if (typeof cognitiveCapacity !== "number" || cognitiveCapacity < 0 || cognitiveCapacity > 1) {
-        res.status(400).json({ error: "cognitiveCapacity must be a number between 0 and 1" });
+    if (disabled !== undefined && typeof disabled !== "boolean") {
+        res.status(400).json({ error: "disabled must be a boolean" });
         return;
     }
     if (handle !== undefined && typeof handle !== "string") {
@@ -62,9 +58,8 @@ export function createMember(req: Request, res: Response): void {
         firstName.trim(),
         lastName.trim(),
         new Date(birthDate),
-        physicalCapacity,
-        cognitiveCapacity,
         handle || undefined,
+        disabled ?? false,
     );
     if (guardianId) member.guardianId = guardianId;
     if (phone) member.phone = phone;
@@ -75,7 +70,7 @@ export function createMember(req: Request, res: Response): void {
 }
 
 // PATCH /members/:id
-// Body: any subset of { firstName, lastName, phone, physicalCapacity, cognitiveCapacity, languages }
+// Body: any subset of { firstName, lastName, phone, disabled, languages }
 export function updateMember(req: Request, res: Response): void {
     const member = service().get(req.params.id as string);
     if (!member) {
@@ -83,7 +78,7 @@ export function updateMember(req: Request, res: Response): void {
         return;
     }
 
-    const { firstName, lastName, phone, physicalCapacity, cognitiveCapacity, languages } = req.body ?? {};
+    const { firstName, lastName, phone, disabled, languages } = req.body ?? {};
 
     if (firstName !== undefined) {
         if (typeof firstName !== "string" || !firstName.trim()) {
@@ -106,19 +101,12 @@ export function updateMember(req: Request, res: Response): void {
         }
         member.phone = phone;
     }
-    if (physicalCapacity !== undefined) {
-        if (typeof physicalCapacity !== "number" || physicalCapacity < 0 || physicalCapacity > 1) {
-            res.status(400).json({ error: "physicalCapacity must be a number between 0 and 1" });
+    if (disabled !== undefined) {
+        if (typeof disabled !== "boolean") {
+            res.status(400).json({ error: "disabled must be a boolean" });
             return;
         }
-        member.physicalCapacity = physicalCapacity;
-    }
-    if (cognitiveCapacity !== undefined) {
-        if (typeof cognitiveCapacity !== "number" || cognitiveCapacity < 0 || cognitiveCapacity > 1) {
-            res.status(400).json({ error: "cognitiveCapacity must be a number between 0 and 1" });
-            return;
-        }
-        member.cognitiveCapacity = cognitiveCapacity;
+        member.disabled = disabled;
     }
 
     if (languages !== undefined) {
@@ -144,8 +132,7 @@ function toDto(m: Member) {
         joinDate:           m.joinDate.toISOString(),
         handle:             m.handle,
         trustScore:         m.trustScore,
-        physicalCapacity:   m.physicalCapacity,
-        cognitiveCapacity:  m.cognitiveCapacity,
+        disabled:           m.disabled,
         guardianId:         m.guardianId,
         phone:              m.phone,
         languages:          m.languages,
@@ -162,4 +149,57 @@ export function deleteMember(req: Request, res: Response): void {
 
     service().discharge(member);
     res.status(204).end();
+}
+
+// GET /members/demographics
+export function getDemographics(_req: Request, res: Response): void {
+    const members = service().getAll();
+    const now = Date.now();
+
+    function ageYears(m: Member): number {
+        return Math.floor((now - new Date(m.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+    }
+
+    const WORKING_AGE_MIN = 15;
+    const WORKING_AGE_MAX = 64;
+
+    const ageBrackets = [
+        { label: "0–14",  min: 0,  max: 14,  count: 0 },
+        { label: "15–24", min: 15, max: 24,  count: 0 },
+        { label: "25–44", min: 25, max: 44,  count: 0 },
+        { label: "45–64", min: 45, max: 64,  count: 0 },
+        { label: "65+",   min: 65, max: Infinity, count: 0 },
+    ];
+
+    let workingAge = 0;
+    let disabled = 0;
+    let dependents = 0;
+
+    for (const m of members) {
+        const age = ageYears(m);
+        for (const b of ageBrackets) {
+            if (age >= b.min && age <= b.max) { b.count++; break; }
+        }
+        if (m.disabled) disabled++;
+        const isWorkingAge = age >= WORKING_AGE_MIN && age <= WORKING_AGE_MAX;
+        if (isWorkingAge) workingAge++;
+        if (age < WORKING_AGE_MIN || age > WORKING_AGE_MAX || m.disabled) dependents++;
+    }
+
+    const laborPool = workingAge - disabled;
+    const dependencyRatio = laborPool > 0
+        ? Math.round((dependents / laborPool) * 100) / 100
+        : null;
+
+    res.json({
+        total: members.length,
+        workingAgeMin: WORKING_AGE_MIN,
+        workingAgeMax: WORKING_AGE_MAX,
+        workingAge,
+        disabled,
+        laborPool,
+        dependents,
+        dependencyRatio,
+        ageBrackets,
+    });
 }

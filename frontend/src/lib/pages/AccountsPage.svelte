@@ -11,7 +11,6 @@
     ownerId: string;
     label: string;
     credits: number;
-    foodVouchers: number;
     fec: number;
     allowNegativeCredits: boolean;
     exemptFromDemurrage: boolean;
@@ -77,7 +76,6 @@
           <th>Member</th>
           <th>Account</th>
           <th class="num">Credits</th>
-          <th class="num">Food Vouchers</th>
           <th class="num">FEC</th>
           <th>Flags</th>
         </tr>
@@ -94,7 +92,6 @@
               {/if}
               <td class="label">{acct.label}</td>
               <td class="num">{fmt(acct.credits)}</td>
-              <td class="num">{fmt(acct.foodVouchers)}</td>
               <td class="num">{fmt(acct.fec)}</td>
               <td class="flags">
                 {#if acct.allowNegativeCredits}<span class="flag">overdraft</span>{/if}

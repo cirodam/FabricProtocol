@@ -17,11 +17,13 @@ export abstract class FunctionalDomain implements IEconomicActor {
     private roles: CommunityRole[] = [];
     private units: FunctionalUnit[] = [];
 
-    constructor(name: string, description: string = "") {
-        this.id = randomUUID();
+    constructor(name: string, description: string = "", id?: string) {
+        this.id = id ?? randomUUID();
         this.name = name;
         this.description = description;
-        Bank.getInstance().openAccount(this, "primary", false, true);
+        if (!Bank.getInstance().getPrimaryAccount(this.id)) {
+            Bank.getInstance().openAccount(this, "primary", false, true);
+        }
     }
 
     getId(): string { return this.id; }

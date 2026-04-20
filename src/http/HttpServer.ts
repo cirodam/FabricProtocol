@@ -13,6 +13,7 @@ import centralBankRoutes from "./routes/centralBankRoutes.js";
 import marketplaceRoutes from "./routes/marketplaceRoutes.js";
 import foodRoutes from "./routes/foodRoutes.js";
 import housingRoutes from "./routes/housingRoutes.js";
+import commonwealthRoutes from "./routes/commonwealthRoutes.js";
 import networkRoutes from "../network/networkRoutes.js";
 
 /**
@@ -71,6 +72,7 @@ export class HttpServer {
         this.app.use("/api/marketplace", marketplaceRoutes);
         this.app.use("/api/food", foodRoutes);
         this.app.use("/api/housing", housingRoutes);
+        this.app.use("/api/commonwealth", commonwealthRoutes);
         this.app.use("/api/node", networkRoutes);
 
         // Serve the Svelte frontend (production build)

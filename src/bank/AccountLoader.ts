@@ -6,7 +6,6 @@ interface AccountRecord {
   ownerId: string;
   label: string;
   credits: number;
-  foodVouchers: number;
   fec: number;
   allowNegativeCredits: boolean;
   exemptFromDemurrage: boolean;
@@ -26,7 +25,6 @@ export class AccountLoader {
       ownerId: account.ownerId,
       label: account.label,
       credits: account.credits,
-      foodVouchers: account.foodVouchers,
       fec: account.fec,
       allowNegativeCredits: account.allowNegativeCredits,
       exemptFromDemurrage: account.exemptFromDemurrage,
@@ -51,7 +49,6 @@ export class AccountLoader {
     a["ownerId"] = r.ownerId;
     a["createdAt"] = new Date(r.createdAt);
     account.credits = r.credits;
-    account.foodVouchers = r.foodVouchers;
     account.fec = r.fec;
     return account;
   }

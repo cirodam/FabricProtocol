@@ -1,6 +1,17 @@
 import { Request, Response } from "express";
 import { MemberService } from "../../member/MemberService.js";
 import { getMemberType, DEFAULT_NUTRITIONAL_PROFILES } from "../../domains/food/NutritionalProfile.js";
+import { FoodDomain } from "../../domains/food/FoodDomain.js";
+
+function settingsDto() {
+    const monthlyFoodAllowance = FoodDomain.getInstance().monthlyFoodAllowance;
+    const memberCount = MemberService.getInstance().getAll().length;
+    return {
+        monthlyFoodAllowance,
+        memberCount,
+        monthlyOutflow: monthlyFoodAllowance * memberCount,
+    };
+}
 
 // GET /food/requirements
 export function getRequirements(_req: Request, res: Response): void {
@@ -19,3 +30,20 @@ export function getRequirements(_req: Request, res: Response): void {
 
     res.json(totals);
 }
+
+// GET /food/settings
+export function getSettings(_req: Request, res: Response): void {
+    res.json(settingsDto());
+}
+
+// PUT /food/settings
+export function updateSettings(req: Request, res: Response): void {
+    const { monthlyFoodAllowance } = req.body ?? {};
+    if (typeof monthlyFoodAllowance !== "number" || monthlyFoodAllowance < 0) {
+        res.status(400).json({ error: "monthlyFoodAllowance must be a non-negative number" });
+        return;
+    }
+    FoodDomain.getInstance().setMonthlyAllowance(monthlyFoodAllowance);
+    res.json(settingsDto());
+}
+

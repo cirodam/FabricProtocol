@@ -6,7 +6,6 @@ export class Account {
     readonly ownerId: string;
     readonly label: string;
     credits: number = 0;
-    foodVouchers: number = 0;
     fec: number = 0;
     readonly allowNegativeCredits: boolean;
     readonly exemptFromDemurrage: boolean;

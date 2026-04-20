@@ -45,7 +45,6 @@ export class SmsHandler {
         const account = Bank.getInstance().getPrimaryAccount(member.getId());
         if (!account) return reply("No account found.");
         const parts = [`Credits: ${account.credits}`];
-        if (account.foodVouchers > 0) parts.push(`Food vouchers: ${account.foodVouchers}`);
         if (account.fec > 0) parts.push(`FEC: ${account.fec}`);
         return reply(parts.join("\n"));
       }

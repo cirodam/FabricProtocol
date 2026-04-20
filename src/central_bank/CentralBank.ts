@@ -123,6 +123,20 @@ export class CentralBank implements IEconomicActor {
     }
 
     /**
+     * Calculate what demurrage would collect at the given rate without applying it.
+     * Returns the total amount that would be collected across all non-exempt accounts.
+     */
+    calculateDemurrage(rate: number): number {
+        if (this.moneyInCirculation <= 0) return 0;
+        let total = 0;
+        for (const account of Bank.getInstance().getAllAccounts()) {
+            if (account.exemptFromDemurrage || account.credits <= 0) continue;
+            total += Math.round(account.credits * rate * 100) / 100;
+        }
+        return total;
+    }
+
+    /**
      * Collect demurrage from all non-exempt accounts and return it to the bank.
      * Demurrage is assessed as a percentage of each account's current balance.
      * Only runs when money is in circulation (i.e. the bank account is negative).

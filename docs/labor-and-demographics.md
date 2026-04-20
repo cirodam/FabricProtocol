@@ -58,6 +58,96 @@ community using tractors, basic implements, and locally produced biodiesel lands
   most can be fabricated in a community machine shop
 - A community of 1,000–5,000 needs 2–3 tractors with a shared implement pool, not a fleet
 - Diesel can be produced from waste vegetable oil or dedicated biodiesel crops,
+  reducing dependence on external fuel supply chains
+
+---
+
+## County-Scale Analysis (15,000 People)
+
+Based on typical rural American county demographics:
+
+### Age Distribution
+
+| Group | Age | % | Count |
+|-------|-----|---|-------|
+| Children | 0–17 | 22% | 3,300 |
+| Young adult | 18–24 | 9% | 1,350 |
+| Prime working | 25–54 | 37% | 5,550 |
+| Late career | 55–64 | 13% | 1,950 |
+| Early retirement | 65–74 | 11% | 1,650 |
+| Elderly | 75+ | 8% | 1,200 |
+
+Working-age population (18–64): **~8,850 people**
+
+### Productive Capacity Within Working Age
+
+| Condition | % of working-age | Count |
+|-----------|-----------------|-------|
+| Fully capable | 60% | 5,310 |
+| Partially capable (chronic illness, disability, caregiver role) | 25% | 2,210 |
+| Unable to work (severe disability, serious illness) | 15% | 1,330 |
+
+**Effective labor pool: ~5,300–6,500 people**
+
+A planning figure of **4,000 committed workers** is conservative and appropriate — it accounts
+for people who choose not to take community employment, are in education, or are transitioning
+between roles.
+
+### Dependency Ratio
+
+| Group | Count |
+|-------|-------|
+| Children (0–17) | 3,300 |
+| Elderly (65+) | 2,850 |
+| Unable to work | 1,330 |
+| **Total dependents** | **~7,480** |
+
+```
+dependency ratio = dependents / workers = 7,480 / 4,000 ≈ 1.9
+```
+
+Each worker sustains themselves plus roughly 1.9 dependents. Modern industrial economies
+sustain ratios of 1.7 or worse — this is manageable. The full potential labor pool (5,300+)
+provides headroom to scale up services or reduce working hours without needing population growth.
+
+### Essential Workforce Requirements
+
+Out of 4,000 committed workers, roughly 28% need to be in essential services:
+
+| Domain | Workers needed | % of workforce |
+|--------|---------------|----------------|
+| Food production & distribution | 200 | 5% |
+| Healthcare | 160 | 4% |
+| Education | 200 | 5% |
+| Water & sanitation | 80 | 2% |
+| Energy | 80 | 2% |
+| Transport & logistics | 120 | 3% |
+| Governance & administration | 80 | 2% |
+| Construction & maintenance | 200 | 5% |
+| **Total essential** | **~1,120** | **~28%** |
+
+This leaves **~2,880 workers** for non-essential commerce — the market economy that gives
+credits real purchasing power. Without a non-essential sector, allowances are credits chasing
+nothing, which inflates prices and erodes M in real terms.
+
+---
+
+## Why Scale Matters
+
+The fiscal equation (see [demurrage-sustainability.md](demurrage-sustainability.md)) is
+scale-invariant — a 500-person community can balance the rate/M math with large enough
+endowments. But the labor constraint is not:
+
+- A 500-person community cannot staff a functional hospital
+- It cannot run full food production at scale
+- It likely lacks the skilled workers to cover all essential domains simultaneously
+
+The ~15,000 threshold is not about reaching a target M in nominal terms. It is about having
+enough people to **staff all essential services while maintaining a non-essential sector large
+enough to make credits worth holding**.
+
+County-scale (10,000–20,000) is the natural unit for this model because it is the smallest
+population that can plausibly close both the labor and fiscal constraints simultaneously.
   breaking the external fuel dependency over time
 
 A functional machine shop that can maintain agricultural equipment is therefore one of

@@ -16,8 +16,7 @@ export class Member implements IEconomicActor {
     birthDate: Date;
     readonly joinDate: Date;
     handle: string;              // lowercase alphanumeric + underscores, unique in community
-    physicalCapacity: number;    // 0.0–1.0
-    cognitiveCapacity: number;   // 0.0–1.0
+    disabled: boolean;            // community-determined; exempt from work expectations
     trustScore: number;          // starts at 1.0, increases by 0.01 on each birthday and join anniversary
     guardianId: string | null;
     phone: string | null;        // E.164, e.g. "+15551234567". null if no phone.
@@ -27,9 +26,8 @@ export class Member implements IEconomicActor {
         firstName: string,
         lastName: string,
         birthDate: Date,
-        physicalCapacity: number,
-        cognitiveCapacity: number,
         handle: string = "",
+        disabled: boolean = false,
     ) {
         this.id = randomUUID();
         this.firstName = firstName;
@@ -37,8 +35,7 @@ export class Member implements IEconomicActor {
         this.birthDate = birthDate;
         this.joinDate = new Date();
         this.handle = handle.toLowerCase().replace(/[^a-z0-9_]/g, "");
-        this.physicalCapacity = physicalCapacity;
-        this.cognitiveCapacity = cognitiveCapacity;
+        this.disabled = disabled;
         this.trustScore = 1.0;
         this.guardianId = null;
         this.phone = null;

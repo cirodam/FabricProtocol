@@ -23,6 +23,7 @@ type JobState = Record<string, string>; // name → last-run ISO string
  * reboot will never silently skip a job that was due during the outage.
  */
 export class Scheduler {
+  private static instance: Scheduler | null = null;
   private readonly stateFile: string;
   private readonly tickMs: number;
   private jobs: Map<string, JobConfig> = new Map();
@@ -36,6 +37,21 @@ export class Scheduler {
     this.state = existsSync(this.stateFile)
       ? JSON.parse(readFileSync(this.stateFile, "utf-8")) as JobState
       : {};
+    Scheduler.instance = this;
+  }
+
+  static getInstance(): Scheduler | null {
+    return Scheduler.instance;
+  }
+
+  /** Return last-run and next-run info for a registered job, or null if unknown. */
+  getJobInfo(name: string): { lastRun: Date | null; nextRun: Date | null; intervalMs: number } | null {
+    const job = this.jobs.get(name);
+    if (!job) return null;
+    const lastRunStr = this.state[name];
+    const lastRun = lastRunStr ? new Date(lastRunStr) : null;
+    const nextRun = lastRun ? new Date(lastRun.getTime() + job.intervalMs) : null;
+    return { lastRun, nextRun, intervalMs: job.intervalMs };
   }
 
   register(job: JobConfig): void {

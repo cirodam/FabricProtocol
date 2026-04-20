@@ -103,7 +103,7 @@ export class Bank {
                 `Insufficient credits: account ${fromAccountId} has ${fromBalance}, attempted ${amount}`
             );
         }
-        if ((currency === "fec" || currency === "foodVouchers") && fromBalance < amount) {
+        if (currency === "fec" && fromBalance < amount) {
             throw new Error(
                 `Insufficient ${currency}: account ${fromAccountId} has ${fromBalance}, attempted ${amount}`
             );
@@ -126,16 +126,5 @@ export class Bank {
         return this.transactionLoader?.query({ accountId, month }) ?? [];
     }
 
-    // Convert credits to foodVouchers (or vice versa) within a single account, 1:1.
-    // Used by the Commons to fund voucher issuance from its credit balance.
-    convertCurrency(accountId: string, from: Currency, to: Currency, amount: number): void {
-        if (amount <= 0) throw new Error(`Conversion amount must be positive, got ${amount}`);
-        const account = this.accounts.get(accountId);
-        if (!account) throw new Error(`Account ${accountId} not found`);
-        const balance = (account as Record<Currency, number>)[from];
-        if (balance < amount) throw new Error(`Insufficient ${from}: has ${balance}, needs ${amount}`);
-        (account as Record<Currency, number>)[from] = Math.round((balance - amount) * 100) / 100;
-        (account as Record<Currency, number>)[to]   = Math.round(((account as Record<Currency, number>)[to] + amount) * 100) / 100;
-        this.accountLoader?.save(account);
-    }
 }
+

@@ -16,8 +16,7 @@
     birthDate: string;
     joinDate: string;
     trustScore: number;
-    physicalCapacity: number;
-    cognitiveCapacity: number;
+    disabled: boolean;
     guardianId: string | null;
     phone: string | null;
     languages: LanguageProficiency[];
@@ -139,21 +138,11 @@
       </div>
 
       <div class="card">
-        <h2>Capacity</h2>
-        <div class="capacity">
-          <span class="cap-label">Physical</span>
-          <div class="bar-track">
-            <div class="bar-fill" style="width: {member.physicalCapacity * 100}%"></div>
-          </div>
-          <span class="cap-pct">{Math.round(member.physicalCapacity * 100)}%</span>
-        </div>
-        <div class="capacity">
-          <span class="cap-label">Cognitive</span>
-          <div class="bar-track">
-            <div class="bar-fill" style="width: {member.cognitiveCapacity * 100}%"></div>
-          </div>
-          <span class="cap-pct">{Math.round(member.cognitiveCapacity * 100)}%</span>
-        </div>
+        <h2>Status</h2>
+        <dl>
+          <dt>Disabled</dt>
+          <dd>{member.disabled ? 'Yes' : 'No'}</dd>
+        </dl>
       </div>
     </div>
 
@@ -251,29 +240,6 @@
   dt { color: var(--text-muted); font-size: 13px; white-space: nowrap; }
   dd { margin: 0; font-size: 14px; }
 
-  .capacity {
-    display: grid;
-    grid-template-columns: 72px 1fr 36px;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-
-  .cap-label { font-size: 13px; color: var(--text-muted); }
-  .cap-pct { font-size: 13px; text-align: right; }
-
-  .bar-track {
-    height: 6px;
-    background: color-mix(in srgb, var(--accent) 15%, transparent);
-    border-radius: 999px;
-    overflow: hidden;
-  }
-
-  .bar-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 999px;
-  }
 
   .lang-card { grid-column: 1 / -1; }
 

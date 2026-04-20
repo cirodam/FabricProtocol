@@ -1,0 +1,21 @@
+{
+  "id": "c187abf1-e274-4eae-86ed-18fb86339be2",
+  "firstName": "Emily",
+  "lastName": "Teague",
+  "birthDate": "1994-12-30T00:00:00.000Z",
+  "joinDate": "2026-04-20T12:51:27.634Z",
+  "handle": "eteague",
+  "trustScore": 1,
+  "guardianId": null,
+  "phone": "111111111111",
+  "pinHash": null,
+  "languages": [
+    {
+      "language": "en",
+      "reading": true,
+      "writing": true,
+      "speaking": true
+    }
+  ],
+  "disabled": false
+}

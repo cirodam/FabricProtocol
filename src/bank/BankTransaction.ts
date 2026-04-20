@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 
-export type Currency = "credits" | "foodVouchers" | "fec";
+export type Currency = "credits" | "fec";
 
 export class BankTransaction {
     readonly id: string;

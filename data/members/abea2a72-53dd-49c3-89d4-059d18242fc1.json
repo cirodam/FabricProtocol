@@ -1,0 +1,21 @@
+{
+  "id": "abea2a72-53dd-49c3-89d4-059d18242fc1",
+  "firstName": "Daisy",
+  "lastName": "Freeman",
+  "birthDate": "1945-02-05T00:00:00.000Z",
+  "joinDate": "2026-04-20T15:05:27.795Z",
+  "handle": "ifreeman",
+  "disabled": false,
+  "trustScore": 1,
+  "guardianId": null,
+  "phone": "9292929292929",
+  "pinHash": null,
+  "languages": [
+    {
+      "language": "en",
+      "reading": true,
+      "writing": true,
+      "speaking": true
+    }
+  ]
+}

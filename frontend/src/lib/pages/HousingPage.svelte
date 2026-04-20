@@ -14,6 +14,13 @@
     createdAt: string;
   }
 
+  interface UnhousedMember {
+    id: string;
+    firstName: string;
+    lastName: string;
+    handle: string;
+  }
+
   const PAGE_SIZE = 20;
 
   let units: HousingUnit[] = $state([]);
@@ -21,6 +28,8 @@
   let page = $state(1);
   let loading = $state(true);
   let error: string | null = $state(null);
+  let unhoused: UnhousedMember[] = $state([]);
+  let unhousedLoading = $state(true);
 
   async function load(p: number) {
     loading = true;
@@ -39,7 +48,19 @@
     }
   }
 
+  async function loadUnhoused() {
+    try {
+      const res = await fetch('/api/housing/unhoused');
+      if (!res.ok) throw new Error(`${res.status}`);
+      const data = await res.json();
+      unhoused = data.members;
+    } finally {
+      unhousedLoading = false;
+    }
+  }
+
   load(1);
+  loadUnhoused();
 
   const totalPages = $derived(Math.max(1, Math.ceil(total / PAGE_SIZE)));
 
@@ -109,6 +130,34 @@
     </div>
   {/if}
 {/if}
+
+<section class="unhoused-section">
+  <h2>Unhoused Members</h2>
+  {#if unhousedLoading}
+    <p class="muted">Loading…</p>
+  {:else if unhoused.length === 0}
+    <p class="muted">All members have housing.</p>
+  {:else}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Handle</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each unhoused as m (m.id)}
+            <tr class="clickable" onclick={() => navigate(`/members/${m.id}`)}>
+              <td>{m.firstName} {m.lastName}</td>
+              <td class="muted">{m.handle ? '@' + m.handle : '—'}</td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  {/if}
+</section>
 
 <style>
   .page-header {
@@ -206,5 +255,15 @@
   }
 
   .muted { color: var(--text-secondary); }
+
+  .unhoused-section {
+    margin-top: 40px;
+  }
+
+  .unhoused-section h2 {
+    margin: 0 0 16px;
+    font-size: 16px;
+    font-weight: 600;
+  }
   .error { color: #ef5350; }
 </style>

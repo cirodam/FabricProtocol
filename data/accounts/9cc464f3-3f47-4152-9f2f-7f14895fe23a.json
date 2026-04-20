@@ -3,7 +3,6 @@
   "ownerId": "40da6c1c-69d5-4828-8e0c-b5ae65cef178",
   "label": "primary",
   "credits": -1000,
-  "foodVouchers": 0,
   "fec": 0,
   "allowNegativeCredits": true,
   "exemptFromDemurrage": true,

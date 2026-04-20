@@ -4,8 +4,7 @@
   let birthDate = $state('');
   let handle = $state('');
   let phone = $state('');
-  let physicalCapacity = $state(1.0);
-  let cognitiveCapacity = $state(1.0);
+  let disabled = $state(false);
 
   let submitting = $state(false);
   let error: string | null = $state(null);
@@ -76,8 +75,7 @@
         firstName,
         lastName,
         birthDate,
-        physicalCapacity,
-        cognitiveCapacity,
+        disabled,
       };
       if (handle.trim()) body.handle = handle.trim();
       if (phone.trim()) body.phone = phone.trim();
@@ -102,8 +100,7 @@
       birthDate = '';
       handle = '';
       phone = '';
-      physicalCapacity = 1.0;
-      cognitiveCapacity = 1.0;
+      disabled = false;
       languages = [];
     } catch (e) {
       error = (e as Error).message;
@@ -177,14 +174,10 @@
     </div>
   </div>
 
-  <div class="capacities">
-    <label>
-      Physical capacity <span class="value">{physicalCapacity.toFixed(2)}</span>
-      <input type="range" min="0" max="1" step="0.05" bind:value={physicalCapacity} />
-    </label>
-    <label>
-      Cognitive capacity <span class="value">{cognitiveCapacity.toFixed(2)}</span>
-      <input type="range" min="0" max="1" step="0.05" bind:value={cognitiveCapacity} />
+  <div class="disabled-row">
+    <label class="checkbox-label">
+      <input type="checkbox" bind:checked={disabled} />
+      Disabled <span class="hint">(community-determined; exempt from work expectations)</span>
     </label>
   </div>
 
@@ -248,28 +241,24 @@
     outline-offset: 1px;
   }
 
-  .capacities {
+  .disabled-row {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    align-items: center;
   }
 
-  .capacities label {
+  .checkbox-label {
+    display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
+    font-weight: 500;
+    cursor: pointer;
   }
 
-  .capacities input[type="range"] {
-    flex: 1;
+  .checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
     accent-color: var(--accent);
-  }
-
-  .value {
-    font-variant-numeric: tabular-nums;
-    color: var(--text-muted);
-    font-weight: 400;
-    min-width: 3ch;
   }
 
   .req { color: #ef4444; }

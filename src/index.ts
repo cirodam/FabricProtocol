@@ -13,6 +13,8 @@ import { GroupService } from "./group/GroupService.js";
 import { GroupLoader } from "./group/GroupLoader.js";
 import { HousingDomain } from "./domains/housing/HousingDomain.js";
 import { HousingUnitLoader } from "./domains/housing/HousingUnitLoader.js";
+import { FoodDomain } from "./domains/food/FoodDomain.js";
+import { FoodDomainLoader } from "./domains/food/FoodDomainLoader.js";
 import { Scheduler, every } from "./scheduler/Scheduler.js";
 import { HttpServer } from "./http/HttpServer.js";
 import { NodeService } from "./network/NodeService.js";
@@ -20,6 +22,9 @@ import { type NodeType } from "./network/NodeIdentity.js";
 
 
 async function init(): Promise<void> {
+  // ── Demurrage rates ──────────────────────────────────────────────────────────
+  const BANK_DEMURRAGE_RATE    = 0.02; // shrinks money supply (bank recovery)
+  const COMMONS_DEMURRAGE_RATE = 0.01; // commons levy (taxation)
   // ── Persistence ─────────────────────────────────────────────────────────────
   Bank.getInstance().init(
     new AccountLoader("data/accounts"),
@@ -32,6 +37,7 @@ async function init(): Promise<void> {
   );
   GroupService.getInstance().init(new GroupLoader("data/groups"));
   HousingDomain.getInstance().init(new HousingUnitLoader("data/housing"));
+  FoodDomain.getInstance().init(new FoodDomainLoader("data/food"));
 
   // ── Scheduler ────────────────────────────────────────────────────────────────
   const scheduler = new Scheduler("data/scheduler");
@@ -44,12 +50,22 @@ async function init(): Promise<void> {
   scheduler.register({
     name: "demurrage",
     intervalMs: every.months(1),
-    run: () => CentralBank.getInstance().assessDemurrage(0.02),
+    run: () => CentralBank.getInstance().assessDemurrage(BANK_DEMURRAGE_RATE),
+  });
+  scheduler.register({
+    name: "commons-levy",
+    intervalMs: every.months(1),
+    run: () => Commonwealth.getInstance().assessDemurrage(COMMONS_DEMURRAGE_RATE),
   });
   scheduler.register({
     name: "payroll",
     intervalMs: every.months(1),
     run: () => Commonwealth.getInstance().payMonthly(),
+  });
+  scheduler.register({
+    name: "food-allowance",
+    intervalMs: every.months(1),
+    run: () => FoodDomain.getInstance().issueMonthlyCredits(),
   });
 
   await scheduler.start();

@@ -1,0 +1,17 @@
+{
+  "id": "894e5ee4-e750-4257-a5ef-bd645fe8023f",
+  "ownerId": "community",
+  "name": "117 Freeman Dr",
+  "latitude": 0,
+  "longitude": 0,
+  "hasRunningWater": true,
+  "hasToilet": true,
+  "hasElectricity": true,
+  "hasHeating": true,
+  "hasCooking": true,
+  "isHabitable": true,
+  "memberIds": [
+    "abea2a72-53dd-49c3-89d4-059d18242fc1"
+  ],
+  "createdAt": "2026-04-20T15:20:43.928Z"
+}

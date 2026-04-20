@@ -10,8 +10,7 @@ interface MemberRecord {
   birthDate: string;
   joinDate: string;
   handle: string;
-  physicalCapacity: number;
-  cognitiveCapacity: number;
+  disabled: boolean;
   trustScore: number;
   guardianId: string | null;
   phone: string | null;
@@ -34,8 +33,7 @@ export class MemberLoader {
       birthDate: member.birthDate.toISOString(),
       joinDate: member.joinDate.toISOString(),
       handle: member.handle,
-      physicalCapacity: member.physicalCapacity,
-      cognitiveCapacity: member.cognitiveCapacity,
+      disabled: member.disabled,
       trustScore: member.trustScore,
       guardianId: member.guardianId,
       phone: member.phone,
@@ -58,9 +56,8 @@ export class MemberLoader {
       r.firstName,
       r.lastName,
       new Date(r.birthDate),
-      r.physicalCapacity,
-      r.cognitiveCapacity,
       r.handle,
+      r.disabled ?? false,
     );
     // Restore persisted identity fields — bypass readonly via cast
     (m as unknown as Record<string, unknown>)["id"] = r.id;

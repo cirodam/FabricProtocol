@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { listMembers, getMember, createMember, updateMember, deleteMember } from "../controllers/MemberController.js";
+import { listMembers, getMember, createMember, updateMember, deleteMember, getDemographics } from "../controllers/MemberController.js";
 
 const router = Router();
 
+router.get("/demographics", getDemographics);
 router.get("/",        listMembers);
 router.get("/:id",     getMember);
 router.post("/",       createMember);

@@ -2,40 +2,61 @@ import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
 import { Bank } from "../../bank/Bank.js";
 import { MemberService } from "../../member/MemberService.js";
 import { NutritionalProfile, DEFAULT_NUTRITIONAL_PROFILES, getMemberType } from "./NutritionalProfile.js";
+import { FoodDomainLoader } from "./FoodDomainLoader.js";
 
 export class FoodDomain extends FunctionalDomain {
-    constructor() {
-        super("Food", "Responsible for feeding all community members.");
+    private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000003";
+    private static instance: FoodDomain;
+
+    monthlyFoodAllowance: number = 0;
+    private loader: FoodDomainLoader | null = null;
+
+    private constructor() {
+        super("Food", "Responsible for feeding all community members.", FoodDomain.DOMAIN_ID);
     }
 
-    // Top up every member's foodVoucher balance to targetAmount.
-    // Only issues the difference — members who already have vouchers get less.
-    // Converts the required credits from this domain's account 1:1 before distributing.
-    issueMonthlyVouchers(targetAmount: number): void {
+    static getInstance(): FoodDomain {
+        if (!FoodDomain.instance) {
+            FoodDomain.instance = new FoodDomain();
+        }
+        return FoodDomain.instance;
+    }
+
+    init(loader: FoodDomainLoader): void {
+        this.loader = loader;
+        const settings = loader.load();
+        this.monthlyFoodAllowance = settings.monthlyFoodAllowance;
+    }
+
+    setMonthlyAllowance(amount: number): void {
+        this.monthlyFoodAllowance = amount;
+        this.loader?.save({ monthlyFoodAllowance: amount });
+    }
+
+    // Issue the monthly food credit allowance to every member.
+    // Transfers credits from this domain's account to each member's primary account.
+    issueMonthlyCredits(): void {
+        const amount = this.monthlyFoodAllowance;
+        if (amount <= 0) return;
+
         const bankInst = Bank.getInstance();
         const domainAccount = bankInst.getPrimaryAccount(this.id);
         if (!domainAccount) return;
 
         const members = MemberService.getInstance().getAll();
+        const accounts = members
+            .map(m => bankInst.getPrimaryAccount(m.getId()))
+            .filter((a): a is NonNullable<typeof a> => a !== undefined);
 
-        const gaps: Array<{ accountId: string; gap: number }> = [];
-        for (const member of members) {
-            const account = bankInst.getPrimaryAccount(member.getId());
-            if (!account) continue;
-            const gap = Math.max(0, targetAmount - account.foodVouchers);
-            if (gap > 0) gaps.push({ accountId: account.id, gap });
-        }
-
-        const totalNeeded = gaps.reduce((sum, g) => sum + g.gap, 0);
+        const totalNeeded = amount * accounts.length;
         if (totalNeeded === 0) return;
         if (domainAccount.credits < totalNeeded) {
-            throw new Error(`Food Provisioning has insufficient credits to issue ${totalNeeded} food vouchers`);
+            console.warn(`Food domain has insufficient credits to issue monthly allowance (needs ${totalNeeded}, has ${domainAccount.credits})`);
+            return;
         }
 
-        bankInst.convertCurrency(domainAccount.id, "credits", "foodVouchers", totalNeeded);
-
-        for (const { accountId, gap } of gaps) {
-            bankInst.transfer(domainAccount.id, accountId, "foodVouchers", gap, "monthly food voucher issuance");
+        for (const account of accounts) {
+            bankInst.transfer(domainAccount.id, account.id, "credits", amount, "monthly food allowance");
         }
     }
 
@@ -54,3 +75,4 @@ export class FoodDomain extends FunctionalDomain {
         return totals;
     }
 }
+

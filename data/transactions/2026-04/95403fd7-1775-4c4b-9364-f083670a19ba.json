@@ -1,0 +1,9 @@
+{
+  "id": "95403fd7-1775-4c4b-9364-f083670a19ba",
+  "fromAccountId": "d854afae-a7d7-488b-82b1-1eab80aa7c66",
+  "toAccountId": "6a035926-5b89-480f-8a9e-9abc2302b895",
+  "currency": "credits",
+  "amount": 10,
+  "memo": "demurrage: commons",
+  "timestamp": "2026-04-20T13:50:41.234Z"
+}

@@ -125,3 +125,14 @@ export function removeMember(req: Request, res: Response): void {
     domain.save(unit);
     res.status(204).send();
 }
+
+// GET /housing/unhoused
+export function getUnhoused(_req: Request, res: Response): void {
+    const memberService = MemberService.getInstance();
+    const ids = HousingDomain.getInstance().findUnhoused();
+    const members = ids.map(id => {
+        const m = memberService.get(id);
+        return m ? { id: m.id, firstName: m.firstName, lastName: m.lastName, handle: m.handle } : null;
+    }).filter(Boolean);
+    res.json({ total: members.length, members });
+}
