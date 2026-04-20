@@ -16,6 +16,9 @@
   import DependencyCarePage from './lib/pages/DependencyCarePage.svelte';
   import ChildCarePage from './lib/pages/ChildCarePage.svelte';
   import HealthcarePage from './lib/pages/HealthcarePage.svelte';
+  import ClinicPage from './lib/pages/ClinicPage.svelte';
+  import AddHealthcareClinicPage from './lib/pages/AddHealthcareClinicPage.svelte';
+  import SettingsPage from './lib/pages/SettingsPage.svelte';
 
   function getPath() {
     const p = window.location.pathname;
@@ -45,7 +48,8 @@
   <button class:active={path.startsWith('/housing')} onclick={() => navigate('/housing')}>Housing</button>
   <button class:active={path === '/dependency-care'} onclick={() => navigate('/dependency-care')}>Dependency Care</button>
   <button class:active={path === '/child-care'} onclick={() => navigate('/child-care')}>Child Care</button>
-  <button class:active={path === '/healthcare'} onclick={() => navigate('/healthcare')}>Healthcare</button>
+  <button class:active={path.startsWith('/healthcare')} onclick={() => navigate('/healthcare')}>Healthcare</button>
+  <button class:active={path === '/settings'} onclick={() => navigate('/settings')}>Settings</button>
 </nav>
 
 <main>
@@ -82,6 +86,12 @@
   {:else if path === '/child-care'}
     <ChildCarePage />
   {:else if path === '/healthcare'}
-    <HealthcarePage />
+    <HealthcarePage {navigate} />
+  {:else if path === '/healthcare/clinics/new'}
+    <AddHealthcareClinicPage {navigate} />
+  {:else if path.startsWith('/healthcare/clinics/')}
+    <ClinicPage id={path.slice('/healthcare/clinics/'.length)} {navigate} />
+  {:else if path === '/settings'}
+    <SettingsPage {navigate} />
   {/if}
 </main>

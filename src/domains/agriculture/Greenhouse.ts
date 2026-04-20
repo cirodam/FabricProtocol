@@ -23,4 +23,7 @@ export class Greenhouse extends FunctionalUnit {
     constructor() {
         super("Greenhouse", "Extends the growing season and produces seedlings for community field operations.");
     }
+
+    getType(): string { return "greenhouse"; }
+
 }

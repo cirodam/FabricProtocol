@@ -31,12 +31,23 @@ export abstract class FunctionalUnit implements IEconomicActor {
     getDisplayName(): string { return this.name; }
     getHandle(): string { return this.name.toLowerCase().replace(/[^a-z0-9_]/g, "_"); }
 
+    /** Stable type tag — used to filter units within a domain (e.g. "clinic", "dental-clinic"). */
+    abstract getType(): string;
+
     addRole(role: CommunityRole): void { this.roles.push(role); }
     getRoles(): CommunityRole[] { return this.roles; }
+    clearRoles(): void { this.roles = []; }
 
     addMember(memberId: string): void { this.memberIds.add(memberId); }
     removeMember(memberId: string): void { this.memberIds.delete(memberId); }
     getMembers(): string[] { return Array.from(this.memberIds); }
+
+    // Monthly payroll obligation: sum of all active role salaries.
+    getPayroll(): number {
+        return this.roles
+            .filter(r => r.isActive())
+            .reduce((sum, r) => sum + r.creditsPerMonth, 0);
+    }
 
     // Pay all active roles from this unit's account.
     payMonthly(bankInst: Bank): void {

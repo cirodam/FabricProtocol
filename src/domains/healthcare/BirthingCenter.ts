@@ -29,4 +29,7 @@ export class BirthingCenter extends FunctionalUnit {
     constructor() {
         super("Birthing Center", "Provides prenatal, delivery, and postpartum care for community members.");
     }
+
+    getType(): string { return "birthing-center"; }
+
 }

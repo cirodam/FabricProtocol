@@ -20,4 +20,7 @@ export class MicroHydroStation extends FunctionalUnit {
         super(name, "Run-of-river micro-hydro generation. Continuous, dispatchable, low-maintenance.");
         this.capacityKw = capacityKw;
     }
+
+    getType(): string { return "micro-hydro-station"; }
+
 }

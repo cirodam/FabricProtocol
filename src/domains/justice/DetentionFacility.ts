@@ -45,4 +45,7 @@ export class DetentionFacility extends FunctionalUnit {
     constructor() {
         super("Detention Facility", "Provides secure holding for community members who pose an immediate danger and cannot be managed by other means.");
     }
+
+    getType(): string { return "detention-facility"; }
+
 }

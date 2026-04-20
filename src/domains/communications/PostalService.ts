@@ -8,4 +8,7 @@ export class PostalService extends FunctionalUnit {
     constructor(name: string = "Postal Service") {
         super(name, "Physical mail, courier, and inter-community document transfer.");
     }
+
+    getType(): string { return "postal-service"; }
+
 }

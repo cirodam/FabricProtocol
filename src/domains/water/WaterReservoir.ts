@@ -22,4 +22,7 @@ export class WaterReservoir extends FunctionalUnit {
         super(name, "Water storage providing buffer capacity between supply and distribution.");
         this.capacityLiters = capacityLiters;
     }
+
+    getType(): string { return "water-reservoir"; }
+
 }

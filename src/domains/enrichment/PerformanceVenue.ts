@@ -9,4 +9,7 @@ export class PerformanceVenue extends FunctionalUnit {
         super(name, "Community performance and assembly venue.");
         this.capacitySeated = capacitySeated;
     }
+
+    getType(): string { return "performance-venue"; }
+
 }

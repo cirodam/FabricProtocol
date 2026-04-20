@@ -19,4 +19,7 @@ export class Cannery extends FunctionalUnit {
     constructor() {
         super("Cannery", "Preserves harvest surplus through canning, fermentation, drying, and curing.");
     }
+
+    getType(): string { return "cannery"; }
+
 }

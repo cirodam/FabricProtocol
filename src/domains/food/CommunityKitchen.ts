@@ -16,4 +16,7 @@ export class CommunityKitchen extends FunctionalUnit {
     constructor() {
         super("Community Kitchen", "Produces cooked meals for institutional and communal distribution.");
     }
+
+    getType(): string { return "community-kitchen"; }
+
 }

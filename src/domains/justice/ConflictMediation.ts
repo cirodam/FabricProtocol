@@ -27,4 +27,7 @@ export class ConflictMediation extends FunctionalUnit {
     constructor() {
         super("Conflict Mediation", "Resolves disputes between community members through voluntary, confidential mediation.");
     }
+
+    getType(): string { return "conflict-mediation"; }
+
 }

@@ -30,4 +30,7 @@ export class MentalHealthServices extends FunctionalUnit {
     constructor() {
         super("Mental Health Services", "Provides counseling, psychiatric care, and addiction services for community members.");
     }
+
+    getType(): string { return "mental-health-services"; }
+
 }

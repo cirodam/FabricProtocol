@@ -25,4 +25,7 @@ export class SeedLibrary extends FunctionalUnit {
     constructor() {
         super("Seed Library", "Maintains community seed supply, genetic diversity, and seed sovereignty.");
     }
+
+    getType(): string { return "seed-library"; }
+
 }

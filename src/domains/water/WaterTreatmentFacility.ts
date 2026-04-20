@@ -27,4 +27,7 @@ export class WaterTreatmentFacility extends FunctionalUnit {
         super(name, "Filters and sterilizes raw water for safe drinking and household use.");
         this.capacityLitersPerDay = capacityLitersPerDay;
     }
+
+    getType(): string { return "water-treatment-facility"; }
+
 }

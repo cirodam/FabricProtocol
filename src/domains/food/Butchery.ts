@@ -21,4 +21,7 @@ export class Butchery extends FunctionalUnit {
     constructor() {
         super("Butchery", "Handles the slaughter and processing of community livestock into food.");
     }
+
+    getType(): string { return "butchery"; }
+
 }

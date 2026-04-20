@@ -32,4 +32,7 @@ export class MedicalCareUnit extends FunctionalUnit {
     constructor() {
         super("Medical Care Unit", "Provides continuous clinical care for community members with complex or end-of-life needs.");
     }
+
+    getType(): string { return "medical-care-unit"; }
+
 }

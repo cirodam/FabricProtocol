@@ -20,4 +20,7 @@ export class Mill extends FunctionalUnit {
     constructor() {
         super("Mill", "Processes whole grain into flour and meal for community consumption.");
     }
+
+    getType(): string { return "mill"; }
+
 }

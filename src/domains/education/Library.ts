@@ -25,4 +25,7 @@ export class Library extends FunctionalUnit {
     constructor() {
         super("Library", "Maintains the community's knowledge commons, records, and reference collections.");
     }
+
+    getType(): string { return "library"; }
+
 }

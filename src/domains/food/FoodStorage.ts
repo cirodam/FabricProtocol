@@ -20,4 +20,7 @@ export class FoodStorage extends FunctionalUnit {
     constructor() {
         super("Food Storage", "Manages community food storage infrastructure, inventory, and rotation.");
     }
+
+    getType(): string { return "food-storage"; }
+
 }

@@ -21,4 +21,7 @@ export class MachineShop extends FunctionalUnit {
     constructor(name: string = "Machine Shop") {
         super(name, "Metal fabrication and machining. Produces and repairs mechanical components for community infrastructure.");
     }
+
+    getType(): string { return "machine-shop"; }
+
 }

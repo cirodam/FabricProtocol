@@ -23,4 +23,7 @@ export class SolarArray extends FunctionalUnit {
         this.capacityKw = capacityKw;
         this.storageKwh = storageKwh;
     }
+
+    getType(): string { return "solar-array"; }
+
 }

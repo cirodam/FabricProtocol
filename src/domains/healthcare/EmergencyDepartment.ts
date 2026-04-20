@@ -25,4 +25,7 @@ export class EmergencyDepartment extends FunctionalUnit {
     constructor() {
         super("Emergency Department", "Provides 24/7 emergency, trauma, and inpatient care for the community.");
     }
+
+    getType(): string { return "emergency-department"; }
+
 }

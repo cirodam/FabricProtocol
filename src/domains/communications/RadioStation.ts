@@ -10,4 +10,7 @@ export class RadioStation extends FunctionalUnit {
         super(name, "Community radio station providing broadcast and emergency communications.");
         this.frequencyMHz = frequencyMHz;
     }
+
+    getType(): string { return "radio-station"; }
+
 }

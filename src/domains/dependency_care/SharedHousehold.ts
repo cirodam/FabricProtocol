@@ -30,4 +30,7 @@ export class SharedHousehold extends FunctionalUnit {
     constructor(name: string) {
         super(name, "A small residential care home providing supported living for dependent community members.");
     }
+
+    getType(): string { return "shared-household"; }
+
 }

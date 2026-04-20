@@ -23,7 +23,12 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
  * Total staffing: ~30–40 FTEs
  */
 export class DentalClinic extends FunctionalUnit {
-    constructor() {
-        super("Dental Clinic", "Provides preventive and restorative oral health care for community members.");
+    readonly createdAt: Date;
+
+    constructor(name: string, description: string = "Provides preventive and restorative oral health care for community members.") {
+        super(name, description);
+        this.createdAt = new Date();
     }
+
+    getType(): string { return "dental-clinic"; }
 }

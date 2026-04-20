@@ -29,4 +29,7 @@ export class HomeChildcare extends FunctionalUnit {
     constructor() {
         super("Home Childcare", "Provides paid positions for community members caring for young children at home.");
     }
+
+    getType(): string { return "home-childcare"; }
+
 }

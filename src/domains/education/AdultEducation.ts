@@ -26,4 +26,7 @@ export class AdultEducation extends FunctionalUnit {
     constructor() {
         super("Adult Education", "Provides foundational and continuing education for adult community members.");
     }
+
+    getType(): string { return "adult-education"; }
+
 }

@@ -15,6 +15,8 @@ import { HousingDomain } from "./domains/housing/HousingDomain.js";
 import { HousingUnitLoader } from "./domains/housing/HousingUnitLoader.js";
 import { FoodDomain } from "./domains/food/FoodDomain.js";
 import { FoodDomainLoader } from "./domains/food/FoodDomainLoader.js";
+import { HealthcareDomain } from "./domains/healthcare/HealthcareDomain.js";
+import { ClinicLoader } from "./domains/healthcare/ClinicLoader.js";
 import { Scheduler, every } from "./scheduler/Scheduler.js";
 import { HttpServer } from "./http/HttpServer.js";
 import { NodeService } from "./network/NodeService.js";
@@ -38,6 +40,13 @@ async function init(): Promise<void> {
   GroupService.getInstance().init(new GroupLoader("data/groups"));
   HousingDomain.getInstance().init(new HousingUnitLoader("data/housing"));
   FoodDomain.getInstance().init(new FoodDomainLoader("data/food"));
+  HealthcareDomain.getInstance().init(new ClinicLoader("data/healthcare/clinics"));
+
+  // ── Register domains with Commonwealth ──────────────────────────────────────
+  const commonwealth = Commonwealth.getInstance();
+  commonwealth.addDomain(HousingDomain.getInstance());
+  commonwealth.addDomain(FoodDomain.getInstance());
+  commonwealth.addDomain(HealthcareDomain.getInstance());
 
   // ── Scheduler ────────────────────────────────────────────────────────────────
   const scheduler = new Scheduler("data/scheduler");

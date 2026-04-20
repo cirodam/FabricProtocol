@@ -17,4 +17,7 @@ export class Bakery extends FunctionalUnit {
     constructor() {
         super("Bakery", "Produces bread and grain-based staples for community distribution.");
     }
+
+    getType(): string { return "bakery"; }
+
 }

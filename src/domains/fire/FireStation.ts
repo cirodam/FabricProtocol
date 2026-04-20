@@ -31,4 +31,7 @@ export class FireStation extends FunctionalUnit {
     constructor(name: string) {
         super(name, "Operational base for fire suppression, rescue, and emergency first response.");
     }
+
+    getType(): string { return "fire-station"; }
+
 }

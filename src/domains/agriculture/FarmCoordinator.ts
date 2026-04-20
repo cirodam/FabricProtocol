@@ -26,4 +26,7 @@ export class FarmCoordinator extends FunctionalUnit {
     constructor() {
         super("Farm Coordinator", "Coordinates with private farms to ensure community food needs are met.");
     }
+
+    getType(): string { return "farm-coordinator"; }
+
 }

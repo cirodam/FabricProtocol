@@ -1,0 +1,20 @@
+{
+  "id": "651076a9-a631-46cf-ad9b-084ef2b17e21",
+  "name": "Eastside Clinic",
+  "description": "Provides primary care, preventive medicine, and chronic disease management.",
+  "staffIds": [
+    "32aa18b2-f737-45dd-86f0-a14617f14fc4"
+  ],
+  "roles": [
+    {
+      "id": "3a403257-f477-4f79-ab1e-cc5ce0bbf79f",
+      "title": "EMT",
+      "description": "",
+      "memberId": "32aa18b2-f737-45dd-86f0-a14617f14fc4",
+      "creditsPerMonth": 800,
+      "termStartDate": "2026-04-20T17:08:51.595Z",
+      "termEndDate": null
+    }
+  ],
+  "createdAt": "2026-04-20T17:08:40.031Z"
+}

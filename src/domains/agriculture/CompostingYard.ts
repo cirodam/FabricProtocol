@@ -25,4 +25,7 @@ export class CompostingYard extends FunctionalUnit {
     constructor() {
         super("Composting Yard", "Closes the nutrient loop by converting organic waste into soil amendments for farm operations.");
     }
+
+    getType(): string { return "composting-yard"; }
+
 }

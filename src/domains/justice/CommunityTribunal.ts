@@ -41,4 +41,7 @@ export class CommunityTribunal extends FunctionalUnit {
     constructor() {
         super("Community Tribunal", "Makes binding decisions on serious harms through a restorative community process.");
     }
+
+    getType(): string { return "community-tribunal"; }
+
 }

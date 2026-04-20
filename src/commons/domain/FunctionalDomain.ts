@@ -34,9 +34,22 @@ export abstract class FunctionalDomain implements IEconomicActor {
     getRoles(): CommunityRole[] { return this.roles; }
 
     addUnit(unit: FunctionalUnit): void { this.units.push(unit); }
+    removeUnit(id: string): void { this.units = this.units.filter(u => u.id !== id); }
     getUnits(): FunctionalUnit[] { return this.units; }
+    getUnitsByType<T extends FunctionalUnit>(type: string): T[] {
+        return this.units.filter(u => u.getType() === type) as T[];
+    }
 
-    // Pay domain-level roles from this domain's account, then delegate to each unit.
+    // Monthly payroll: domain-level roles plus all units.
+    getPayroll(): number {
+        const domainPayroll = this.roles
+            .filter(r => r.isActive())
+            .reduce((sum, r) => sum + r.creditsPerMonth, 0);
+        const unitsPayroll = this.units.reduce((sum, u) => sum + u.getPayroll(), 0);
+        return domainPayroll + unitsPayroll;
+    }
+
+    // Pay domain-level roles, then delegate to each unit.
     payMonthly(): void {
         const bankInst = Bank.getInstance();
         const payerAccount = bankInst.getPrimaryAccount(this.id);

@@ -25,4 +25,7 @@ export class VocationalTraining extends FunctionalUnit {
     constructor() {
         super("Vocational Training", "Develops community-specific skills through apprenticeship and structured mentorship across all functional domains.");
     }
+
+    getType(): string { return "vocational-training"; }
+
 }

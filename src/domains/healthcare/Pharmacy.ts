@@ -28,4 +28,7 @@ export class Pharmacy extends FunctionalUnit {
     constructor() {
         super("Pharmacy", "Dispenses medications and manages the community's essential medicine stockpile.");
     }
+
+    getType(): string { return "pharmacy"; }
+
 }

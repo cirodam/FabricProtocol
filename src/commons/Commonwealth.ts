@@ -102,6 +102,32 @@ export class Commonwealth implements IEconomicActor {
         }
     }
 
+    /**
+     * Returns monthly payroll obligations broken down by domain, plus a commons-level
+     * line for positions held directly by the Commonwealth (governance staff, etc.).
+     *
+     * Shape:
+     *   {
+     *     commons:  number,          // positions held at the Commonwealth level
+     *     domains:  { name, payroll }[],
+     *     total:    number
+     *   }
+     */
+    getOutflows(): { commons: number; domains: { name: string; payroll: number }[]; total: number } {
+        const commons = this.positions
+            .filter(p => p.isActive())
+            .reduce((sum, p) => sum + p.creditsPerMonth, 0);
+
+        const domains = this.domains.map(d => ({
+            name: d.name,
+            payroll: d.getPayroll(),
+        }));
+
+        const total = commons + domains.reduce((sum, d) => sum + d.payroll, 0);
+
+        return { commons, domains, total };
+    }
+
     // Collect demurrage from all non-exempt accounts into the Commons primary account.
     // Always runs — commons levy is unconditional.
     assessDemurrage(rate: number): void {

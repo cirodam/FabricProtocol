@@ -15,4 +15,7 @@ export class Woodshop extends FunctionalUnit {
     constructor(name: string = "Woodshop") {
         super(name, "Carpentry and woodworking. Produces structural and finish wood goods for the community.");
     }
+
+    getType(): string { return "woodshop"; }
+
 }

@@ -28,4 +28,7 @@ export class School extends FunctionalUnit {
     constructor() {
         super("School", "Provides formal instruction for children, scaled to community capacity.");
     }
+
+    getType(): string { return "school"; }
+
 }
