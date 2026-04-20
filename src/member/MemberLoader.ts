@@ -1,4 +1,5 @@
 import { Member } from "./Member.js";
+import { LanguageProficiency } from "./Member.js";
 import { FileStore } from "../storage/FileStore.js";
 
 /** Shape of a Member record on disk. All Dates stored as ISO strings. */
@@ -15,6 +16,7 @@ interface MemberRecord {
   guardianId: string | null;
   phone: string | null;
   pinHash: string | null;
+  languages: LanguageProficiency[];
 }
 
 export class MemberLoader {
@@ -38,6 +40,7 @@ export class MemberLoader {
       guardianId: member.guardianId,
       phone: member.phone,
       pinHash: member.pinHash,
+      languages: member.languages,
     };
     this.store.write(member.id, record);
   }
@@ -66,6 +69,7 @@ export class MemberLoader {
     m.guardianId = r.guardianId;
     m.phone = r.phone;
     m.pinHash = r.pinHash ?? null;
+    m.languages = r.languages ?? [];
     return m;
   }
 }

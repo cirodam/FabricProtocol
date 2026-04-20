@@ -1,6 +1,13 @@
 import { randomUUID } from "crypto";
 import { IEconomicActor } from "../IEconomicActor.js";
 
+export interface LanguageProficiency {
+    language: string;   // BCP 47, e.g. "en", "es", "zh-Hans"
+    reading: boolean;
+    writing: boolean;
+    speaking: boolean;
+}
+
 export class Member implements IEconomicActor {
 
     readonly id: string;
@@ -15,6 +22,7 @@ export class Member implements IEconomicActor {
     guardianId: string | null;
     phone: string | null;        // E.164, e.g. "+15551234567". null if no phone.
     pinHash: string | null;      // SHA-256 hex of PIN. null until set.
+    languages: LanguageProficiency[];
     constructor(
         firstName: string,
         lastName: string,
@@ -35,6 +43,7 @@ export class Member implements IEconomicActor {
         this.guardianId = null;
         this.phone = null;
         this.pinHash = null;
+        this.languages = [];
     }
 
     getId(): string { return this.id; }

@@ -1,6 +1,13 @@
 <script lang="ts">
   const { id, navigate }: { id: string; navigate: (path: string) => void } = $props();
 
+  interface LanguageProficiency {
+    language: string;
+    reading: boolean;
+    writing: boolean;
+    speaking: boolean;
+  }
+
   interface Member {
     id: string;
     firstName: string;
@@ -13,6 +20,7 @@
     cognitiveCapacity: number;
     guardianId: string | null;
     phone: string | null;
+    languages: LanguageProficiency[];
   }
 
   let member: Member | null = $state(null);
@@ -148,6 +156,32 @@
         </div>
       </div>
     </div>
+
+      {#if member.languages.length > 0}
+        <div class="card lang-card">
+          <h2>Languages</h2>
+          <table class="lang-table">
+            <thead>
+              <tr>
+                <th>Language</th>
+                <th>Reading</th>
+                <th>Writing</th>
+                <th>Speaking</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each member.languages as lang (lang.language)}
+                <tr>
+                  <td>{lang.language}</td>
+                  <td>{lang.reading ? '✓' : '—'}</td>
+                  <td>{lang.writing ? '✓' : '—'}</td>
+                  <td>{lang.speaking ? '✓' : '—'}</td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
+      {/if}
   </div>
 {/if}
 
@@ -240,6 +274,22 @@
     background: var(--accent);
     border-radius: 999px;
   }
+
+  .lang-card { grid-column: 1 / -1; }
+
+  .lang-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .lang-table th {
+    text-align: left;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .lang-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .lang-table tr:last-child td { border-bottom: none; }
 
   .muted { color: var(--text-muted); }
   .error { color: #ef4444; }

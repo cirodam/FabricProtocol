@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Member } from "../../member/Member.js";
+import { Member, LanguageProficiency } from "../../member/Member.js";
 import { MemberService } from "../../member/MemberService.js";
 
 const service = () => MemberService.getInstance();
@@ -21,9 +21,9 @@ export function getMember(req: Request, res: Response): void {
 }
 
 // POST /members
-// Body: { firstName, lastName, birthDate, physicalCapacity, cognitiveCapacity, handle?, guardianId?, phone? }
+// Body: { firstName, lastName, birthDate, physicalCapacity, cognitiveCapacity, handle?, guardianId?, phone?, languages? }
 export function createMember(req: Request, res: Response): void {
-    const { firstName, lastName, birthDate, physicalCapacity, cognitiveCapacity, handle, guardianId, phone } = req.body ?? {};
+    const { firstName, lastName, birthDate, physicalCapacity, cognitiveCapacity, handle, guardianId, phone, languages } = req.body ?? {};
 
     if (typeof firstName !== "string" || !firstName.trim()) {
         res.status(400).json({ error: "firstName is required" });
@@ -68,13 +68,14 @@ export function createMember(req: Request, res: Response): void {
     );
     if (guardianId) member.guardianId = guardianId;
     if (phone) member.phone = phone;
+    if (Array.isArray(languages)) member.languages = (languages as LanguageProficiency[]);
 
     service().add(member);
     res.status(201).json(toDto(member));
 }
 
 // PATCH /members/:id
-// Body: any subset of { firstName, lastName, phone, physicalCapacity, cognitiveCapacity }
+// Body: any subset of { firstName, lastName, phone, physicalCapacity, cognitiveCapacity, languages }
 export function updateMember(req: Request, res: Response): void {
     const member = service().get(req.params.id as string);
     if (!member) {
@@ -82,7 +83,7 @@ export function updateMember(req: Request, res: Response): void {
         return;
     }
 
-    const { firstName, lastName, phone, physicalCapacity, cognitiveCapacity } = req.body ?? {};
+    const { firstName, lastName, phone, physicalCapacity, cognitiveCapacity, languages } = req.body ?? {};
 
     if (firstName !== undefined) {
         if (typeof firstName !== "string" || !firstName.trim()) {
@@ -120,6 +121,14 @@ export function updateMember(req: Request, res: Response): void {
         member.cognitiveCapacity = cognitiveCapacity;
     }
 
+    if (languages !== undefined) {
+        if (!Array.isArray(languages)) {
+            res.status(400).json({ error: "languages must be an array" });
+            return;
+        }
+        member.languages = languages as LanguageProficiency[];
+    }
+
     // Persist the changes
     MemberService.getInstance().save(member);
 
@@ -139,6 +148,7 @@ function toDto(m: Member) {
         cognitiveCapacity:  m.cognitiveCapacity,
         guardianId:         m.guardianId,
         phone:              m.phone,
+        languages:          m.languages,
     };
 }
 
