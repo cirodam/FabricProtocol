@@ -15,7 +15,8 @@
     handle: string;
     birthDate: string;
     joinDate: string;
-    trustScore: number;
+    trustScore: number; // kept for backwards compat — not rendered
+    personYears: number;
     disabled: boolean;
     guardianId: string | null;
     phone: string | null;
@@ -132,8 +133,8 @@
           <dt>Duration</dt>
           <dd>{yearsAsMember(member.joinDate)}</dd>
 
-          <dt>Trust score</dt>
-          <dd>{member.trustScore.toFixed(2)}</dd>
+          <dt>Person-years</dt>
+          <dd>{member.personYears.toFixed(2)}</dd>
         </dl>
       </div>
 

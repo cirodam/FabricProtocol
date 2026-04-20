@@ -39,7 +39,7 @@ export function getOutflows(_req: Request, res: Response): void {
     const cb = CentralBank.getInstance();
     const allowances = {
         total:       cb.desiredMoneyInCirculation,
-        perMember:   CentralBank.BASE_ENDOWMENT,
+        perMember:   CentralBank.CREDITS_PER_PERSON_YEAR,
     };
     res.json({
         payroll,

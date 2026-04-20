@@ -13,8 +13,8 @@ import { MemberEndowmentLoader } from "./MemberEndowmentLoader.js";
 export class CentralBank implements IEconomicActor {
     private static instance: CentralBank;
 
-    /** Base endowment issued to a fully-trusted member (trustScore = 1.0). */
-    static readonly BASE_ENDOWMENT = 1000;
+    /** Credits issued per person-year (on joining and each anniversary). */
+    static readonly CREDITS_PER_PERSON_YEAR = 10_000;
 
     readonly id: string;
 

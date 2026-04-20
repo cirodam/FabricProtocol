@@ -11,7 +11,6 @@ interface MemberRecord {
   joinDate: string;
   handle: string;
   disabled: boolean;
-  trustScore: number;
   guardianId: string | null;
   phone: string | null;
   pinHash: string | null;
@@ -34,7 +33,6 @@ export class MemberLoader {
       joinDate: member.joinDate.toISOString(),
       handle: member.handle,
       disabled: member.disabled,
-      trustScore: member.trustScore,
       guardianId: member.guardianId,
       phone: member.phone,
       pinHash: member.pinHash,
@@ -62,7 +60,6 @@ export class MemberLoader {
     // Restore persisted identity fields — bypass readonly via cast
     (m as unknown as Record<string, unknown>)["id"] = r.id;
     (m as unknown as Record<string, unknown>)["joinDate"] = new Date(r.joinDate);
-    m.trustScore = r.trustScore;
     m.guardianId = r.guardianId;
     m.phone = r.phone;
     m.pinHash = r.pinHash ?? null;

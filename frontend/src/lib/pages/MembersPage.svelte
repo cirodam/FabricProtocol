@@ -8,7 +8,7 @@
     handle: string;
     birthDate: string;
     joinDate: string;
-    trustScore: number;
+    personYears: number;
     phone: string | null;
   }
 

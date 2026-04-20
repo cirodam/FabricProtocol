@@ -36,8 +36,7 @@ export class MemberService {
   add(member: Member): void {
     this.members.set(member.id, member);
     Bank.getInstance().openAccount(member, "primary");
-    const endowment = Math.round(CentralBank.BASE_ENDOWMENT * member.trustScore);
-    CentralBank.getInstance().issueEndowment(member, endowment);
+    CentralBank.getInstance().issueEndowment(member, CentralBank.CREDITS_PER_PERSON_YEAR);
     this.loader?.save(member);
   }
 
@@ -96,26 +95,17 @@ export class MemberService {
     return member.pinHash === createHash("sha256").update(pin).digest("hex");
   }
 
-  // Call once per day. Increments trustScore by 0.01 (capped at 1.0) on a
-  // member's birthday and on the anniversary of their join date.
+  // Call once per day. On each member's join anniversary, issues one person-year
+  // of credits (CREDITS_PER_PERSON_YEAR) via the CentralBank.
   checkAnniversaries(today: Date = new Date()): void {
     const mm = today.getMonth();
     const dd = today.getDate();
     for (const member of this.members.values()) {
-      const isBirthday =
-        member.birthDate.getMonth() === mm && member.birthDate.getDate() === dd;
       const isJoinAnniversary =
         member.joinDate.getMonth() === mm && member.joinDate.getDate() === dd;
-      let changed = false;
-      if (isBirthday) {
-        member.trustScore = Math.round((member.trustScore + 0.01) * 100) / 100;
-        changed = true;
-      }
       if (isJoinAnniversary) {
-        member.trustScore = Math.round((member.trustScore + 0.01) * 100) / 100;
-        changed = true;
+        CentralBank.getInstance().issueEndowment(member, CentralBank.CREDITS_PER_PERSON_YEAR);
       }
-      if (changed) this.loader?.save(member);
     }
   }
 
