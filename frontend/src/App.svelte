@@ -26,6 +26,7 @@
   import SortitionPage from './lib/pages/SortitionPage.svelte';
   import SortitionPoolPage from './lib/pages/SortitionPoolPage.svelte';
   import AddSortitionPoolPage from './lib/pages/AddSortitionPoolPage.svelte';
+  import AssemblyPage from './lib/pages/AssemblyPage.svelte';
   import HealthcarePage from './lib/pages/HealthcarePage.svelte';
   import ClinicPage from './lib/pages/ClinicPage.svelte';
   import AddHealthcareClinicPage from './lib/pages/AddHealthcareClinicPage.svelte';
@@ -76,6 +77,7 @@
   <button class:active={path.startsWith('/healthcare')} onclick={() => navigate('/healthcare')}>Healthcare</button>
   <button class:active={path.startsWith('/education')} onclick={() => navigate('/education')}>Education</button>
   <button class:active={path.startsWith('/sortition')} onclick={() => navigate('/sortition')}>Sortition</button>
+  <button class:active={path === '/assembly'} onclick={() => navigate('/assembly')}>Assembly</button>
   <button class:active={path === '/settings'} onclick={() => navigate('/settings')}>Settings</button>
 </nav>
 
@@ -160,6 +162,8 @@
     <AddSortitionPoolPage {navigate} />
   {:else if path.startsWith('/sortition/pools/')}
     <SortitionPoolPage id={path.slice('/sortition/pools/'.length)} {navigate} />
+  {:else if path === '/assembly'}
+    <AssemblyPage {navigate} />
   {:else if path === '/education'}
     <EducationPage {navigate} />
   {:else if path === '/education/schools/new'}

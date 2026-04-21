@@ -44,6 +44,8 @@ import { SortitionService } from "./commons/sortition/SortitionService.js";
 import { SortitionPoolLoader } from "./commons/sortition/SortitionPoolLoader.js";
 import { CouncilService } from "./commons/council/CouncilService.js";
 import { DomainCouncilLoader } from "./commons/council/DomainCouncilLoader.js";
+import { AssemblyService } from "./commons/assembly/AssemblyService.js";
+import { CitizensAssemblyLoader } from "./commons/assembly/CitizensAssemblyLoader.js";
 
 
 async function init(): Promise<void> {
@@ -81,6 +83,8 @@ async function init(): Promise<void> {
   FireDomain.getInstance().initCompanies(new FireCompanyLoader("data/fire/companies"));
   SortitionService.getInstance().init(new SortitionPoolLoader("data/sortition/pools"));
   CouncilService.getInstance().init(new DomainCouncilLoader("data/councils"));
+  AssemblyService.getInstance().init(new CitizensAssemblyLoader("data/assembly"));
+  AssemblyService.getInstance().getOrCreate();
 
   // ── Register domains with Commonwealth ──────────────────────────────────────
   const commonwealth = Commonwealth.getInstance();
