@@ -36,6 +36,10 @@ import { DependencyCareDomain } from "./domains/dependency_care/DependencyCareDo
 import { SharedHouseholdLoader } from "./domains/dependency_care/SharedHouseholdLoader.js";
 import { MedicalCareUnitLoader } from "./domains/dependency_care/MedicalCareUnitLoader.js";
 import { HomeCaregivingLoader } from "./domains/dependency_care/HomeCaregivingLoader.js";
+import { ChildcareDomain } from "./domains/child_care/ChildcareDomain.js";
+import { HomeChildcareLoader } from "./domains/child_care/HomeChildcareLoader.js";
+import { FireDomain } from "./domains/fire/FireDomain.js";
+import { FireCompanyLoader } from "./domains/fire/FireCompanyLoader.js";
 
 
 async function init(): Promise<void> {
@@ -69,6 +73,8 @@ async function init(): Promise<void> {
   DependencyCareDomain.getInstance().initHouseholds(new SharedHouseholdLoader("data/dependency-care/households"));
   DependencyCareDomain.getInstance().initMedicalCareUnits(new MedicalCareUnitLoader("data/dependency-care/medical-care-units"));
   DependencyCareDomain.getInstance().initHomeCaregiving(new HomeCaregivingLoader("data/dependency-care/home-caregiving"));
+  ChildcareDomain.getInstance().initHomeChildcare(new HomeChildcareLoader("data/child-care/home-childcare"));
+  FireDomain.getInstance().initCompanies(new FireCompanyLoader("data/fire/companies"));
 
   // ── Register domains with Commonwealth ──────────────────────────────────────
   const commonwealth = Commonwealth.getInstance();

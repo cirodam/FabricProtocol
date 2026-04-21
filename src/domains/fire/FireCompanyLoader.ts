@@ -1,0 +1,78 @@
+import { FireCompany } from "./FireCompany.js";
+import { FileStore } from "../../storage/FileStore.js";
+import { CommunityRole } from "../../commons/CommunityRole.js";
+
+interface RoleRecord {
+    id: string;
+    title: string;
+    description: string;
+    memberId: string | null;
+    creditsPerMonth: number;
+    termStartDate: string | null;
+    termEndDate: string | null;
+}
+
+interface FireCompanyRecord {
+    id: string;
+    name: string;
+    description: string;
+    staffIds: string[];
+    roles: RoleRecord[];
+    createdAt: string;
+}
+
+export class FireCompanyLoader {
+    private readonly store: FileStore;
+
+    constructor(dataDir: string) {
+        this.store = new FileStore(dataDir);
+    }
+
+    save(company: FireCompany): void {
+        const roles: RoleRecord[] = company.getRoles().map(r => ({
+            id:              r.id,
+            title:           r.title,
+            description:     r.description,
+            memberId:        r.memberId,
+            creditsPerMonth: r.creditsPerMonth,
+            termStartDate:   r.termStartDate?.toISOString() ?? null,
+            termEndDate:     r.termEndDate?.toISOString()   ?? null,
+        }));
+        const record: FireCompanyRecord = {
+            id:          company.id,
+            name:        company.name,
+            description: company.description,
+            staffIds:    company.getMembers(),
+            roles,
+            createdAt:   company.createdAt.toISOString(),
+        };
+        this.store.write(company.id, record);
+    }
+
+    loadAll(): FireCompany[] {
+        return this.store.readAll<FireCompanyRecord>().map(r => this.fromRecord(r));
+    }
+
+    delete(id: string): boolean {
+        return this.store.delete(id);
+    }
+
+    private fromRecord(r: FireCompanyRecord): FireCompany {
+        const company = new FireCompany(r.name);
+        (company as unknown as Record<string, unknown>)["id"]          = r.id;
+        (company as unknown as Record<string, unknown>)["description"] = r.description;
+        (company as unknown as Record<string, unknown>)["createdAt"]   = new Date(r.createdAt);
+        for (const staffId of r.staffIds ?? []) {
+            company.addMember(staffId);
+        }
+        for (const rr of r.roles ?? []) {
+            const role = new CommunityRole(rr.title, rr.description, rr.creditsPerMonth);
+            (role as unknown as Record<string, unknown>)["id"] = rr.id;
+            role.memberId      = rr.memberId;
+            role.termStartDate = rr.termStartDate ? new Date(rr.termStartDate) : null;
+            role.termEndDate   = rr.termEndDate   ? new Date(rr.termEndDate)   : null;
+            company.addRole(role);
+        }
+        return company;
+    }
+}

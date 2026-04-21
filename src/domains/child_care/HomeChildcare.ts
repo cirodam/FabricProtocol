@@ -26,8 +26,11 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
  * formalized here into the payroll system rather than left to informal arrangement.
  */
 export class HomeChildcare extends FunctionalUnit {
+    readonly createdAt: Date;
+
     constructor() {
         super("Home Childcare", "Provides paid positions for community members caring for young children at home.");
+        this.createdAt = new Date();
     }
 
     getType(): string { return "home-childcare"; }

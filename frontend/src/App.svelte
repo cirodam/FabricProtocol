@@ -22,12 +22,16 @@
   import AddMedicalCareUnitPage from './lib/pages/AddMedicalCareUnitPage.svelte';
   import HomeCaregivingPage from './lib/pages/HomeCaregivingPage.svelte';
   import ChildCarePage from './lib/pages/ChildCarePage.svelte';
+  import HomeChildcarePage from './lib/pages/HomeChildcarePage.svelte';
   import HealthcarePage from './lib/pages/HealthcarePage.svelte';
   import ClinicPage from './lib/pages/ClinicPage.svelte';
   import AddHealthcareClinicPage from './lib/pages/AddHealthcareClinicPage.svelte';
   import DentalClinicPage from './lib/pages/DentalClinicPage.svelte';
   import AddDentalClinicPage from './lib/pages/AddDentalClinicPage.svelte';
   import SettingsPage from './lib/pages/SettingsPage.svelte';
+  import FirePage from './lib/pages/FirePage.svelte';
+  import FireCompanyPage from './lib/pages/FireCompanyPage.svelte';
+  import AddFireCompanyPage from './lib/pages/AddFireCompanyPage.svelte';
   import EducationPage from './lib/pages/EducationPage.svelte';
   import SchoolPage from './lib/pages/SchoolPage.svelte';
   import AddSchoolPage from './lib/pages/AddSchoolPage.svelte';
@@ -64,7 +68,8 @@
   <button class:active={path === '/food'} onclick={() => navigate('/food')}>Food</button>
   <button class:active={path.startsWith('/housing')} onclick={() => navigate('/housing')}>Housing</button>
   <button class:active={path.startsWith('/dependency-care')} onclick={() => navigate('/dependency-care')}>Dependency Care</button>
-  <button class:active={path === '/child-care'} onclick={() => navigate('/child-care')}>Child Care</button>
+  <button class:active={path.startsWith('/child-care')} onclick={() => navigate('/child-care')}>Child Care</button>
+  <button class:active={path.startsWith('/fire')} onclick={() => navigate('/fire')}>Fire</button>
   <button class:active={path.startsWith('/healthcare')} onclick={() => navigate('/healthcare')}>Healthcare</button>
   <button class:active={path.startsWith('/education')} onclick={() => navigate('/education')}>Education</button>
   <button class:active={path === '/settings'} onclick={() => navigate('/settings')}>Settings</button>
@@ -124,7 +129,9 @@
   {:else if path === '/dependency-care/home-caregiving'}
     <HomeCaregivingPage {navigate} />
   {:else if path === '/child-care'}
-    <ChildCarePage />
+    <ChildCarePage {navigate} />
+  {:else if path === '/child-care/home-childcare'}
+    <HomeChildcarePage {navigate} />
   {:else if path === '/healthcare'}
     <HealthcarePage {navigate} />
   {:else if path === '/healthcare/clinics/new'}
@@ -137,6 +144,12 @@
     <DentalClinicPage id={path.slice('/healthcare/dental-clinics/'.length)} {navigate} />
   {:else if path === '/settings'}
     <SettingsPage {navigate} />
+  {:else if path === '/fire'}
+    <FirePage {navigate} />
+  {:else if path === '/fire/companies/new'}
+    <AddFireCompanyPage {navigate} />
+  {:else if path.startsWith('/fire/companies/')}
+    <FireCompanyPage id={path.slice('/fire/companies/'.length)} {navigate} />
   {:else if path === '/education'}
     <EducationPage {navigate} />
   {:else if path === '/education/schools/new'}

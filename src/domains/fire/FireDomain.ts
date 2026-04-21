@@ -1,4 +1,6 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
+import { FireCompany } from "./FireCompany.js";
+import { FireCompanyLoader } from "./FireCompanyLoader.js";
 
 /**
  * The Fire domain protects the community from fire and provides emergency rescue services.
@@ -21,7 +23,50 @@ import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
  * because it arrives before an ambulance.
  */
 export class FireDomain extends FunctionalDomain {
-    constructor() {
-        super("Fire", "Protects the community from fire and provides emergency rescue and first response services.");
+    private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000013";
+    private static instance: FireDomain;
+
+    private companyLoader: FireCompanyLoader | null = null;
+
+    private constructor() {
+        super("Fire", "Protects the community from fire and provides emergency rescue and first response services.", FireDomain.DOMAIN_ID);
+    }
+
+    static getInstance(): FireDomain {
+        if (!FireDomain.instance) {
+            FireDomain.instance = new FireDomain();
+        }
+        return FireDomain.instance;
+    }
+
+    // ── Fire Companies ────────────────────────────────────────────────────────
+
+    initCompanies(loader: FireCompanyLoader): void {
+        this.companyLoader = loader;
+        for (const c of loader.loadAll()) {
+            this.addUnit(c);
+        }
+    }
+
+    addCompany(company: FireCompany): void {
+        this.addUnit(company);
+        this.companyLoader?.save(company);
+    }
+
+    saveCompany(company: FireCompany): void {
+        this.companyLoader?.save(company);
+    }
+
+    getCompany(id: string): FireCompany | undefined {
+        return this.getUnitsByType<FireCompany>("fire-company").find(c => c.id === id);
+    }
+
+    getAllCompanies(): FireCompany[] {
+        return this.getUnitsByType<FireCompany>("fire-company");
+    }
+
+    removeCompany(id: string): void {
+        this.removeUnit(id);
+        this.companyLoader?.delete(id);
     }
 }
