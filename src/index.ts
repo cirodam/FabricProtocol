@@ -40,6 +40,10 @@ import { ChildcareDomain } from "./domains/child_care/ChildcareDomain.js";
 import { HomeChildcareLoader } from "./domains/child_care/HomeChildcareLoader.js";
 import { FireDomain } from "./domains/fire/FireDomain.js";
 import { FireCompanyLoader } from "./domains/fire/FireCompanyLoader.js";
+import { SortitionService } from "./commons/sortition/SortitionService.js";
+import { SortitionPoolLoader } from "./commons/sortition/SortitionPoolLoader.js";
+import { CouncilService } from "./commons/council/CouncilService.js";
+import { DomainCouncilLoader } from "./commons/council/DomainCouncilLoader.js";
 
 
 async function init(): Promise<void> {
@@ -75,6 +79,8 @@ async function init(): Promise<void> {
   DependencyCareDomain.getInstance().initHomeCaregiving(new HomeCaregivingLoader("data/dependency-care/home-caregiving"));
   ChildcareDomain.getInstance().initHomeChildcare(new HomeChildcareLoader("data/child-care/home-childcare"));
   FireDomain.getInstance().initCompanies(new FireCompanyLoader("data/fire/companies"));
+  SortitionService.getInstance().init(new SortitionPoolLoader("data/sortition/pools"));
+  CouncilService.getInstance().init(new DomainCouncilLoader("data/councils"));
 
   // ── Register domains with Commonwealth ──────────────────────────────────────
   const commonwealth = Commonwealth.getInstance();
@@ -84,6 +90,21 @@ async function init(): Promise<void> {
   commonwealth.addDomain(EducationDomain.getInstance());
   commonwealth.addDomain(CourierDomain.getInstance());
   commonwealth.addDomain(DependencyCareDomain.getInstance());
+
+  // ── Ensure every active domain has a permanent council ──────────────────────
+  const councilSvc = CouncilService.getInstance();
+  for (const domain of [
+    HousingDomain.getInstance(),
+    FoodDomain.getInstance(),
+    HealthcareDomain.getInstance(),
+    EducationDomain.getInstance(),
+    CourierDomain.getInstance(),
+    DependencyCareDomain.getInstance(),
+    ChildcareDomain.getInstance(),
+    FireDomain.getInstance(),
+  ]) {
+    councilSvc.getOrCreateCouncil(domain.id, domain.name);
+  }
 
   // ── Scheduler ────────────────────────────────────────────────────────────────
   const scheduler = new Scheduler("data/scheduler");

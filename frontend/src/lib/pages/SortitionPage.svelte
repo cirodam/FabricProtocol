@@ -1,25 +1,24 @@
 <script lang="ts">
-  import CouncilPanel from '../components/CouncilPanel.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
-  interface FireCompany {
+  interface Pool {
     id: string;
     name: string;
     description: string;
-    staffCount: number;
+    memberCount: number;
     createdAt: string;
   }
 
-  let companies: FireCompany[] = $state([]);
+  let pools: Pool[] = $state([]);
   let loading = $state(true);
   let error: string | null = $state(null);
 
   async function load() {
     try {
-      const res = await fetch('/api/fire/companies');
+      const res = await fetch('/api/sortition/pools');
       if (!res.ok) throw new Error(`${res.status}`);
       const data = await res.json();
-      companies = data.companies;
+      pools = data.pools;
     } catch (e) {
       error = (e as Error).message;
     } finally {
@@ -31,7 +30,7 @@
 </script>
 
 <div class="page-header">
-  <h1>Fire</h1>
+  <h1>Sortition</h1>
 </div>
 
 {#if loading}
@@ -41,24 +40,24 @@
 {:else}
   <section class="section">
     <div class="section-header">
-      <h2>Fire Companies <span class="count">{companies.length}</span></h2>
-      <button class="new-btn" onclick={() => navigate('/fire/companies/new')}>+ New company</button>
+      <h2>Pools <span class="count">{pools.length}</span></h2>
+      <button class="new-btn" onclick={() => navigate('/sortition/pools/new')}>+ New pool</button>
     </div>
-    {#if companies.length === 0}
-      <p class="muted">No fire companies yet.</p>
+    {#if pools.length === 0}
+      <p class="muted">No sortition pools yet.</p>
     {:else}
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Name</th><th>Description</th><th class="num">Staff</th><th>Added</th></tr>
+            <tr><th>Name</th><th>Description</th><th class="num">Members</th><th>Created</th></tr>
           </thead>
           <tbody>
-            {#each companies as c (c.id)}
-              <tr class="clickable" onclick={() => navigate(`/fire/companies/${c.id}`)}>
-                <td class="name">{c.name}</td>
-                <td class="muted">{c.description || '—'}</td>
-                <td class="num">{c.staffCount}</td>
-                <td class="muted">{new Date(c.createdAt).toLocaleDateString()}</td>
+            {#each pools as p (p.id)}
+              <tr class="clickable" onclick={() => navigate(`/sortition/pools/${p.id}`)}>
+                <td class="name">{p.name}</td>
+                <td class="muted">{p.description || '—'}</td>
+                <td class="num">{p.memberCount}</td>
+                <td class="muted">{new Date(p.createdAt).toLocaleDateString()}</td>
               </tr>
             {/each}
           </tbody>
@@ -66,7 +65,6 @@
       </div>
     {/if}
   </section>
-  <CouncilPanel domainId="00000000-0000-0000-0000-000000000013" {navigate} />
 {/if}
 
 <style>

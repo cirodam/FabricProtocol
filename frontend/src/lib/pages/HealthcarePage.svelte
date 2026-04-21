@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CouncilPanel from '../components/CouncilPanel.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
   interface ClinicDto {
@@ -105,6 +106,7 @@
       {/if}
     </section>
   {/if}
+  <CouncilPanel domainId="00000000-0000-0000-0000-000000000004" {navigate} />
 </div>
 
 <style>

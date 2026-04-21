@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CouncilPanel from '../components/CouncilPanel.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
   interface Totals {
@@ -223,6 +224,7 @@
       </div>
     {/if}
   </section>
+  <CouncilPanel domainId="00000000-0000-0000-0000-000000000003" {navigate} />
 {/if}
 
 <style>

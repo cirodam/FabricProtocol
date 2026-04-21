@@ -1,25 +1,25 @@
 <script lang="ts">
-  import CouncilPanel from '../components/CouncilPanel.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
-  interface FireCompany {
-    id: string;
-    name: string;
-    description: string;
-    staffCount: number;
-    createdAt: string;
+  interface Council {
+    domainId: string;
+    domainName: string;
+    poolId: string | null;
+    size: number;
+    seatCount: number;
+    vacancies: number;
   }
 
-  let companies: FireCompany[] = $state([]);
+  let councils: Council[] = $state([]);
   let loading = $state(true);
   let error: string | null = $state(null);
 
   async function load() {
     try {
-      const res = await fetch('/api/fire/companies');
+      const res = await fetch('/api/councils');
       if (!res.ok) throw new Error(`${res.status}`);
       const data = await res.json();
-      companies = data.companies;
+      councils = data.councils;
     } catch (e) {
       error = (e as Error).message;
     } finally {
@@ -31,7 +31,7 @@
 </script>
 
 <div class="page-header">
-  <h1>Fire</h1>
+  <h1>Councils</h1>
 </div>
 
 {#if loading}
@@ -41,24 +41,23 @@
 {:else}
   <section class="section">
     <div class="section-header">
-      <h2>Fire Companies <span class="count">{companies.length}</span></h2>
-      <button class="new-btn" onclick={() => navigate('/fire/companies/new')}>+ New company</button>
+      <h2>Domain Councils <span class="count">{councils.length}</span></h2>
     </div>
-    {#if companies.length === 0}
-      <p class="muted">No fire companies yet.</p>
+    {#if councils.length === 0}
+      <p class="muted">No councils found. Start the server to initialise domain councils.</p>
     {:else}
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Name</th><th>Description</th><th class="num">Staff</th><th>Added</th></tr>
+            <tr><th>Domain</th><th>Pool</th><th class="num">Seated</th><th class="num">Vacancies</th></tr>
           </thead>
           <tbody>
-            {#each companies as c (c.id)}
-              <tr class="clickable" onclick={() => navigate(`/fire/companies/${c.id}`)}>
-                <td class="name">{c.name}</td>
-                <td class="muted">{c.description || '—'}</td>
-                <td class="num">{c.staffCount}</td>
-                <td class="muted">{new Date(c.createdAt).toLocaleDateString()}</td>
+            {#each councils as c (c.domainId)}
+              <tr class="clickable" onclick={() => navigate(`/councils/${c.domainId}`)}>
+                <td class="name">{c.domainName}</td>
+                <td class="muted">{c.poolId ? '✓ linked' : '— no pool'}</td>
+                <td class="num">{c.seatCount} / {c.size}</td>
+                <td class="num {c.vacancies > 0 ? 'warn' : ''}">{c.vacancies}</td>
               </tr>
             {/each}
           </tbody>
@@ -66,7 +65,6 @@
       </div>
     {/if}
   </section>
-  <CouncilPanel domainId="00000000-0000-0000-0000-000000000013" {navigate} />
 {/if}
 
 <style>
@@ -97,6 +95,7 @@
   td { padding: 0.65rem 0.75rem; border-bottom: 1px solid var(--color-border, #f1f5f9); font-size: 0.9rem; }
   td.name { font-weight: 500; }
   td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.warn { color: var(--color-warning, #d97706); font-weight: 600; }
   tr.clickable { cursor: pointer; }
   tr.clickable:hover td { background: var(--color-hover, #f8fafc); }
 </style>

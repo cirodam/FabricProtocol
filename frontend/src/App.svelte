@@ -23,6 +23,9 @@
   import HomeCaregivingPage from './lib/pages/HomeCaregivingPage.svelte';
   import ChildCarePage from './lib/pages/ChildCarePage.svelte';
   import HomeChildcarePage from './lib/pages/HomeChildcarePage.svelte';
+  import SortitionPage from './lib/pages/SortitionPage.svelte';
+  import SortitionPoolPage from './lib/pages/SortitionPoolPage.svelte';
+  import AddSortitionPoolPage from './lib/pages/AddSortitionPoolPage.svelte';
   import HealthcarePage from './lib/pages/HealthcarePage.svelte';
   import ClinicPage from './lib/pages/ClinicPage.svelte';
   import AddHealthcareClinicPage from './lib/pages/AddHealthcareClinicPage.svelte';
@@ -72,6 +75,7 @@
   <button class:active={path.startsWith('/fire')} onclick={() => navigate('/fire')}>Fire</button>
   <button class:active={path.startsWith('/healthcare')} onclick={() => navigate('/healthcare')}>Healthcare</button>
   <button class:active={path.startsWith('/education')} onclick={() => navigate('/education')}>Education</button>
+  <button class:active={path.startsWith('/sortition')} onclick={() => navigate('/sortition')}>Sortition</button>
   <button class:active={path === '/settings'} onclick={() => navigate('/settings')}>Settings</button>
 </nav>
 
@@ -150,6 +154,12 @@
     <AddFireCompanyPage {navigate} />
   {:else if path.startsWith('/fire/companies/')}
     <FireCompanyPage id={path.slice('/fire/companies/'.length)} {navigate} />
+  {:else if path === '/sortition'}
+    <SortitionPage {navigate} />
+  {:else if path === '/sortition/pools/new'}
+    <AddSortitionPoolPage {navigate} />
+  {:else if path.startsWith('/sortition/pools/')}
+    <SortitionPoolPage id={path.slice('/sortition/pools/'.length)} {navigate} />
   {:else if path === '/education'}
     <EducationPage {navigate} />
   {:else if path === '/education/schools/new'}

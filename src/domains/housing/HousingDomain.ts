@@ -9,7 +9,8 @@ export class HousingDomain extends FunctionalDomain {
     private loader: HousingUnitLoader | null = null;
 
     constructor() {
-        super("Housing", "Manages community housing stock and member accommodation.");
+        super("Housing", "Manages community housing stock and member accommodation.",
+            "00000000-0000-0000-0000-000000000001");
     }
 
     static getInstance(): HousingDomain {
