@@ -42,7 +42,7 @@
 <div class="page-header">
   <h1>Members</h1>
   <span class="count">{loading ? '…' : members.length}</span>
-  <button class="add-btn" onclick={() => navigate('/members/add')}>+ Add member</button>
+  <button class="add-btn" onclick={() => navigate('/applications/new')}>+ New application</button>
 </div>
 
 {#if loading}

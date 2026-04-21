@@ -1,0 +1,18 @@
+{
+  "id": "4026ea69-2670-4067-9294-da47f15615ec",
+  "createdAt": "2026-04-21T18:28:40.897Z",
+  "createdBy": "system",
+  "title": "Wednesday Exchange",
+  "type": "marketplace",
+  "description": "Mid-week exchange for labor hours, prepared food, and quick trades.",
+  "location": null,
+  "startAt": "2026-04-22T20:00:00.000Z",
+  "endAt": "2026-04-22T23:00:00.000Z",
+  "allDay": false,
+  "recurrence": {
+    "frequency": "weekly",
+    "daysOfWeek": [
+      3
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "9828fc13-fe21-4716-a0f2-238e6eb87a32",
+  "ownerId": "00000000-0000-0000-0000-000000000014",
+  "label": "primary",
+  "kin": 0,
+  "allowNegativeKin": false,
+  "exemptFromDemurrage": true,
+  "createdAt": "2026-04-21T15:58:20.538Z"
+}

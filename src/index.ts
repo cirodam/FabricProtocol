@@ -40,6 +40,8 @@ import { HomeChildcareLoader } from "./domains/child_care/HomeChildcareLoader.js
 import { FireDomain } from "./domains/fire/FireDomain.js";
 import { FireCompanyLoader } from "./domains/fire/FireCompanyLoader.js";
 import { ProvisioningDomain } from "./domains/provisioning/ProvisioningDomain.js";
+import { ApplicationService } from "./member/ApplicationService.js";
+import { MemberApplicationLoader } from "./member/MemberApplicationLoader.js";
 import { SortitionService } from "./commons/sortition/SortitionService.js";
 import { SortitionPoolLoader } from "./commons/sortition/SortitionPoolLoader.js";
 import { CouncilService } from "./commons/council/CouncilService.js";
@@ -49,6 +51,12 @@ import { CitizensAssemblyLoader } from "./commons/assembly/CitizensAssemblyLoade
 import { GovernanceService } from "./commons/GovernanceService.js";
 import { ConstitutionLoader } from "./commons/ConstitutionLoader.js";
 import { Constitution } from "./commons/Constitution.js";
+import { CalendarService } from "./calendar/CalendarService.js";
+import { CalendarEventLoader } from "./calendar/CalendarEventLoader.js";
+import { MessageService } from "./messaging/MessageService.js";
+import { MessageLoader } from "./messaging/MessageLoader.js";
+import { ReferendumService } from "./referendum/ReferendumService.js";
+import { ReferendumLoader } from "./referendum/ReferendumLoader.js";
 
 
 async function init(): Promise<void> {
@@ -65,6 +73,11 @@ async function init(): Promise<void> {
   CentralBank.getInstance().demurrageRate = constitution.bankDemurrageRate;
   Commonwealth.getInstance().levyRate = constitution.commonsLevyRate;
   MemberService.getInstance().init(new MemberLoader("data/members"));
+  ApplicationService.getInstance().init(new MemberApplicationLoader("data/members/applications"));
+  CalendarService.getInstance().init(new CalendarEventLoader("data/calendar"));
+  CalendarService.getInstance().seedDefaults();
+  MessageService.getInstance().init(new MessageLoader("data/messages"));
+  ReferendumService.getInstance().init(new ReferendumLoader("data/referenda"));
   Marketplace.getInstance().init(
     new PostLoader("data/posts")
   );

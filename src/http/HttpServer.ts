@@ -28,6 +28,10 @@ import councilRoutes from "./routes/councilRoutes.js";
 import assemblyRoutes from "./routes/assemblyRoutes.js";
 import constitutionRoutes from "./routes/constitutionRoutes.js";
 import provisioningRoutes from "./routes/provisioningRoutes.js";
+import applicationRoutes from "./routes/applicationRoutes.js";
+import calendarRoutes from "./routes/calendarRoutes.js";
+import messageRoutes from "./routes/messageRoutes.js";
+import referendumRoutes from "./routes/referendumRoutes.js";
 import networkRoutes from "../network/networkRoutes.js";
 
 /**
@@ -100,6 +104,10 @@ export class HttpServer {
         this.app.use("/api/assembly", assemblyRoutes);
         this.app.use("/api/constitution", constitutionRoutes);
         this.app.use("/api/provisioning", provisioningRoutes);
+        this.app.use("/api/applications", applicationRoutes);
+        this.app.use("/api/calendar", calendarRoutes);
+        this.app.use("/api/messages", messageRoutes);
+        this.app.use("/api/referenda", referendumRoutes);
         this.app.use("/api/node", networkRoutes);
 
         // Serve the Svelte frontend (production build)

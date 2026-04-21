@@ -41,7 +41,9 @@ export class AccountLoader {
 
   private fromRecord(r: AccountRecord): Account {
     const stub = { getId: () => r.ownerId, getDisplayName: () => "", getHandle: () => "" };
-    const account = new Account(stub, r.label, r.allowNegativeKin, r.exemptFromDemurrage);
+    // Backward compat: field was previously called allowNegativeCredits
+    const allowNeg = r.allowNegativeKin ?? (r as unknown as Record<string, unknown>)["allowNegativeCredits"] ?? false;
+    const account = new Account(stub, r.label, allowNeg as boolean, r.exemptFromDemurrage);
     const a = account as unknown as Record<string, unknown>;
     a["id"] = r.id;
     a["ownerId"] = r.ownerId;

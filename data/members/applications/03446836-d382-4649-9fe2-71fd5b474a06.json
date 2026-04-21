@@ -1,0 +1,15 @@
+{
+  "id": "03446836-d382-4649-9fe2-71fd5b474a06",
+  "submittedAt": "2026-04-21T16:26:16.277Z",
+  "firstName": "Bob",
+  "lastName": "Sanchez",
+  "birthDate": "1961-06-30T00:00:00.000Z",
+  "handle": "bsanchez",
+  "phone": "7624368761",
+  "note": null,
+  "status": "approved",
+  "reviewedAt": "2026-04-21T16:28:30.442Z",
+  "reviewedBy": null,
+  "reviewNote": null,
+  "memberId": "c3009b43-e216-432f-9c61-5ab235d2fb2c"
+}

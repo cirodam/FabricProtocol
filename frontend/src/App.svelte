@@ -4,7 +4,7 @@
   import MemberPage from './lib/pages/MemberPage.svelte';
   import AccountsPage from './lib/pages/AccountsPage.svelte';
   import AccountPage from './lib/pages/AccountPage.svelte';
-  import AddMemberPage from './lib/pages/AddMemberPage.svelte';
+  import AddApplicationPage from './lib/pages/AddApplicationPage.svelte';
   import MarketplacePage from './lib/pages/MarketplacePage.svelte';
   import AddPostPage from './lib/pages/AddPostPage.svelte';
   import PostPage from './lib/pages/PostPage.svelte';
@@ -29,6 +29,14 @@
   import AssemblyPage from './lib/pages/AssemblyPage.svelte';
   import ConstitutionPage from './lib/pages/ConstitutionPage.svelte';
   import ProvisioningPage from './lib/pages/ProvisioningPage.svelte';
+  import ApplicationsPage from './lib/pages/ApplicationsPage.svelte';
+  import CalendarPage from './lib/pages/CalendarPage.svelte';
+  import AddEventPage from './lib/pages/AddEventPage.svelte';
+  import MessagesPage from './lib/pages/MessagesPage.svelte';
+  import ComposeMessagePage from './lib/pages/ComposeMessagePage.svelte';
+  import ReferendaPage from './lib/pages/ReferendaPage.svelte';
+  import CreateReferendumPage from './lib/pages/CreateReferendumPage.svelte';
+  import ReferendumDetailPage from './lib/pages/ReferendumDetailPage.svelte';
   import HealthcarePage from './lib/pages/HealthcarePage.svelte';
   import ClinicPage from './lib/pages/ClinicPage.svelte';
   import AddHealthcareClinicPage from './lib/pages/AddHealthcareClinicPage.svelte';
@@ -54,18 +62,28 @@
 
   let path = $state(getPath());
 
+  function getMemberId() {
+    return new URLSearchParams(window.location.search).get('as') ?? '';
+  }
+  let currentMemberId = $state(getMemberId());
+
   function navigate(to: string) {
     history.pushState({}, '', to);
     path = to;
+    currentMemberId = getMemberId();
   }
 
-  window.addEventListener('popstate', () => { path = getPath(); });
+  window.addEventListener('popstate', () => { path = getPath(); currentMemberId = getMemberId(); });
 </script>
 
 <nav>
   <span class="brand">LocalCommunity</span>
   <button class:active={path === '/'} onclick={() => navigate('/')}>Home</button>
   <button class:active={path === '/members'} onclick={() => navigate('/members')}>Members</button>
+  <button class:active={path === '/applications'} onclick={() => navigate('/applications')}>Applications</button>
+  <button class:active={path.startsWith('/calendar')} onclick={() => navigate('/calendar')}>Calendar</button>
+  <button class:active={path.startsWith('/messages')} onclick={() => navigate('/messages')}>Messages</button>
+  <button class:active={path.startsWith('/referenda')} onclick={() => navigate('/referenda')}>Referenda</button>
   <button class:active={path === '/accounts'} onclick={() => navigate('/accounts')}>Accounts</button>
   <button class:active={path.startsWith('/marketplace')} onclick={() => navigate('/marketplace')}>Marketplace</button>
   <button class:active={path === '/central-bank'} onclick={() => navigate('/central-bank')}>Central Bank</button>
@@ -94,8 +112,24 @@
     <AccountsPage {navigate} />
   {:else if path.startsWith('/accounts/')}
     <AccountPage id={path.slice('/accounts/'.length)} {navigate} />
-  {:else if path === '/members/add'}
-    <AddMemberPage />
+  {:else if path === '/applications/new'}
+    <AddApplicationPage {navigate} />
+  {:else if path === '/applications'}
+    <ApplicationsPage {navigate} />
+  {:else if path === '/calendar/new'}
+    <AddEventPage {navigate} />
+  {:else if path === '/calendar'}
+    <CalendarPage {navigate} />
+  {:else if path === '/messages/new'}
+    <ComposeMessagePage {navigate} memberId={currentMemberId} />
+  {:else if path === '/messages'}
+    <MessagesPage {navigate} memberId={currentMemberId} />
+  {:else if path === '/referenda/new'}
+    <CreateReferendumPage {navigate} />
+  {:else if path.startsWith('/referenda/')}
+    <ReferendumDetailPage {navigate} id={path.slice('/referenda/'.length)} />
+  {:else if path === '/referenda'}
+    <ReferendaPage {navigate} />
   {:else if path.startsWith('/members/')}
     <MemberPage id={path.slice('/members/'.length)} {navigate} />
   {:else if path === '/marketplace'}
