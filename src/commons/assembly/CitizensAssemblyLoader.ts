@@ -7,6 +7,7 @@ interface SeatRecord {
 }
 
 interface AssemblyRecord {
+    termMonths: number;
     seats: SeatRecord[];
 }
 
@@ -19,6 +20,7 @@ export class CitizensAssemblyLoader {
 
     save(assembly: CitizensAssembly): void {
         const record: AssemblyRecord = {
+            termMonths: assembly.termMonths,
             seats: assembly.getSeats().map(s => ({
                 memberId: s.memberId,
                 seatedAt: s.seatedAt.toISOString(),
@@ -34,7 +36,7 @@ export class CitizensAssemblyLoader {
     }
 
     private fromRecord(r: AssemblyRecord): CitizensAssembly {
-        const assembly = new CitizensAssembly();
+        const assembly = new CitizensAssembly(r.termMonths ?? 6);
         for (const s of r.seats ?? []) {
             (assembly as unknown as { seats: AssemblySeat[] }).seats.push({
                 memberId: s.memberId,

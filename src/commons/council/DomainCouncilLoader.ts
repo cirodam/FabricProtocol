@@ -7,10 +7,12 @@ interface SeatRecord {
 }
 
 interface DomainCouncilRecord {
-    domainId: string;
-    domainName: string;
-    poolId: string | null;
-    seats: SeatRecord[];
+    id:         string;
+    name:       string;
+    domainIds:  string[];
+    targetSize: number;
+    poolId:     string | null;
+    seats:      SeatRecord[];
 }
 
 export class DomainCouncilLoader {
@@ -22,23 +24,40 @@ export class DomainCouncilLoader {
 
     save(council: DomainCouncil): void {
         const record: DomainCouncilRecord = {
-            domainId:   council.domainId,
-            domainName: council.domainName,
+            id:         council.id,
+            name:       council.name,
+            domainIds:  council.domainIds,
+            targetSize: council.targetSize,
             poolId:     council.poolId,
             seats:      council.getSeats().map(s => ({
                 memberId: s.memberId,
                 seatedAt: s.seatedAt.toISOString(),
             })),
         };
-        this.store.write(council.domainId, record);
+        this.store.write(council.id, record);
     }
 
     loadAll(): DomainCouncil[] {
         return this.store.readAll<DomainCouncilRecord>().map(r => this.fromRecord(r));
     }
 
+    load(id: string): DomainCouncil | undefined {
+        const r = this.store.read<DomainCouncilRecord>(id);
+        return r ? this.fromRecord(r) : undefined;
+    }
+
+    delete(id: string): boolean {
+        return this.store.delete(id);
+    }
+
     private fromRecord(r: DomainCouncilRecord): DomainCouncil {
-        const council = new DomainCouncil(r.domainId, r.domainName, r.poolId ?? null);
+        const council = new DomainCouncil(
+            r.name,
+            r.domainIds ?? [],
+            r.poolId ?? null,
+            r.targetSize ?? DomainCouncil.DEFAULT_SIZE,
+            r.id,
+        );
         for (const s of r.seats ?? []) {
             (council as unknown as { seats: CouncilSeat[] }).seats.push({
                 memberId: s.memberId,

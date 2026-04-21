@@ -99,6 +99,7 @@ async function init(): Promise<void> {
   FireDomain.getInstance().initCompanies(new FireCompanyLoader("data/fire/companies"));
   SortitionService.getInstance().init(new SortitionPoolLoader("data/sortition/pools"));
   CouncilService.getInstance().init(new DomainCouncilLoader("data/councils"));
+  CouncilService.getInstance().seedDefaults();
   AssemblyService.getInstance().init(new CitizensAssemblyLoader("data/assembly"));
   AssemblyService.getInstance().getOrCreate();
 
@@ -111,22 +112,6 @@ async function init(): Promise<void> {
   commonwealth.addDomain(CourierDomain.getInstance());
   commonwealth.addDomain(DependencyCareDomain.getInstance());
   commonwealth.addDomain(ProvisioningDomain.getInstance());
-
-  // ── Ensure every active domain has a permanent council ──────────────────────
-  const councilSvc = CouncilService.getInstance();
-  for (const domain of [
-    HousingDomain.getInstance(),
-    FoodDomain.getInstance(),
-    HealthcareDomain.getInstance(),
-    EducationDomain.getInstance(),
-    CourierDomain.getInstance(),
-    DependencyCareDomain.getInstance(),
-    ChildcareDomain.getInstance(),
-    FireDomain.getInstance(),
-    ProvisioningDomain.getInstance(),
-  ]) {
-    councilSvc.getOrCreateCouncil(domain.id, domain.name);
-  }
 
   // ── Scheduler ────────────────────────────────────────────────────────────────
   const scheduler = new Scheduler("data/scheduler");

@@ -6,10 +6,11 @@ import { MemberService } from "../../member/MemberService.js";
 
 function councilToDto(c: DomainCouncil) {
     return {
-        domainId:   c.domainId,
-        domainName: c.domainName,
+        id:         c.id,
+        name:       c.name,
+        domainIds:  c.domainIds,
+        targetSize: c.targetSize,
         poolId:     c.poolId,
-        size:       DomainCouncil.SIZE,
         seatCount:  c.seatCount,
         vacancies:  c.vacancies,
     };
@@ -21,9 +22,9 @@ export function listCouncils(_req: Request, res: Response): void {
     res.json({ total: councils.length, councils });
 }
 
-// GET /councils/:domainId
+// GET /councils/:id
 export function getCouncil(req: Request, res: Response): void {
-    const council = CouncilService.getInstance().getCouncil(req.params.domainId as string);
+    const council = CouncilService.getInstance().getCouncil(req.params.id as string);
     if (!council) { res.status(404).json({ error: "Council not found" }); return; }
     const memberService = MemberService.getInstance();
     const seats = council.getSeats().map(s => {
@@ -44,10 +45,54 @@ export function getCouncil(req: Request, res: Response): void {
     });
 }
 
-// PATCH /councils/:domainId/pool  — body: { poolId } (or null to unlink)
+// POST /councils — create a new council
+export function createCouncil(req: Request, res: Response): void {
+    const { name, domainIds, targetSize } = req.body as {
+        name: string;
+        domainIds: string[];
+        targetSize?: number;
+    };
+    if (!name?.trim()) { res.status(400).json({ error: "name is required" }); return; }
+    if (!Array.isArray(domainIds) || domainIds.length === 0) {
+        res.status(400).json({ error: "domainIds must be a non-empty array" }); return;
+    }
+    const council = CouncilService.getInstance().create(name.trim(), domainIds, targetSize);
+    res.status(201).json(councilToDto(council));
+}
+
+// PATCH /councils/:id  — update name, domainIds, or targetSize
+export function updateCouncil(req: Request, res: Response): void {
+    const svc     = CouncilService.getInstance();
+    const council = svc.getCouncil(req.params.id as string);
+    if (!council) { res.status(404).json({ error: "Council not found" }); return; }
+
+    const { name, domainIds, targetSize } = req.body as {
+        name?: string;
+        domainIds?: string[];
+        targetSize?: number;
+    };
+    if (name !== undefined) council.name = name.trim();
+    if (Array.isArray(domainIds)) council.domainIds = domainIds;
+    if (typeof targetSize === "number") {
+        council.targetSize = Math.min(5, Math.max(3, targetSize));
+    }
+    svc.saveCouncil(council);
+    res.json(councilToDto(council));
+}
+
+// DELETE /councils/:id
+export function deleteCouncil(req: Request, res: Response): void {
+    const svc     = CouncilService.getInstance();
+    const council = svc.getCouncil(req.params.id as string);
+    if (!council) { res.status(404).json({ error: "Council not found" }); return; }
+    svc.delete(req.params.id as string);
+    res.status(204).send();
+}
+
+// PATCH /councils/:id/pool  — body: { poolId } (or null to unlink)
 export function setPool(req: Request, res: Response): void {
     const svc     = CouncilService.getInstance();
-    const council = svc.getCouncil(req.params.domainId as string);
+    const council = svc.getCouncil(req.params.id as string);
     if (!council) { res.status(404).json({ error: "Council not found" }); return; }
 
     const { poolId } = req.body ?? {};
@@ -66,10 +111,10 @@ export function setPool(req: Request, res: Response): void {
     res.json(councilToDto(council));
 }
 
-// POST /councils/:domainId/draw  — fill empty seats from the linked pool
+// POST /councils/:id/draw  — fill empty seats from the linked pool
 export function drawSeats(req: Request, res: Response): void {
     const svc     = CouncilService.getInstance();
-    const council = svc.getCouncil(req.params.domainId as string);
+    const council = svc.getCouncil(req.params.id as string);
     if (!council) { res.status(404).json({ error: "Council not found" }); return; }
 
     if (!council.poolId) {
@@ -104,13 +149,15 @@ export function drawSeats(req: Request, res: Response): void {
     });
 }
 
-// DELETE /councils/:domainId/seats/:memberId
+// DELETE /councils/:id/seats/:memberId
 export function vacateSeat(req: Request, res: Response): void {
     const svc     = CouncilService.getInstance();
-    const council = svc.getCouncil(req.params.domainId as string);
+    const council = svc.getCouncil(req.params.id as string);
     if (!council) { res.status(404).json({ error: "Council not found" }); return; }
     const removed = council.vacateSeat(req.params.memberId as string);
     if (!removed) { res.status(404).json({ error: "Member not seated" }); return; }
     svc.saveCouncil(council);
     res.status(204).send();
 }
+
+

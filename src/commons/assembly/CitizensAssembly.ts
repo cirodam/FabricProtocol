@@ -5,18 +5,29 @@ export interface AssemblySeat {
 
 /**
  * The Citizens Assembly is the community's top-level governing body.
- * It has 50 seats filled by sortition from the full body of members.
+ * Its size scales with the active membership: max(9, floor(count × 0.15)).
+ * Seats are filled by sortition from the full body of active members.
  *
  * There is exactly one assembly per community. It is never created or
  * deleted — only its seats change over time.
  */
 export class CitizensAssembly {
-    static readonly SIZE = 50;
+    /** How many months a term lasts. */
+    termMonths: number;
 
     private seats: AssemblySeat[];
 
-    constructor() {
+    constructor(termMonths = 6) {
+        this.termMonths = termMonths;
         this.seats = [];
+    }
+
+    /**
+     * Compute the target assembly size for a given active member count.
+     * At least 9 seats; 15 % of active membership rounded down.
+     */
+    static targetSize(activeMemberCount: number): number {
+        return Math.max(9, Math.floor(activeMemberCount * 0.15));
     }
 
     getSeats(): AssemblySeat[] {
@@ -31,13 +42,14 @@ export class CitizensAssembly {
         return this.seats.length;
     }
 
-    get vacancies(): number {
-        return CitizensAssembly.SIZE - this.seats.length;
+    /** Vacancies relative to the given active member count. */
+    vacanciesFor(activeMemberCount: number): number {
+        return Math.max(0, CitizensAssembly.targetSize(activeMemberCount) - this.seats.length);
     }
 
-    /** Add a seat. No-op if member is already seated or assembly is full. */
-    addSeat(memberId: string): boolean {
-        if (this.isSeated(memberId) || this.seats.length >= CitizensAssembly.SIZE) return false;
+    /** Add a seat. No-op if member is already seated or target size reached. */
+    addSeat(memberId: string, activeMemberCount: number): boolean {
+        if (this.isSeated(memberId) || this.seats.length >= CitizensAssembly.targetSize(activeMemberCount)) return false;
         this.seats.push({ memberId, seatedAt: new Date() });
         return true;
     }

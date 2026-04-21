@@ -2,7 +2,15 @@ import { VoteThreshold } from "./Proposal.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-export type ParameterAuthority = "immutable" | "citizens-assembly" | "council" | "commonwealth";
+export type ParameterAuthority = "immutable" | "referendum" | "assembly" | "council" | "commonwealth";
+
+export type GovernanceBody = "council" | "assembly" | "referendum";
+
+export interface ActionAuthority {
+    readonly action:      string;
+    readonly body:        GovernanceBody;
+    readonly description: string;
+}
 
 export interface ConstitutionalParameter<T extends number | boolean> {
     readonly value: T;
@@ -21,10 +29,11 @@ export interface ConstitutionAmendment {
 }
 
 export interface ConstitutionDocument {
-    version: number;
-    adoptedAt: string;
-    parameters: Record<string, ConstitutionalParameter<number | boolean>>;
-    amendments: ConstitutionAmendment[];
+    version:      number;
+    adoptedAt:    string;
+    parameters:   Record<string, ConstitutionalParameter<number | boolean>>;
+    amendments:   ConstitutionAmendment[];
+    authorityMap: ActionAuthority[];
 }
 
 // ── Defaults ─────────────────────────────────────────────────────────────────
@@ -89,19 +98,19 @@ export const DEFAULT_CONSTITUTION: ConstitutionDocument = {
         // ── Vote thresholds ──────────────────────────────────────────────────
         thresholdSimpleMajority: {
             value: 0.51,
-            authority: "citizens-assembly",
+            authority: "referendum",
             description: "Fraction of total members required to pass a simple majority proposal.",
             constraints: { min: 0.51, max: 0.66 },
         },
         thresholdSupermajority: {
             value: 0.67,
-            authority: "citizens-assembly",
+            authority: "referendum",
             description: "Fraction of total members required to pass a supermajority proposal.",
             constraints: { min: 0.60, max: 0.80 },
         },
         thresholdNearConsensus: {
             value: 0.90,
-            authority: "citizens-assembly",
+            authority: "referendum",
             description: "Fraction of total members required to pass a near-consensus proposal.",
             constraints: { min: 0.80, max: 1.00 },
         },
@@ -109,7 +118,7 @@ export const DEFAULT_CONSTITUTION: ConstitutionDocument = {
         // ── Governance process ───────────────────────────────────────────────
         deliberationPeriodDays: {
             value: 3,
-            authority: "council",
+            authority: "assembly",
             description: "Minimum days before a proposal vote can close.",
             constraints: { min: 1, max: 30 },
         },
@@ -117,14 +126,14 @@ export const DEFAULT_CONSTITUTION: ConstitutionDocument = {
         // ── Monetary policy ──────────────────────────────────────────────────
         bankDemurrageRate: {
             value: 0.02,
-            authority: "citizens-assembly",
+            authority: "referendum",
             description:
                 "Monthly rate at which the Central Bank applies demurrage to recover unanchored kin.",
             constraints: { min: 0, max: 0.10 },
         },
         commonsLevyRate: {
             value: 0.02,
-            authority: "citizens-assembly",
+            authority: "referendum",
             description:
                 "Monthly commons levy rate applied to all non-exempt member accounts. Funds flow to the Commonwealth.",
             constraints: { min: 0, max: 0.10 },
@@ -133,20 +142,36 @@ export const DEFAULT_CONSTITUTION: ConstitutionDocument = {
         // ── Basic income ─────────────────────────────────────────────────────
         monthlyFoodAllowance: {
             value: 833,
-            authority: "citizens-assembly",
+            authority: "assembly",
             description:
                 "Kin paid to each member per month from the Food domain as an unconditional food allowance. This is a community policy decision — not a monetary definition. The community decides how much of the commons to distribute to members each month.",
             constraints: { min: 0 },
         },
     },
     amendments: [],
+    authorityMap: [
+        { action: "admit-member",            body: "assembly",   description: "Admitting a new member to the community" },
+        { action: "suspend-member",           body: "assembly",   description: "Suspending a member pending review" },
+        { action: "exclude-member",           body: "referendum", description: "Permanently excluding a member" },
+        { action: "change-levy-rate",         body: "referendum", description: "Changing the commons levy rate" },
+        { action: "change-demurrage-rate",    body: "referendum", description: "Changing the bank demurrage rate" },
+        { action: "change-food-allowance",    body: "assembly",   description: "Changing the monthly food allowance" },
+        { action: "amend-constitution",       body: "referendum", description: "Amending the constitution" },
+        { action: "join-federation",          body: "referendum", description: "Joining a federation" },
+        { action: "leave-federation",         body: "referendum", description: "Leaving a federation" },
+        { action: "split-council",            body: "assembly",   description: "Splitting a multi-domain council into two" },
+        { action: "allocate-domain-budget",   body: "assembly",   description: "Setting budget envelopes for domains" },
+        { action: "declare-domain-emergency", body: "council",    description: "Declaring a domain emergency (assembly ratifies within 72h)" },
+        { action: "change-market-schedule",   body: "council",    description: "Changing market day schedule" },
+        { action: "enact-domain-statute",     body: "council",    description: "Enacting an operating rule within a domain" },
+    ],
 };
 
 // ── Constitution singleton ───────────────────────────────────────────────────
 
 export class Constitution {
     private static instance: Constitution;
-    private doc: ConstitutionDocument = { ...DEFAULT_CONSTITUTION, amendments: [] };
+    private doc: ConstitutionDocument = { ...DEFAULT_CONSTITUTION, amendments: [], authorityMap: [...DEFAULT_CONSTITUTION.authorityMap] };
 
     private constructor() {}
 
@@ -242,4 +267,12 @@ export class Constitution {
     get commonsLevyRate(): number         { return this.get<number>("commonsLevyRate"); }
     get kinPerPersonYear(): number        { return this.get<number>("kinPerPersonYear"); }
     get monthlyFoodAllowance(): number    { return this.get<number>("monthlyFoodAllowance"); }
+
+    /** Which governance body must authorize the given action. Returns null if not in the map. */
+    getRequiredBody(action: string): GovernanceBody | null {
+        return this.doc.authorityMap.find(a => a.action === action)?.body ?? null;
+    }
+
+    /** Full authority map. */
+    get authorityMap(): readonly ActionAuthority[] { return this.doc.authorityMap; }
 }

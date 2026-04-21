@@ -1,31 +1,46 @@
+import { randomUUID } from "crypto";
+
 export interface CouncilSeat {
     memberId: string;
     seatedAt: Date;
 }
 
 /**
- * A DomainCouncil is the permanent oversight body for a functional domain.
- * It has exactly 5 seats, filled by drawing from a linked sortition pool.
+ * A DomainCouncil is a governance body with purview over one or more
+ * functional domains. It has 3–5 seats (default 5) filled by drawing
+ * from a linked sortition pool of domain-qualified members.
  *
- * Every domain has exactly one council — it is not created or deleted,
- * only its seats and linked pool change over time. Sortition-based selection
- * removes competitive election dynamics and rotates responsibility through
- * the broader membership.
+ * A council may cover multiple domains — groupings are set at community
+ * formation and can be split by assembly vote as the community grows.
  */
 export class DomainCouncil {
-    static readonly SIZE = 5;
+    static readonly DEFAULT_SIZE = 5;
 
-    readonly domainId: string;
-    readonly domainName: string;
+    readonly id: string;
+    name: string;
+    /** All domain IDs this council has purview over. */
+    domainIds: string[];
+    targetSize: number;
     poolId: string | null;
     private seats: CouncilSeat[];
 
-    constructor(domainId: string, domainName: string, poolId: string | null = null) {
-        this.domainId   = domainId;
-        this.domainName = domainName;
+    constructor(
+        name: string,
+        domainIds: string[],
+        poolId: string | null = null,
+        targetSize: number    = DomainCouncil.DEFAULT_SIZE,
+        id?: string,
+    ) {
+        this.id         = id ?? randomUUID();
+        this.name       = name;
+        this.domainIds  = domainIds;
+        this.targetSize = Math.min(5, Math.max(3, targetSize));
         this.poolId     = poolId;
         this.seats      = [];
     }
+
+    /** Primary domain (first in list) — for display and legacy compat. */
+    get primaryDomainId(): string | null { return this.domainIds[0] ?? null; }
 
     getSeats(): CouncilSeat[] {
         return [...this.seats];
@@ -40,12 +55,12 @@ export class DomainCouncil {
     }
 
     get vacancies(): number {
-        return DomainCouncil.SIZE - this.seats.length;
+        return this.targetSize - this.seats.length;
     }
 
     /** Add a seat. No-op if member is already seated or council is full. */
     addSeat(memberId: string): boolean {
-        if (this.isSeated(memberId) || this.seats.length >= DomainCouncil.SIZE) return false;
+        if (this.isSeated(memberId) || this.seats.length >= this.targetSize) return false;
         this.seats.push({ memberId, seatedAt: new Date() });
         return true;
     }

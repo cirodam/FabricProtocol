@@ -1,15 +1,18 @@
 import { Router } from "express";
 import {
-    listCouncils, getCouncil,
+    listCouncils, getCouncil, createCouncil, updateCouncil, deleteCouncil,
     setPool, drawSeats, vacateSeat,
 } from "../controllers/CouncilController.js";
 
 const router = Router();
 
-router.get("/",                                  listCouncils);
-router.get("/:domainId",                          getCouncil);
-router.patch("/:domainId/pool",                   setPool);
-router.post("/:domainId/draw",                    drawSeats);
-router.delete("/:domainId/seats/:memberId",       vacateSeat);
+router.get(    "/",                        listCouncils);
+router.post(   "/",                        createCouncil);
+router.get(    "/:id",                     getCouncil);
+router.patch(  "/:id",                     updateCouncil);
+router.delete( "/:id",                     deleteCouncil);
+router.patch(  "/:id/pool",                setPool);
+router.post(   "/:id/draw",                drawSeats);
+router.delete( "/:id/seats/:memberId",     vacateSeat);
 
 export default router;
