@@ -17,7 +17,7 @@ import commonwealthRoutes from "./routes/commonwealthRoutes.js";
 import healthcareRoutes from "./routes/healthcareRoutes.js";
 import educationRoutes from "./routes/educationRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-import externalReserveRoutes from "./routes/externalReserveRoutes.js";
+
 import locationRoutes from "./routes/locationRoutes.js";
 import courierRoutes from "./routes/courierRoutes.js";
 import dependencyCareRoutes from "./routes/dependencyCareRoutes.js";
@@ -26,6 +26,8 @@ import fireRoutes from "./routes/fireRoutes.js";
 import sortitionRoutes from "./routes/sortitionRoutes.js";
 import councilRoutes from "./routes/councilRoutes.js";
 import assemblyRoutes from "./routes/assemblyRoutes.js";
+import constitutionRoutes from "./routes/constitutionRoutes.js";
+import provisioningRoutes from "./routes/provisioningRoutes.js";
 import networkRoutes from "../network/networkRoutes.js";
 
 /**
@@ -88,7 +90,6 @@ export class HttpServer {
         this.app.use("/api/healthcare", healthcareRoutes);
         this.app.use("/api/education", educationRoutes);
         this.app.use("/api/admin", adminRoutes);
-        this.app.use("/api/external-reserve", externalReserveRoutes);
         this.app.use("/api/locations", locationRoutes);
         this.app.use("/api/courier", courierRoutes);
         this.app.use("/api/dependency-care", dependencyCareRoutes);
@@ -97,6 +98,8 @@ export class HttpServer {
         this.app.use("/api/sortition", sortitionRoutes);
         this.app.use("/api/councils", councilRoutes);
         this.app.use("/api/assembly", assemblyRoutes);
+        this.app.use("/api/constitution", constitutionRoutes);
+        this.app.use("/api/provisioning", provisioningRoutes);
         this.app.use("/api/node", networkRoutes);
 
         // Serve the Svelte frontend (production build)

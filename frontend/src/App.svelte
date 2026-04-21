@@ -27,6 +27,8 @@
   import SortitionPoolPage from './lib/pages/SortitionPoolPage.svelte';
   import AddSortitionPoolPage from './lib/pages/AddSortitionPoolPage.svelte';
   import AssemblyPage from './lib/pages/AssemblyPage.svelte';
+  import ConstitutionPage from './lib/pages/ConstitutionPage.svelte';
+  import ProvisioningPage from './lib/pages/ProvisioningPage.svelte';
   import HealthcarePage from './lib/pages/HealthcarePage.svelte';
   import ClinicPage from './lib/pages/ClinicPage.svelte';
   import AddHealthcareClinicPage from './lib/pages/AddHealthcareClinicPage.svelte';
@@ -68,6 +70,7 @@
   <button class:active={path.startsWith('/marketplace')} onclick={() => navigate('/marketplace')}>Marketplace</button>
   <button class:active={path === '/central-bank'} onclick={() => navigate('/central-bank')}>Central Bank</button>
   <button class:active={path === '/commonwealth'} onclick={() => navigate('/commonwealth')}>Commonwealth</button>
+  <button class:active={path === '/provisioning'} onclick={() => navigate('/provisioning')}>Provisioning</button>
   <button class:active={path === '/demographics'} onclick={() => navigate('/demographics')}>Demographics</button>
   <button class:active={path === '/food'} onclick={() => navigate('/food')}>Food</button>
   <button class:active={path.startsWith('/housing')} onclick={() => navigate('/housing')}>Housing</button>
@@ -78,6 +81,7 @@
   <button class:active={path.startsWith('/education')} onclick={() => navigate('/education')}>Education</button>
   <button class:active={path.startsWith('/sortition')} onclick={() => navigate('/sortition')}>Sortition</button>
   <button class:active={path === '/assembly'} onclick={() => navigate('/assembly')}>Assembly</button>
+  <button class:active={path === '/constitution'} onclick={() => navigate('/constitution')}>Constitution</button>
   <button class:active={path === '/settings'} onclick={() => navigate('/settings')}>Settings</button>
 </nav>
 
@@ -104,6 +108,8 @@
     <CentralBankPage {navigate} />
   {:else if path === '/commonwealth'}
     <CommonwealthPage />
+  {:else if path === '/provisioning'}
+    <ProvisioningPage {navigate} />
   {:else if path === '/demographics'}
     <DemographicsPage />
   {:else if path === '/food'}
@@ -164,6 +170,8 @@
     <SortitionPoolPage id={path.slice('/sortition/pools/'.length)} {navigate} />
   {:else if path === '/assembly'}
     <AssemblyPage />
+  {:else if path === '/constitution'}
+    <ConstitutionPage />
   {:else if path === '/education'}
     <EducationPage {navigate} />
   {:else if path === '/education/schools/new'}

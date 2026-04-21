@@ -31,6 +31,7 @@ export abstract class FunctionalDomain implements IEconomicActor {
     getHandle(): string { return this.name.toLowerCase().replace(/[^a-z0-9_]/g, "_"); }
 
     addRole(role: CommunityRole): void { this.roles.push(role); }
+    removeRole(memberId: string): void { this.roles = this.roles.filter(r => r.memberId !== memberId); }
     getRoles(): CommunityRole[] { return this.roles; }
 
     addUnit(unit: FunctionalUnit): void { this.units.push(unit); }

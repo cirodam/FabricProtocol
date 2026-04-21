@@ -4,11 +4,11 @@ import { getMemberType, DEFAULT_NUTRITIONAL_PROFILES } from "../../domains/food/
 import { FoodDomain } from "../../domains/food/FoodDomain.js";
 import { CommunityKitchen } from "../../domains/food/CommunityKitchen.js";
 import { Mill } from "../../domains/food/Mill.js";
-import { FoodPurchasing } from "../../domains/food/FoodPurchasing.js";
 import { CommunityRole } from "../../commons/CommunityRole.js";
+import { Constitution } from "../../commons/Constitution.js";
 
 function settingsDto() {
-    const monthlyFoodAllowance = FoodDomain.getInstance().monthlyFoodAllowance;
+    const monthlyFoodAllowance = Constitution.getInstance().monthlyFoodAllowance;
     const memberCount = MemberService.getInstance().getAll().length;
     return {
         monthlyFoodAllowance,
@@ -37,17 +37,6 @@ export function getRequirements(_req: Request, res: Response): void {
 
 // GET /food/settings
 export function getSettings(_req: Request, res: Response): void {
-    res.json(settingsDto());
-}
-
-// PUT /food/settings
-export function updateSettings(req: Request, res: Response): void {
-    const { monthlyFoodAllowance } = req.body ?? {};
-    if (typeof monthlyFoodAllowance !== "number" || monthlyFoodAllowance < 0) {
-        res.status(400).json({ error: "monthlyFoodAllowance must be a non-negative number" });
-        return;
-    }
-    FoodDomain.getInstance().setMonthlyAllowance(monthlyFoodAllowance);
     res.json(settingsDto());
 }
 
@@ -261,128 +250,6 @@ export function removeMillStaff(req: Request, res: Response): void {
     for (const r of roles) mill.addRole(r);
     mill.removeMember(memberId);
     domain.saveMill(mill);
-    res.status(204).send();
-}
-
-// ── Food Purchasing endpoints ────────────────────────────────────────────────
-
-function foodPurchasingToDto(fp: FoodPurchasing) {
-    return {
-        id:            fp.id,
-        name:          fp.name,
-        description:   fp.description,
-        staffIds:      fp.getMembers(),
-        staffCount:    fp.getMembers().length,
-        totalUsdSpent: fp.totalUsdSpent,
-        createdAt:     fp.createdAt.toISOString(),
-    };
-}
-
-// GET /food/purchasing
-export function listFoodPurchasing(_req: Request, res: Response): void {
-    const units = FoodDomain.getInstance().getAllFoodPurchasing().map(foodPurchasingToDto);
-    res.json({ total: units.length, units });
-}
-
-// GET /food/purchasing/:id
-export function getFoodPurchasingById(req: Request, res: Response): void {
-    const unit = FoodDomain.getInstance().getFoodPurchasing(req.params.id as string);
-    if (!unit) { res.status(404).json({ error: "Food purchasing unit not found" }); return; }
-    const memberService = MemberService.getInstance();
-    const rolesByMember = new Map(unit.getRoles().map(r => [r.memberId, r]));
-    const staff = unit.getMembers().map(id => {
-        const m = memberService.get(id);
-        const role = rolesByMember.get(id);
-        return {
-            id:              m?.id ?? id,
-            firstName:       m?.firstName ?? "Unknown",
-            lastName:        m?.lastName ?? "",
-            handle:          m?.handle ?? "",
-            roleTitle:       role?.title ?? "",
-            kinPerMonth: role?.kinPerMonth ?? 0,
-        };
-    });
-    res.json({ ...foodPurchasingToDto(unit), staff });
-}
-
-// POST /food/purchasing  — body: { name, description? }
-export function createFoodPurchasing(req: Request, res: Response): void {
-    const { name, description } = req.body ?? {};
-    if (typeof name !== "string" || !name.trim()) {
-        res.status(400).json({ error: "name is required" }); return;
-    }
-    const unit = description
-        ? new FoodPurchasing(name.trim(), description)
-        : new FoodPurchasing(name.trim());
-    FoodDomain.getInstance().addFoodPurchasing(unit);
-    res.status(201).json(foodPurchasingToDto(unit));
-}
-
-// DELETE /food/purchasing/:id
-export function deleteFoodPurchasing(req: Request, res: Response): void {
-    const domain = FoodDomain.getInstance();
-    const unit = domain.getFoodPurchasing(req.params.id as string);
-    if (!unit) { res.status(404).json({ error: "Food purchasing unit not found" }); return; }
-    domain.removeFoodPurchasing(unit.id);
-    res.status(204).send();
-}
-
-// POST /food/purchasing/:id/purchase  — body: { usd }
-export function recordPurchase(req: Request, res: Response): void {
-    const domain = FoodDomain.getInstance();
-    const unit = domain.getFoodPurchasing(req.params.id as string);
-    if (!unit) { res.status(404).json({ error: "Food purchasing unit not found" }); return; }
-
-    const usd = Number(req.body?.usd);
-    if (!Number.isFinite(usd) || usd <= 0) {
-        res.status(400).json({ error: "usd must be a positive number" }); return;
-    }
-    unit.recordPurchase(usd);
-    domain.saveFoodPurchasing(unit);
-    res.json(foodPurchasingToDto(unit));
-}
-
-// POST /food/purchasing/:id/staff  — body: { memberId, title, kinPerMonth }
-export function addFoodPurchasingStaff(req: Request, res: Response): void {
-    const domain = FoodDomain.getInstance();
-    const unit = domain.getFoodPurchasing(req.params.id as string);
-    if (!unit) { res.status(404).json({ error: "Food purchasing unit not found" }); return; }
-
-    const { memberId, title, kinPerMonth } = req.body ?? {};
-    if (typeof memberId !== "string" || !memberId.trim()) {
-        res.status(400).json({ error: "memberId is required" }); return;
-    }
-    if (typeof title !== "string" || !title.trim()) {
-        res.status(400).json({ error: "title is required" }); return;
-    }
-    const salary = typeof kinPerMonth === "number" ? kinPerMonth : Number(kinPerMonth ?? 0);
-    if (!Number.isFinite(salary) || salary < 0) {
-        res.status(400).json({ error: "kinPerMonth must be a non-negative number" }); return;
-    }
-    if (!MemberService.getInstance().get(memberId)) {
-        res.status(404).json({ error: "Member not found" }); return;
-    }
-    const role = new CommunityRole(title.trim(), "", salary);
-    role.memberId      = memberId;
-    role.termStartDate = new Date();
-    unit.addRole(role);
-    unit.addMember(memberId);
-    domain.saveFoodPurchasing(unit);
-    res.status(204).send();
-}
-
-// DELETE /food/purchasing/:id/staff/:memberId
-export function removeFoodPurchasingStaff(req: Request, res: Response): void {
-    const domain = FoodDomain.getInstance();
-    const unit = domain.getFoodPurchasing(req.params.id as string);
-    if (!unit) { res.status(404).json({ error: "Food purchasing unit not found" }); return; }
-
-    const memberId = req.params.memberId as string;
-    const roles = unit.getRoles().filter(r => r.memberId !== memberId);
-    unit.clearRoles();
-    for (const r of roles) unit.addRole(r);
-    unit.removeMember(memberId);
-    domain.saveFoodPurchasing(unit);
     res.status(204).send();
 }
 

@@ -17,7 +17,6 @@ import { FoodDomain } from "./domains/food/FoodDomain.js";
 import { FoodDomainLoader } from "./domains/food/FoodDomainLoader.js";
 import { CommunityKitchenLoader } from "./domains/food/CommunityKitchenLoader.js";
 import { MillLoader } from "./domains/food/MillLoader.js";
-import { FoodPurchasingLoader } from "./domains/food/FoodPurchasingLoader.js";
 import { HealthcareDomain } from "./domains/healthcare/HealthcareDomain.js";
 import { ClinicLoader } from "./domains/healthcare/ClinicLoader.js";
 import { DentalClinicLoader } from "./domains/healthcare/DentalClinicLoader.js";
@@ -40,26 +39,31 @@ import { ChildcareDomain } from "./domains/child_care/ChildcareDomain.js";
 import { HomeChildcareLoader } from "./domains/child_care/HomeChildcareLoader.js";
 import { FireDomain } from "./domains/fire/FireDomain.js";
 import { FireCompanyLoader } from "./domains/fire/FireCompanyLoader.js";
+import { ProvisioningDomain } from "./domains/provisioning/ProvisioningDomain.js";
 import { SortitionService } from "./commons/sortition/SortitionService.js";
 import { SortitionPoolLoader } from "./commons/sortition/SortitionPoolLoader.js";
 import { CouncilService } from "./commons/council/CouncilService.js";
 import { DomainCouncilLoader } from "./commons/council/DomainCouncilLoader.js";
 import { AssemblyService } from "./commons/assembly/AssemblyService.js";
 import { CitizensAssemblyLoader } from "./commons/assembly/CitizensAssemblyLoader.js";
+import { GovernanceService } from "./commons/GovernanceService.js";
+import { ConstitutionLoader } from "./commons/ConstitutionLoader.js";
+import { Constitution } from "./commons/Constitution.js";
 
 
 async function init(): Promise<void> {
-  // ── Demurrage rates ──────────────────────────────────────────────────────────
-  const BANK_DEMURRAGE_RATE    = 0.02; // shrinks money supply (bank recovery)
-  const COMMONS_DEMURRAGE_RATE = 0.02; // commons levy (taxation)
+  // ── Constitution (must be first — other services read parameters from it) ──
+  GovernanceService.getInstance().initConstitution(new ConstitutionLoader("data/constitution"));
+  const constitution = Constitution.getInstance();
+
   // ── Persistence ─────────────────────────────────────────────────────────────
   Bank.getInstance().init(
     new AccountLoader("data/accounts"),
     new TransactionLoader("data/transactions")
   );
   CentralBank.getInstance().init(new MemberEndowmentLoader("data/endowment-profiles"));
-  CentralBank.getInstance().demurrageRate = BANK_DEMURRAGE_RATE;
-  Commonwealth.getInstance().levyRate = COMMONS_DEMURRAGE_RATE;
+  CentralBank.getInstance().demurrageRate = constitution.bankDemurrageRate;
+  Commonwealth.getInstance().levyRate = constitution.commonsLevyRate;
   MemberService.getInstance().init(new MemberLoader("data/members"));
   Marketplace.getInstance().init(
     new PostLoader("data/posts")
@@ -69,7 +73,6 @@ async function init(): Promise<void> {
   FoodDomain.getInstance().init(new FoodDomainLoader("data/food"));
   FoodDomain.getInstance().initKitchens(new CommunityKitchenLoader("data/food/kitchens"));
   FoodDomain.getInstance().initMills(new MillLoader("data/food/mills"));
-  FoodDomain.getInstance().initFoodPurchasing(new FoodPurchasingLoader("data/food/purchasing"));
   HealthcareDomain.getInstance().init(new ClinicLoader("data/healthcare/clinics"));
   HealthcareDomain.getInstance().initDentalClinics(new DentalClinicLoader("data/healthcare/dental-clinics"));
   EducationDomain.getInstance().initSchools(new SchoolLoader("data/education/schools"));
@@ -94,6 +97,7 @@ async function init(): Promise<void> {
   commonwealth.addDomain(EducationDomain.getInstance());
   commonwealth.addDomain(CourierDomain.getInstance());
   commonwealth.addDomain(DependencyCareDomain.getInstance());
+  commonwealth.addDomain(ProvisioningDomain.getInstance());
 
   // ── Ensure every active domain has a permanent council ──────────────────────
   const councilSvc = CouncilService.getInstance();
@@ -106,6 +110,7 @@ async function init(): Promise<void> {
     DependencyCareDomain.getInstance(),
     ChildcareDomain.getInstance(),
     FireDomain.getInstance(),
+    ProvisioningDomain.getInstance(),
   ]) {
     councilSvc.getOrCreateCouncil(domain.id, domain.name);
   }
@@ -123,13 +128,13 @@ async function init(): Promise<void> {
     intervalMs: every.months(1),
     run: () => {
       if (CentralBank.getInstance().unrecoveredKin > 0)
-        CentralBank.getInstance().assessDemurrage(BANK_DEMURRAGE_RATE);
+        CentralBank.getInstance().assessDemurrage(constitution.bankDemurrageRate);
     },
   });
   scheduler.register({
     name: "commons-levy",
     intervalMs: every.months(1),
-    run: () => Commonwealth.getInstance().assessDemurrage(COMMONS_DEMURRAGE_RATE),
+    run: () => Commonwealth.getInstance().assessDemurrage(constitution.commonsLevyRate),
   });
   scheduler.register({
     name: "payroll",

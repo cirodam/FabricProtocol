@@ -7,19 +7,15 @@ import { CommunityKitchen } from "./CommunityKitchen.js";
 import { CommunityKitchenLoader } from "./CommunityKitchenLoader.js";
 import { Mill } from "./Mill.js";
 import { MillLoader } from "./MillLoader.js";
-import { FoodPurchasing } from "./FoodPurchasing.js";
-import { FoodPurchasingLoader } from "./FoodPurchasingLoader.js";
+import { Constitution } from "../../commons/Constitution.js";
 
 export class FoodDomain extends FunctionalDomain {
     private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000003";
     private static instance: FoodDomain;
 
-    monthlyFoodAllowance: number = 0;
     private loader: FoodDomainLoader | null = null;
     private kitchenLoader: CommunityKitchenLoader | null = null;
     private millLoader: MillLoader | null = null;
-    private foodPurchasingLoader: FoodPurchasingLoader | null = null;
-
     private constructor() {
         super("Food", "Responsible for feeding all community members.", FoodDomain.DOMAIN_ID);
     }
@@ -33,8 +29,7 @@ export class FoodDomain extends FunctionalDomain {
 
     init(loader: FoodDomainLoader): void {
         this.loader = loader;
-        const settings = loader.load();
-        this.monthlyFoodAllowance = settings.monthlyFoodAllowance;
+        loader.load(); // load other domain settings if present
     }
 
     initKitchens(loader: CommunityKitchenLoader): void {
@@ -95,44 +90,11 @@ export class FoodDomain extends FunctionalDomain {
         this.millLoader?.delete(id);
     }
 
-    initFoodPurchasing(loader: FoodPurchasingLoader): void {
-        this.foodPurchasingLoader = loader;
-        for (const unit of loader.loadAll()) {
-            this.addUnit(unit);
-        }
-    }
-
-    addFoodPurchasing(unit: FoodPurchasing): void {
-        this.addUnit(unit);
-        this.foodPurchasingLoader?.save(unit);
-    }
-
-    saveFoodPurchasing(unit: FoodPurchasing): void {
-        this.foodPurchasingLoader?.save(unit);
-    }
-
-    getFoodPurchasing(id: string): FoodPurchasing | undefined {
-        return this.getUnits().find(u => u.id === id) as FoodPurchasing | undefined;
-    }
-
-    getAllFoodPurchasing(): FoodPurchasing[] {
-        return this.getUnitsByType<FoodPurchasing>("food-purchasing");
-    }
-
-    removeFoodPurchasing(id: string): void {
-        this.removeUnit(id);
-        this.foodPurchasingLoader?.delete(id);
-    }
-
-    setMonthlyAllowance(amount: number): void {
-        this.monthlyFoodAllowance = amount;
-        this.loader?.save({ monthlyFoodAllowance: amount });
-    }
-
-    // Issue the monthly food credit allowance to every member.
-    // Transfers kin from this domain's account to each member's primary account.
+    // Issue the monthly food allowance to every member from this domain's account.
+    // The amount is governed by the Constitution (monthlyFoodAllowance), set by the Citizens Assembly.
+    // Kin flows from the Food domain's account — funded by the commons — to each member's primary account.
     issueMonthlyKin(): void {
-        const amount = this.monthlyFoodAllowance;
+        const amount = Constitution.getInstance().monthlyFoodAllowance;
         if (amount <= 0) return;
 
         const bankInst = Bank.getInstance();

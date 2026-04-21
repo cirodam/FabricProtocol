@@ -3,6 +3,7 @@ import { Commonwealth } from "../../commons/Commonwealth.js";
 import { Bank } from "../../bank/Bank.js";
 import { Scheduler } from "../../scheduler/Scheduler.js";
 import { CentralBank } from "../../central_bank/CentralBank.js";
+import { Constitution } from "../../commons/Constitution.js";
 
 const COMMONS_DEMURRAGE_RATE = 0.02;
 
@@ -38,7 +39,7 @@ export function getOutflows(_req: Request, res: Response): void {
     const cb = CentralBank.getInstance();
     const allowances = {
         total:       cb.desiredMoneyInCirculation,
-        perMember:   CentralBank.KIN_PER_PERSON_YEAR,
+        perMember:   Constitution.getInstance().monthlyFoodAllowance,
     };
     res.json({
         payroll,
