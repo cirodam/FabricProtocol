@@ -1,4 +1,8 @@
 <script lang="ts">
+  import CommunitySidebar from '../components/CommunitySidebar.svelte';
+
+  const { navigate }: { navigate: (to: string) => void } = $props();
+
   interface AgeBracket {
     label: string;
     min: number;
@@ -42,6 +46,9 @@
   }
 </script>
 
+<div class="domain-layout">
+<CommunitySidebar {navigate} />
+<div class="domain-main">
 <div class="page-header">
   <h1>Demographics</h1>
 </div>
@@ -123,6 +130,8 @@
     </table>
   </section>
 {/if}
+</div>
+</div>
 
 <style>
   .page-header {

@@ -1,4 +1,8 @@
 <script lang="ts">
+  import CommunitySidebar from '../components/CommunitySidebar.svelte';
+
+  const { navigate }: { navigate: (to: string) => void } = $props();
+
   interface Summary {
     kin: number;
   }
@@ -63,103 +67,109 @@
   }
 </script>
 
-<div class="page-header">
-  <h1>Commonwealth</h1>
+<div class="domain-layout">
+  <CommunitySidebar {navigate} />
+
+  <div class="domain-main">
+    <div class="page-header">
+      <h1>Commonwealth</h1>
+    </div>
+
+    {#if loading}
+      <p class="muted">Loading…</p>
+    {:else if error}
+      <p class="error">{error}</p>
+    {:else}
+      {#if summary}
+        <section class="section">
+          <h2>Balance</h2>
+          <div class="stats">
+            <div class="stat-card">
+              <div class="stat-label">Kin</div>
+              <div class="stat-value">{fmt(summary.kin)}</div>
+            </div>
+          </div>
+        </section>
+      {/if}
+
+      {#if demurrage}
+        <section class="section">
+          <h2>Commons Levy</h2>
+          <p class="section-desc">A monthly charge on all non-exempt credit balances. Funds flow into the Commonwealth to cover community expenses.</p>
+          <div class="stats">
+            <div class="stat-card">
+              <div class="stat-label">Monthly Rate</div>
+              <div class="stat-value">{fmtPct(demurrage.rate)}</div>
+              <div class="stat-sub">of each member's balance</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Projected Collection</div>
+              <div class="stat-value">{fmt(demurrage.projectedCollection)}</div>
+              <div class="stat-sub">kin at current balances</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Next Collection</div>
+              <div class="stat-value date-value">{fmtDate(demurrage.nextRun)}</div>
+              <div class="stat-sub">last run: {fmtDate(demurrage.lastRun)}</div>
+            </div>
+          </div>
+        </section>
+      {/if}
+
+      {#if outflows}
+        <section class="section">
+          <h2>Monthly Outflows</h2>
+          <p class="section-desc">Payroll obligations across all functional domains, plus outstanding member allowances.</p>
+
+          <div class="stats" style="margin-bottom: 1.5rem;">
+            <div class="stat-card">
+              <div class="stat-label">Total Monthly Payroll</div>
+              <div class="stat-value">{fmt(outflows.payroll.total)}</div>
+              <div class="stat-sub">kin / month</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Outstanding Allowances</div>
+              <div class="stat-value">{fmt(outflows.allowances.total)}</div>
+              <div class="stat-sub">{fmt(outflows.allowances.perMember)} kin per member</div>
+            </div>
+          </div>
+
+          <table class="outflows-table">
+            <thead>
+              <tr>
+                <th>Domain</th>
+                <th class="num">Monthly payroll</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#if outflows.payroll.commons > 0}
+                <tr>
+                  <td>Commonwealth (governance)</td>
+                  <td class="num">{fmt(outflows.payroll.commons)}</td>
+                </tr>
+              {/if}
+              {#each outflows.payroll.domains as d (d.name)}
+                <tr>
+                  <td>{d.name}</td>
+                  <td class="num">{#if d.payroll > 0}{fmt(d.payroll)}{:else}<span class="muted">—</span>{/if}</td>
+                </tr>
+              {/each}
+              {#if outflows.payroll.domains.length === 0 && outflows.payroll.commons === 0}
+                <tr><td colspan="2" class="muted">No payroll roles assigned yet.</td></tr>
+              {/if}
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td>Total</td>
+                <td class="num">{fmt(outflows.payroll.total)}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </section>
+      {/if}
+    {/if}
+  </div>
 </div>
-
-{#if loading}
-  <p class="muted">Loading…</p>
-{:else if error}
-  <p class="error">{error}</p>
-{:else}
-  {#if summary}
-    <section class="section">
-      <h2>Balance</h2>
-      <div class="stats">
-        <div class="stat-card">
-          <div class="stat-label">Kin</div>
-          <div class="stat-value">{fmt(summary.kin)}</div>
-        </div>
-      </div>
-    </section>
-  {/if}
-
-  {#if demurrage}
-    <section class="section">
-      <h2>Commons Levy</h2>
-      <p class="section-desc">A monthly charge on all non-exempt credit balances. Funds flow into the Commonwealth to cover community expenses.</p>
-      <div class="stats">
-        <div class="stat-card">
-          <div class="stat-label">Monthly Rate</div>
-          <div class="stat-value">{fmtPct(demurrage.rate)}</div>
-          <div class="stat-sub">of each member's balance</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Projected Collection</div>
-          <div class="stat-value">{fmt(demurrage.projectedCollection)}</div>
-          <div class="stat-sub">kin at current balances</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Next Collection</div>
-          <div class="stat-value date-value">{fmtDate(demurrage.nextRun)}</div>
-          <div class="stat-sub">last run: {fmtDate(demurrage.lastRun)}</div>
-        </div>
-      </div>
-    </section>
-  {/if}
-
-  {#if outflows}
-    <section class="section">
-      <h2>Monthly Outflows</h2>
-      <p class="section-desc">Payroll obligations across all functional domains, plus outstanding member allowances.</p>
-
-      <div class="stats" style="margin-bottom: 1.5rem;">
-        <div class="stat-card">
-          <div class="stat-label">Total Monthly Payroll</div>
-          <div class="stat-value">{fmt(outflows.payroll.total)}</div>
-          <div class="stat-sub">kin / month</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Outstanding Allowances</div>
-          <div class="stat-value">{fmt(outflows.allowances.total)}</div>
-          <div class="stat-sub">{fmt(outflows.allowances.perMember)} kin per member</div>
-        </div>
-      </div>
-
-      <table class="outflows-table">
-        <thead>
-          <tr>
-            <th>Domain</th>
-            <th class="num">Monthly payroll</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#if outflows.payroll.commons > 0}
-            <tr>
-              <td>Commonwealth (governance)</td>
-              <td class="num">{fmt(outflows.payroll.commons)}</td>
-            </tr>
-          {/if}
-          {#each outflows.payroll.domains as d (d.name)}
-            <tr>
-              <td>{d.name}</td>
-              <td class="num">{#if d.payroll > 0}{fmt(d.payroll)}{:else}<span class="muted">—</span>{/if}</td>
-            </tr>
-          {/each}
-          {#if outflows.payroll.domains.length === 0 && outflows.payroll.commons === 0}
-            <tr><td colspan="2" class="muted">No payroll roles assigned yet.</td></tr>
-          {/if}
-        </tbody>
-        <tfoot>
-          <tr class="total-row">
-            <td>Total</td>
-            <td class="num">{fmt(outflows.payroll.total)}</td>
-          </tr>
-        </tfoot>
-      </table>
-    </section>
-  {/if}
-{/if}
 
 <style>
   .page-header {
@@ -248,3 +258,4 @@
     border-bottom: none;
   }
 </style>
+

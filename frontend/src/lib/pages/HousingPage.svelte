@@ -1,5 +1,6 @@
 <script lang="ts">
   import CouncilPanel from '../components/CouncilPanel.svelte';
+  import CommunitySidebar from '../components/CommunitySidebar.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
   interface HousingUnit {
@@ -70,6 +71,9 @@
   }
 </script>
 
+<div class="domain-layout">
+<CommunitySidebar {navigate} />
+<div class="domain-main">
 <div class="page-header">
   <h1>Housing</h1>
   <span class="muted">{total} unit{total === 1 ? '' : 's'}</span>
@@ -161,6 +165,8 @@
 </section>
 
 <CouncilPanel domainId="00000000-0000-0000-0000-000000000001" {navigate} />
+</div>
+</div>
 
 <style>
   .page-header {

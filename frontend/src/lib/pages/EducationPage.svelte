@@ -1,5 +1,6 @@
 <script lang="ts">
   import CouncilPanel from '../components/CouncilPanel.svelte';
+  import CommunitySidebar from '../components/CommunitySidebar.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
   interface SchoolDto {
@@ -43,7 +44,9 @@
   load();
 </script>
 
-<div class="page">
+<div class="domain-layout">
+<CommunitySidebar {navigate} />
+<div class="domain-main">
   <div class="page-header">
     <div>
       <h1>Education</h1>
@@ -107,10 +110,9 @@
   {/if}
   <CouncilPanel domainId="00000000-0000-0000-0000-000000000005" {navigate} />
 </div>
+</div>
 
 <style>
-  .page { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
-
   .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; }
   .page-header h1 { margin: 0; }
   .subtitle { margin: 0.25rem 0 0; color: var(--color-muted, #888); font-size: 0.95rem; }

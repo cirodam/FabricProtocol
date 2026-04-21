@@ -62,3 +62,15 @@ main {
   margin: 0 auto;
   width: 100%;
 }
+
+/* Shared layout for Commonwealth + domain pages with sidebar */
+.domain-layout {
+  display: flex;
+  margin: -32px -24px;
+  min-height: calc(100vh - 48px); /* fill below nav */
+}
+.domain-main {
+  flex: 1;
+  padding: 32px 24px;
+  min-width: 0;
+}

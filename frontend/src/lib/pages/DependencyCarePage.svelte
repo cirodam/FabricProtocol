@@ -1,5 +1,6 @@
 <script lang="ts">
   import CouncilPanel from '../components/CouncilPanel.svelte';
+  import CommunitySidebar from '../components/CommunitySidebar.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
   interface SharedHousehold {
@@ -53,6 +54,9 @@
   load();
 </script>
 
+<div class="domain-layout">
+<CommunitySidebar {navigate} />
+<div class="domain-main">
 <div class="page-header">
   <h1>Dependency Care</h1>
 </div>
@@ -138,6 +142,8 @@
   </section>
   <CouncilPanel domainId="00000000-0000-0000-0000-000000000011" {navigate} />
 {/if}
+</div>
+</div>
 
 <style>
   h1 { margin: 0 0 12px; font-size: 22px; font-weight: 600; }

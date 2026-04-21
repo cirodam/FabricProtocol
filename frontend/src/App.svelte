@@ -87,16 +87,7 @@
   <button class:active={path === '/accounts'} onclick={() => navigate('/accounts')}>Accounts</button>
   <button class:active={path.startsWith('/marketplace')} onclick={() => navigate('/marketplace')}>Marketplace</button>
   <button class:active={path === '/central-bank'} onclick={() => navigate('/central-bank')}>Central Bank</button>
-  <button class:active={path === '/commonwealth'} onclick={() => navigate('/commonwealth')}>Commonwealth</button>
-  <button class:active={path === '/provisioning'} onclick={() => navigate('/provisioning')}>Provisioning</button>
-  <button class:active={path === '/demographics'} onclick={() => navigate('/demographics')}>Demographics</button>
-  <button class:active={path === '/food'} onclick={() => navigate('/food')}>Food</button>
-  <button class:active={path.startsWith('/housing')} onclick={() => navigate('/housing')}>Housing</button>
-  <button class:active={path.startsWith('/dependency-care')} onclick={() => navigate('/dependency-care')}>Dependency Care</button>
-  <button class:active={path.startsWith('/child-care')} onclick={() => navigate('/child-care')}>Child Care</button>
-  <button class:active={path.startsWith('/fire')} onclick={() => navigate('/fire')}>Fire</button>
-  <button class:active={path.startsWith('/healthcare')} onclick={() => navigate('/healthcare')}>Healthcare</button>
-  <button class:active={path.startsWith('/education')} onclick={() => navigate('/education')}>Education</button>
+  <button class:active={path.startsWith('/commonwealth')} onclick={() => navigate('/commonwealth')}>Commonwealth</button>
   <button class:active={path.startsWith('/sortition')} onclick={() => navigate('/sortition')}>Sortition</button>
   <button class:active={path === '/assembly'} onclick={() => navigate('/assembly')}>Assembly</button>
   <button class:active={path === '/constitution'} onclick={() => navigate('/constitution')}>Constitution</button>
@@ -141,11 +132,11 @@
   {:else if path === '/central-bank'}
     <CentralBankPage {navigate} />
   {:else if path === '/commonwealth'}
-    <CommonwealthPage />
+    <CommonwealthPage {navigate} />
   {:else if path === '/provisioning'}
     <ProvisioningPage {navigate} />
   {:else if path === '/demographics'}
-    <DemographicsPage />
+    <DemographicsPage {navigate} />
   {:else if path === '/food'}
     <FoodPage {navigate} />
   {:else if path === '/food/kitchens/new'}
