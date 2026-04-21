@@ -12,9 +12,8 @@
     id: string;
     ownerId: string;
     label: string;
-    credits: number;
-    fec: number;
-    allowNegativeCredits: boolean;
+    kin: number;
+    allowNegativeKin: boolean;
     exemptFromDemurrage: boolean;
     createdAt: string;
   }
@@ -54,7 +53,8 @@
 
   load();
 
-  function fmt(n: number) {
+  function fmt(n: number | null | undefined) {
+    if (n == null) return '—';
     return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 </script>
@@ -77,8 +77,7 @@
         <tr>
           <th>Member</th>
           <th>Account</th>
-          <th class="num">Credits</th>
-          <th class="num">FEC</th>
+          <th class="num">Kin</th>
           <th>Flags</th>
         </tr>
       </thead>
@@ -95,10 +94,9 @@
               <td class="label">
                 <button class="link-btn" onclick={() => navigate(`/accounts/${acct.id}`)}>{acct.label}</button>
               </td>
-              <td class="num">{fmt(acct.credits)}</td>
-              <td class="num">{fmt(acct.fec)}</td>
+              <td class="num">{fmt(acct.kin)}</td>
               <td class="flags">
-                {#if acct.allowNegativeCredits}<span class="flag">overdraft</span>{/if}
+                {#if acct.allowNegativeKin}<span class="flag">overdraft</span>{/if}
                 {#if acct.exemptFromDemurrage}<span class="flag">exempt</span>{/if}
               </td>
             </tr>

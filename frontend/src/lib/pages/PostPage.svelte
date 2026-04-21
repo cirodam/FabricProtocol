@@ -63,9 +63,9 @@
   function formatPrice(p: Post) {
     if (p.price === 0) return 'Free';
     if (p.type === 'service') {
-      return p.pricingUnit === 'per_hour' ? `${p.price} credits / hour` : `${p.price} credits`;
+      return p.pricingUnit === 'per_hour' ? `${p.price} kin / hour` : `${p.price} kin`;
     }
-    return `${p.price} credits`;
+    return `${p.price} kin`;
   }
 </script>
 

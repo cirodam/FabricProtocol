@@ -127,7 +127,7 @@ Out of 4,000 committed workers, roughly 28% need to be in essential services:
 | **Total essential** | **~1,120** | **~28%** |
 
 This leaves **~2,880 workers** for non-essential commerce — the market economy that gives
-credits real purchasing power. Without a non-essential sector, allowances are credits chasing
+kin real purchasing power. Without a non-essential sector, allowances are kin chasing
 nothing, which inflates prices and erodes M in real terms.
 
 ---
@@ -144,7 +144,7 @@ endowments. But the labor constraint is not:
 
 The ~15,000 threshold is not about reaching a target M in nominal terms. It is about having
 enough people to **staff all essential services while maintaining a non-essential sector large
-enough to make credits worth holding**.
+enough to make kin worth holding**.
 
 County-scale (10,000–20,000) is the natural unit for this model because it is the smallest
 population that can plausibly close both the labor and fiscal constraints simultaneously.

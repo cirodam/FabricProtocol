@@ -11,7 +11,7 @@ import { Post } from "../marketplace/Post.js";
  *
  * Supported commands (case-insensitive):
  *   BAL                              — account balance
- *   SEND <amount> <handle> [memo]    — transfer credits
+ *   SEND <amount> <handle> [memo]    — transfer kin
  *   POST OFFER|REQUEST <category> <title> <price> [qty]  — create marketplace post
  *   POSTS [category]                 — list active posts
  *   PIN <pin>                        — authenticate session
@@ -44,9 +44,7 @@ export class SmsHandler {
       case "BAL": {
         const account = Bank.getInstance().getPrimaryAccount(member.getId());
         if (!account) return reply("No account found.");
-        const parts = [`Credits: ${account.credits}`];
-        if (account.fec > 0) parts.push(`FEC: ${account.fec}`);
-        return reply(parts.join("\n"));
+        return reply(`Kin: ${account.kin}`);
       }
 
       case "SEND": {
@@ -70,9 +68,9 @@ export class SmsHandler {
         if (!toAccount) return reply(`No account found for ${handle}`);
 
         try {
-          Bank.getInstance().transfer(fromAccount.id, toAccount.id, "credits", amount, memo);
+          Bank.getInstance().transfer(fromAccount.id, toAccount.id, "kin", amount, memo);
           const updated = Bank.getInstance().getPrimaryAccount(member.getId())!;
-          return reply(`Sent ${amount} credits to ${handle}. New balance: ${updated.credits}`);
+          return reply(`Sent ${amount} kin to ${handle}. New balance: ${updated.kin}`);
         } catch (err) {
           return reply((err as Error).message);
         }
@@ -133,7 +131,7 @@ export class SmsHandler {
             qty !== undefined ? { quantity: qty } : { pricingUnit: "in_total" }
         );
         Marketplace.getInstance().addPost(post);
-        return reply(`Posted: ${side} ${title} at ${price} credits${qty !== undefined ? `, qty ${qty}` : ""}.`);
+        return reply(`Posted: ${side} ${title} at ${price} kin${qty !== undefined ? `, qty ${qty}` : ""}.`);
       }
 
       default:

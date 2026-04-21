@@ -5,7 +5,7 @@ export class Community {
 
   readonly id: string;
   readonly name = "Community";
-  readonly currencyName = "Credit";
+  readonly currencyName = "Kin";
   readonly latitude: number = 0;
   readonly longitude: number = 0;
 

@@ -6,13 +6,13 @@ The community sustains essential services through a monthly demurrage levy — a
 
 ## Money Supply (M)
 
-**M** is the total credits in circulation: the sum of all account balances across all members and domains.
+**M** is the total kin in circulation: the sum of all account balances across all members and domains.
 
-In a closed community, M is conserved by internal transactions — spending moves credits between accounts but does not change M. M changes only through:
+In a closed community, M is conserved by internal transactions — spending moves kin between accounts but does not change M. M changes only through:
 
 - **Injection**: endowments issued by the Central Bank (increases M)
 - **Destruction**: Central Bank demurrage / bank recovery (decreases M)
-- **Leakage**: net outflow to external parties via FEC trade (decreases M)
+- **Leakage**: net outflow to external parties via kithe trade (decreases M)
 
 ## Commonwealth Outflows
 
@@ -22,7 +22,7 @@ Each month the Commonwealth is responsible for two categories of spending:
 monthly outflow = Σ allowances + Σ wages
 ```
 
-**Allowances** are per-member credits distributed for essential needs (food, healthcare, etc.) — a local UBI funded by the Commonwealth and routed through domain accounts:
+**Allowances** are per-member kin distributed for essential needs (food, healthcare, etc.) — a local UBI funded by the Commonwealth and routed through domain accounts:
 
 ```
 Commonwealth → FoodDomain → members
@@ -32,7 +32,7 @@ Commonwealth → HealthcareDomain → members
 
 **Wages** are direct payments to community-employed workers in essential services (food workers, healthcare workers, etc.).
 
-Both stay within M. Workers and members spend their credits, those credits accumulate in other accounts, and demurrage collects from wherever they land.
+Both stay within M. Workers and members spend their kin, those kin accumulate in other accounts, and demurrage collects from wherever they land.
 
 ## Demurrage Revenue
 
@@ -42,7 +42,7 @@ Each monthly levy collects:
 revenue = rate × M
 ```
 
-The rate applies uniformly to all non-exempt credit balances. Because the system is closed, velocity does not affect total revenue — credits spent quickly land in another account and are taxed there instead. The aggregate tax base is always M.
+The rate applies uniformly to all non-exempt credit balances. Because the system is closed, velocity does not affect total revenue — kin spent quickly land in another account and are taxed there instead. The aggregate tax base is always M.
 
 ## Sustainability Condition
 
@@ -68,7 +68,7 @@ rate = monthly outflow / M
 
 ## Setting M Through Endowment Policy
 
-M is not determined by commerce or behavior — it is directly controlled by how many credits the Central Bank issues through endowments. The community chooses M, and that choice determines what rate is required to sustain a given level of services:
+M is not determined by commerce or behavior — it is directly controlled by how many kin the Central Bank issues through endowments. The community chooses M, and that choice determines what rate is required to sustain a given level of services:
 
 ```
 required M = outflow / rate
@@ -93,12 +93,12 @@ Total outflow:                           ≈ 4,000,000 cr/mo
 
 | Target rate | Required M | Endowment per member |
 |-------------|-----------|---------------------|
-| 10%/mo | 40M credits | ~2,700 cr |
-| 5%/mo | 80M credits | ~5,300 cr |
-| 2%/mo | 200M credits | ~13,300 cr |
-| 1%/mo | 400M credits | ~26,700 cr |
+| 10%/mo | 40M kin | ~2,700 cr |
+| 5%/mo | 80M kin | ~5,300 cr |
+| 2%/mo | 200M kin | ~13,300 cr |
+| 1%/mo | 400M kin | ~26,700 cr |
 
-The community sets its endowment amount knowing it directly determines the rate they will live under. A higher endowment per member means a lower ongoing tax rate — but requires the Central Bank to issue more credits upfront.
+The community sets its endowment amount knowing it directly determines the rate they will live under. A higher endowment per member means a lower ongoing tax rate — but requires the Central Bank to issue more kin upfront.
 
 **Trajectory over time:**
 
@@ -118,7 +118,7 @@ This illustrates why **scale matters**. A 15,000-person community issuing 2,700 
 The sustainability condition can fail if M shrinks unexpectedly:
 
 - **Bank demurrage too aggressive**: the 2% Central Bank recovery rate destroys money. If set too high relative to endowment injection, M deflates and demurrage revenue falls.
-- **External trade imbalance**: net imports drain credits out of the community as FEC payments.
+- **External trade imbalance**: net imports drain kin out of the community as kithe payments.
 - **Community too small**: M never reaches the threshold where a tolerable rate covers essential costs.
 
 ## The Role of Endowments

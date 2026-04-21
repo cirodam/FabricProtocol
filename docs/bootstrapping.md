@@ -128,9 +128,9 @@ The emergency is stabilizing. People are fed, housed, and receiving basic medica
 
 The barter economy that emerged in Phase 1 is inefficient. People are tracking favors and debts informally, which creates friction and resentment.
 
-Issue a community credit. The simplest implementation: a ledger maintained by a trusted bookkeeper (or two, for redundancy) that records credits earned and spent by each member. Credits are earned by contributing labor to community domains. Credits are spent at the community store, for services from other members, and for any goods the community produces.
+Issue a community credit. The simplest implementation: a ledger maintained by a trusted bookkeeper (or two, for redundancy) that records kin earned and spent by each member. Kin are earned by contributing labor to community domains. Kin are spent at the community store, for services from other members, and for any goods the community produces.
 
-The initial issuance is simple: every adult member receives a baseline endowment — enough to cover basic needs for 30 days. New credits enter the system when the community decides to fund something (pay domain workers, fund a new project). Credits leave the system through demurrage — a small monthly fee on holdings above the baseline, which flows back to the community pool.
+The initial issuance is simple: every adult member receives a baseline endowment — enough to cover basic needs for 30 days. New kin enter the system when the community decides to fund something (pay domain workers, fund a new project). Kin leave the system through demurrage — a small monthly fee on holdings above the baseline, which flows back to the community pool.
 
 This is not inflation. It is a tool for coordinating labor and distribution. See the central bank and currency backing documents for the full model.
 
@@ -157,7 +157,7 @@ Each domain:
 - Sets its own operating standards, ratified by the community
 - Reports to the general assembly
 
-Workers in each domain earn credits for their labor. The community decides how much each domain is funded. Domains spend their allocation on labor, equipment, and materials.
+Workers in each domain earn kin for their labor. The community decides how much each domain is funded. Domains spend their allocation on labor, equipment, and materials.
 
 ### Build the Qualified Sortition Pools
 

@@ -116,7 +116,7 @@
           class="allowance-input"
           bind:value={allowanceInput}
         />
-        <span class="unit">credits / member / month</span>
+        <span class="unit">kin / member / month</span>
         <button class="save-btn" onclick={saveAllowance} disabled={saving}>
           {saving ? 'Saving…' : 'Save'}
         </button>
@@ -124,13 +124,13 @@
         {#if saveError}<span class="error">{saveError}</span>{/if}
       {:else}
         <span class="allowance-value">{monthlyAllowance.toLocaleString()}</span>
-        <span class="unit">credits / member / month</span>
+        <span class="unit">kin / member / month</span>
         <button class="edit-btn" onclick={startEdit}>Edit</button>
       {/if}
     </div>
     <div class="outflow-row">
       <span class="outflow-label">Total monthly outflow</span>
-      <span class="outflow-value">{monthlyOutflow.toLocaleString()} credits</span>
+      <span class="outflow-value">{monthlyOutflow.toLocaleString()} kin</span>
       <span class="outflow-sub">({memberCount} members)</span>
     </div>
   </section>

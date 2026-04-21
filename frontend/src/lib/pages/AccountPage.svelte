@@ -5,9 +5,8 @@
     id: string;
     ownerId: string;
     label: string;
-    credits: number;
-    fec: number;
-    allowNegativeCredits: boolean;
+    kin: number;
+    allowNegativeKin: boolean;
     exemptFromDemurrage: boolean;
     createdAt: string;
   }
@@ -56,7 +55,8 @@
 
   load();
 
-  function fmt(n: number) {
+  function fmt(n: number | null | undefined) {
+    if (n == null) return '—';
     return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
@@ -70,11 +70,11 @@
 
   const demurrageAmount = $derived.by(() => {
     if (!account || !schedule) return 0;
-    return account.credits * schedule.rate;
+    return account.kin * schedule.rate;
   });
   const balanceAfter = $derived.by(() => {
     if (!account || !schedule) return 0;
-    return account.credits - demurrageAmount;
+    return account.kin - demurrageAmount;
   });
 </script>
 
@@ -103,15 +103,12 @@
     </div>
     <div class="balance-block">
       <span class="balance-label">Balance</span>
-      <span class="balance">{fmt(account.credits)} credits</span>
-      {#if account.fec > 0}
-        <span class="fec">{fmt(account.fec)} FEC</span>
-      {/if}
+      <span class="balance">{fmt(account.kin)} kin</span>
     </div>
   </div>
 
   <div class="flags-row">
-    {#if account.allowNegativeCredits}
+    {#if account.allowNegativeKin}
       <span class="flag">overdraft allowed</span>
     {/if}
     {#if account.exemptFromDemurrage}
@@ -140,11 +137,11 @@
         </div>
         <div class="demurrage-row separator">
           <span class="dl">Amount taken</span>
-          <span class="dv debit">− {fmt(demurrageAmount)} credits</span>
+          <span class="dv debit">− {fmt(demurrageAmount)} kin</span>
         </div>
         <div class="demurrage-row">
           <span class="dl">Balance after</span>
-          <span class="dv">{fmt(balanceAfter)} credits</span>
+          <span class="dv">{fmt(balanceAfter)} kin</span>
         </div>
       </div>
     {:else}
@@ -217,13 +214,6 @@
     font-weight: 700;
     font-variant-numeric: tabular-nums;
     color: var(--text);
-  }
-
-  .fec {
-    display: block;
-    font-size: 14px;
-    color: var(--text-muted);
-    font-variant-numeric: tabular-nums;
   }
 
   .flags-row {

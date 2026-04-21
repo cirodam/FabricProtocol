@@ -15,7 +15,7 @@ The model is the Hanseatic League: a confederation of merchant cities that coord
 The Congress of Federations is authorized to do exactly the following, and nothing else:
 
 **1. Maintain the inter-federation clearing system**
-Operate and audit the ledger that records inter-federation trade obligations. The clearing system uses the same FEC standard as intra-federation trade: **1 FEC = 1 kWh of verified energy production**. This single anchor applies at all levels above the community — no separate inter-federation currency, no conversion step, no exchange rate between layers. The Congress runs the same clearing engine as the federation layer, with federations as participants instead of communities.
+Operate and audit the ledger that records inter-federation trade obligations. The clearing system uses the same kithe standard as intra-federation trade: **1 kithe = 1 kWh of verified energy production**. This single anchor applies at all levels above the community — no separate inter-federation currency, no conversion step, no exchange rate between layers. The Congress runs the same clearing engine as the federation layer, with federations as participants instead of communities.
 
 **2. Resolve disputes between federations**
 Provide a neutral arbitration process when two federations have a trade dispute or a disagreement about clearing balances. Rulings are binding on the specific dispute; they do not create precedent that expands Congress authority.
@@ -39,7 +39,7 @@ These prohibitions are absolute and cannot be amended by any vote short of unani
 - **Cannot override a community's internal governance** — the layered autonomy principle applies at every level
 - **Cannot tax member federations or communities** — the Congress is funded by voluntary contributions proportional to federation population
 - **Cannot compel a federation to accept or expel a community** — membership decisions at every level are voluntary
-- **Cannot issue currency** — the FEC system is algorithmic and federation-operated; the Congress has no monetary authority
+- **Cannot issue currency** — the kithe system is algorithmic and federation-operated; the Congress has no monetary authority
 - **Cannot acquire territory** — the Congress is a coordination body, not a state
 - **Cannot maintain a standing military force** — defense coordination is limited to mutual aid agreements between federations
 - **Cannot accumulate authority through precedent** — rulings on specific disputes do not create binding law

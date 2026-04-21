@@ -85,7 +85,7 @@ export function getKitchen(req: Request, res: Response): void {
             lastName:        m?.lastName ?? "",
             handle:          m?.handle ?? "",
             roleTitle:       role?.title ?? "",
-            creditsPerMonth: role?.creditsPerMonth ?? 0,
+            kinPerMonth: role?.kinPerMonth ?? 0,
         };
     });
     res.json({ ...kitchenToDto(kitchen), staff });
@@ -114,22 +114,22 @@ export function deleteKitchen(req: Request, res: Response): void {
     res.status(204).send();
 }
 
-// POST /food/kitchens/:id/staff  — body: { memberId, title, creditsPerMonth }
+// POST /food/kitchens/:id/staff  — body: { memberId, title, kinPerMonth }
 export function addKitchenStaff(req: Request, res: Response): void {
     const domain = FoodDomain.getInstance();
     const kitchen = domain.getKitchen(req.params.id as string);
     if (!kitchen) { res.status(404).json({ error: "Kitchen not found" }); return; }
 
-    const { memberId, title, creditsPerMonth } = req.body ?? {};
+    const { memberId, title, kinPerMonth } = req.body ?? {};
     if (typeof memberId !== "string" || !memberId.trim()) {
         res.status(400).json({ error: "memberId is required" }); return;
     }
     if (typeof title !== "string" || !title.trim()) {
         res.status(400).json({ error: "title is required" }); return;
     }
-    const salary = typeof creditsPerMonth === "number" ? creditsPerMonth : Number(creditsPerMonth ?? 0);
+    const salary = typeof kinPerMonth === "number" ? kinPerMonth : Number(kinPerMonth ?? 0);
     if (!Number.isFinite(salary) || salary < 0) {
-        res.status(400).json({ error: "creditsPerMonth must be a non-negative number" }); return;
+        res.status(400).json({ error: "kinPerMonth must be a non-negative number" }); return;
     }
     if (!MemberService.getInstance().get(memberId)) {
         res.status(404).json({ error: "Member not found" }); return;
@@ -192,7 +192,7 @@ export function getMill(req: Request, res: Response): void {
             lastName:        m?.lastName ?? "",
             handle:          m?.handle ?? "",
             roleTitle:       role?.title ?? "",
-            creditsPerMonth: role?.creditsPerMonth ?? 0,
+            kinPerMonth: role?.kinPerMonth ?? 0,
         };
     });
     res.json({ ...millToDto(mill), staff });
@@ -220,22 +220,22 @@ export function deleteMill(req: Request, res: Response): void {
     res.status(204).send();
 }
 
-// POST /food/mills/:id/staff  — body: { memberId, title, creditsPerMonth }
+// POST /food/mills/:id/staff  — body: { memberId, title, kinPerMonth }
 export function addMillStaff(req: Request, res: Response): void {
     const domain = FoodDomain.getInstance();
     const mill = domain.getMill(req.params.id as string);
     if (!mill) { res.status(404).json({ error: "Mill not found" }); return; }
 
-    const { memberId, title, creditsPerMonth } = req.body ?? {};
+    const { memberId, title, kinPerMonth } = req.body ?? {};
     if (typeof memberId !== "string" || !memberId.trim()) {
         res.status(400).json({ error: "memberId is required" }); return;
     }
     if (typeof title !== "string" || !title.trim()) {
         res.status(400).json({ error: "title is required" }); return;
     }
-    const salary = typeof creditsPerMonth === "number" ? creditsPerMonth : Number(creditsPerMonth ?? 0);
+    const salary = typeof kinPerMonth === "number" ? kinPerMonth : Number(kinPerMonth ?? 0);
     if (!Number.isFinite(salary) || salary < 0) {
-        res.status(400).json({ error: "creditsPerMonth must be a non-negative number" }); return;
+        res.status(400).json({ error: "kinPerMonth must be a non-negative number" }); return;
     }
     if (!MemberService.getInstance().get(memberId)) {
         res.status(404).json({ error: "Member not found" }); return;
@@ -299,7 +299,7 @@ export function getFoodPurchasingById(req: Request, res: Response): void {
             lastName:        m?.lastName ?? "",
             handle:          m?.handle ?? "",
             roleTitle:       role?.title ?? "",
-            creditsPerMonth: role?.creditsPerMonth ?? 0,
+            kinPerMonth: role?.kinPerMonth ?? 0,
         };
     });
     res.json({ ...foodPurchasingToDto(unit), staff });
@@ -342,22 +342,22 @@ export function recordPurchase(req: Request, res: Response): void {
     res.json(foodPurchasingToDto(unit));
 }
 
-// POST /food/purchasing/:id/staff  — body: { memberId, title, creditsPerMonth }
+// POST /food/purchasing/:id/staff  — body: { memberId, title, kinPerMonth }
 export function addFoodPurchasingStaff(req: Request, res: Response): void {
     const domain = FoodDomain.getInstance();
     const unit = domain.getFoodPurchasing(req.params.id as string);
     if (!unit) { res.status(404).json({ error: "Food purchasing unit not found" }); return; }
 
-    const { memberId, title, creditsPerMonth } = req.body ?? {};
+    const { memberId, title, kinPerMonth } = req.body ?? {};
     if (typeof memberId !== "string" || !memberId.trim()) {
         res.status(400).json({ error: "memberId is required" }); return;
     }
     if (typeof title !== "string" || !title.trim()) {
         res.status(400).json({ error: "title is required" }); return;
     }
-    const salary = typeof creditsPerMonth === "number" ? creditsPerMonth : Number(creditsPerMonth ?? 0);
+    const salary = typeof kinPerMonth === "number" ? kinPerMonth : Number(kinPerMonth ?? 0);
     if (!Number.isFinite(salary) || salary < 0) {
-        res.status(400).json({ error: "creditsPerMonth must be a non-negative number" }); return;
+        res.status(400).json({ error: "kinPerMonth must be a non-negative number" }); return;
     }
     if (!MemberService.getInstance().get(memberId)) {
         res.status(404).json({ error: "Member not found" }); return;

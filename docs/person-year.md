@@ -27,15 +27,15 @@ A larger, older community has more person-years and a proportionally larger mone
 
 ### Creation
 
-When a member joins, the Central Bank issues them 10,000 credits — one person-year's worth. Every year thereafter, on the anniversary of their joining, the Central Bank issues another 10,000 credits. This is not a loan. It is the community's recognition that another year of presence and participation has value.
+When a member joins, the Central Bank issues them 10,000 kin — one person-year's worth. Every year thereafter, on the anniversary of their joining, the Central Bank issues another 10,000 kin. This is not a loan. It is the community's recognition that another year of presence and participation has value.
 
-The money supply grows with the community. More members, more years, more credits in circulation. The total money supply at any moment is approximately:
+The money supply grows with the community. More members, more years, more kin in circulation. The total money supply at any moment is approximately:
 
 $$M = \sum_{\text{members}} \text{years in community} \times 10{,}000$$
 
 ### Destruction
 
-When a member leaves or dies, the Central Bank reclaims their remaining account balance. Whatever was issued to them but already spent — credits now held by other members — becomes an unrecovered deficit on the bank's books.
+When a member leaves or dies, the Central Bank reclaims their remaining account balance. Whatever was issued to them but already spent — kin now held by other members — becomes an unrecovered deficit on the bank's books.
 
 The community then runs demurrage across all accounts until that deficit is recovered and the Central Bank is made whole. Demurrage is not a standing tax. It runs only when there is an unrecovered deficit, and stops the moment the deficit is cleared.
 
@@ -55,7 +55,7 @@ The codebase previously used a `trustScore` (0.0–1.0) that scaled a member's o
 
 ## At the federation level
 
-The same principle applies one level up. Each community's FEC (Federation Exchange Credits) allocation is proportional to its total accumulated person-years across all members. A larger, older community has more FEC purchasing power in the federation. A new community starts small and grows into it.
+The same principle applies one level up. Each community's kithe (Federation Exchange Kin) allocation is proportional to its total accumulated person-years across all members. A larger, older community has more kithe purchasing power in the federation. A new community starts small and grows into it.
 
 The federation money supply is therefore:
 
@@ -63,7 +63,7 @@ $$\text{FEC supply} = \sum_{\text{communities}} \sum_{\text{members}} \text{year
 
 No federation committee decides this. No vote is required. The supply adjusts automatically as communities grow and age.
 
-FEC and local credits are backed by the same thing — person-years — measured at different scales. This is why the conversion from FEC to local credits does not require an arbitrary exchange rate. The community's Central Bank issues local credits against incoming FEC at the same person-year rate it uses for everything else.
+FEC and local kin are backed by the same thing — person-years — measured at different scales. This is why the conversion from kithe to local kin does not require an arbitrary exchange rate. The community's Central Bank issues local kin against incoming kithe at the same person-year rate it uses for everything else.
 
 ---
 

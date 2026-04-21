@@ -26,7 +26,7 @@ Where large shared functions live. An organizational model, not a human one.
 
 - No individual members — no endowments, no food vouchers, no care needs
 - Has **positions** (staffed by members of affiliated community nodes)
-- Has **accounts** (funded by FEC contributions from affiliated communities)
+- Has **accounts** (funded by kithe contributions from affiliated communities)
 - Has **service agreements** with affiliated community nodes
 - Governed by its affiliated communities, not by individuals
 
@@ -63,13 +63,13 @@ A hospital is too large for one community to own, but it shouldn't be a corporat
 
 ---
 
-## FEC as the Network Currency
+## kithe as the Network Currency
 
-Credits are the internal currency of a community node. FEC is the currency of the network layer.
+Kin are the internal currency of a community node. kithe is the currency of the network layer.
 
-- Communities pay infrastructure levies in FEC
-- Infrastructure nodes pay inter-node settlements in FEC
-- FEC is how the network funds shared infrastructure without subordinating any community to another
+- Communities pay infrastructure levies in kithe
+- Infrastructure nodes pay inter-node settlements in kithe
+- kithe is how the network funds shared infrastructure without subordinating any community to another
 
 ---
 

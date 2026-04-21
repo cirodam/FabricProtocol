@@ -1,7 +1,7 @@
 <script lang="ts">
   const { navigate }: { navigate: (path: string) => void } = $props();
 
-  interface StaffMember { id: string; firstName: string; lastName: string; handle: string; roleTitle: string; creditsPerMonth: number; }
+  interface StaffMember { id: string; firstName: string; lastName: string; handle: string; roleTitle: string; kinPerMonth: number; }
   interface HcDetail {
     id: string;
     name: string;
@@ -53,7 +53,7 @@
       const res = await fetch("/api/child-care/home-childcare/staff", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memberId: addMemberId, title: addTitle.trim(), creditsPerMonth: addSalary }),
+        body: JSON.stringify({ memberId: addMemberId, title: addTitle.trim(), kinPerMonth: addSalary }),
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
@@ -107,7 +107,7 @@
       {:else}
         <table class="staff-table">
           <thead>
-            <tr><th>Name</th><th>Role</th><th class="num">Credits/mo</th><th></th></tr>
+            <tr><th>Name</th><th>Role</th><th class="num">Kin/mo</th><th></th></tr>
           </thead>
           <tbody>
             {#each unit.staff as s (s.id)}
@@ -118,7 +118,7 @@
                   </button>
                 </td>
                 <td class="muted">{s.roleTitle || "—"}</td>
-                <td class="num">{s.creditsPerMonth > 0 ? s.creditsPerMonth.toLocaleString() : "—"}</td>
+                <td class="num">{s.kinPerMonth > 0 ? s.kinPerMonth.toLocaleString() : "—"}</td>
                 <td><button class="remove-btn" onclick={() => removeStaff(s.id)}>Remove</button></td>
               </tr>
             {/each}
@@ -136,7 +136,7 @@
             {/each}
           </select>
           <input type="text" bind:value={addTitle} placeholder="Role title (e.g. Home Childcarer)" disabled={addWorking} />
-          <input type="number" bind:value={addSalary} min="0" placeholder="Credits / month" disabled={addWorking} />
+          <input type="number" bind:value={addSalary} min="0" placeholder="Kin / month" disabled={addWorking} />
           <button type="submit" disabled={addWorking || !addMemberId || !addTitle.trim()}>{addWorking ? "Adding…" : "Add staff"}</button>
         </div>
       </form>

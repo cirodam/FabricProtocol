@@ -12,7 +12,7 @@ export function getMoneySupply(_req: Request, res: Response): void {
     res.json({
         moneyInCirculation:        bank.moneyInCirculation,
         desiredMoneyInCirculation: bank.desiredMoneyInCirculation,
-        unrecoveredCredits:        bank.unrecoveredCredits,
+        unrecoveredKin:        bank.unrecoveredKin,
     });
 }
 

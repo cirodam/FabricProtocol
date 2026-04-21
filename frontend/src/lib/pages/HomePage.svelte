@@ -37,7 +37,8 @@
 
   load();
 
-  function fmt(n: number): string {
+  function fmt(n: number | null | undefined): string {
+    if (n == null) return '—';
     return n.toLocaleString();
   }
 

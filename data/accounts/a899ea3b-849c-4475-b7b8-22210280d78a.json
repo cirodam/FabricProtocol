@@ -2,9 +2,9 @@
   "id": "a899ea3b-849c-4475-b7b8-22210280d78a",
   "ownerId": "860139a8-6c07-4442-bf91-9f6a5dccbfc3",
   "label": "primary",
-  "credits": 0,
-  "fec": 0,
   "allowNegativeCredits": false,
   "exemptFromDemurrage": false,
-  "createdAt": "2026-04-21T01:49:16.586Z"
+  "createdAt": "2026-04-21T01:49:16.586Z",
+  "kin": 0,
+  "kithe": 0
 }

@@ -12,8 +12,7 @@ export function getSummary(_req: Request, res: Response): void {
     const account = Bank.getInstance().getPrimaryAccount(commonwealth.id);
 
     res.json({
-        credits: account?.credits ?? 0,
-        fec:     account?.fec ?? 0,
+        kin: account?.kin ?? 0,
     });
 }
 
@@ -39,7 +38,7 @@ export function getOutflows(_req: Request, res: Response): void {
     const cb = CentralBank.getInstance();
     const allowances = {
         total:       cb.desiredMoneyInCirculation,
-        perMember:   CentralBank.CREDITS_PER_PERSON_YEAR,
+        perMember:   CentralBank.KIN_PER_PERSON_YEAR,
     };
     res.json({
         payroll,

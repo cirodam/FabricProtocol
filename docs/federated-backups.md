@@ -8,7 +8,7 @@ No central server. No corporate dependency. Resilience is a property of the netw
 
 ## Trust Requirement
 
-Backups contain sensitive data: member records, balances, care needs, guardianship relationships, governance history. Backup agreements require a governance vote on both sides. The trust threshold should be higher than basic federation or FEC trading.
+Backups contain sensitive data: member records, balances, care needs, guardianship relationships, governance history. Backup agreements require a governance vote on both sides. The trust threshold should be higher than basic federation or kithe trading.
 
 A node that holds a backup cannot use the data — it is encrypted with the originating community's key and opaque to the holder.
 

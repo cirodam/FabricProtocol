@@ -17,7 +17,7 @@ with no central coordinator.
 |------|---------|-------------|
 | `community` | A local community running the Fabric stack | The community itself |
 | `infrastructure` | A service node (relay, archive, bridge, etc.) | Infrastructure operator |
-| `federation` | A clearing house for inter-community FEC transactions | Federation council |
+| `federation` | A clearing house for inter-community kithe transactions | Federation council |
 | `forum` | A hosted topic space for cross-network interest groups | Anyone (individual, org) |
 
 All four types speak the same protocol and are treated identically by the peer registry.
@@ -97,7 +97,7 @@ Required properties for any cross-node credit transfer:
 - **HMAC request signing** — every request body is signed with the sending community's
   shared secret. The receiver verifies before processing. Non-repudiation: neither party
   can deny a finalized transfer.
-- **Settlement finality via federation node** — for FEC swaps, the `federation` node type
+- **Settlement finality via federation node** — for kithe swaps, the `federation` node type
   acts as a trusted clearing house, confirming both sides independently before committing.
 
 This is the same pattern used by Stripe, ACH bridges, and most financial APIs.

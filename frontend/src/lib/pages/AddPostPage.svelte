@@ -120,7 +120,7 @@
 
   <div class="grid">
     <label>
-      Price <span class="hint">(credits, 0 = free)</span>
+      Price <span class="hint">(kin, 0 = free)</span>
       <input type="number" min="0" step="1" bind:value={price} required />
     </label>
 

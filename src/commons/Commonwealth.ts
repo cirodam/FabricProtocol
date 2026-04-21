@@ -6,7 +6,7 @@ import { LedgerService } from "../ledger/LedgerService.js";
 import { AssetLedger } from "../ledger/AssetLedger.js";
 
 // The Commons represents the community's collective investment in itself.
-// It holds pooled credits used to meet basic needs, provide care for dependents,
+// It holds pooled kin used to meet basic needs, provide care for dependents,
 // fund insurance, and support members who cannot fully participate in the credit system.
 export class Commonwealth implements IEconomicActor {
     private static instance: Commonwealth;
@@ -56,14 +56,14 @@ export class Commonwealth implements IEconomicActor {
         return this.domains;
     }
 
-    // Allocate credits from the Commons account to a domain's account.
+    // Allocate kin from the Commons account to a domain's account.
     fundDomain(domain: FunctionalDomain, amount: number): void {
         const bankInst = Bank.getInstance();
         const from = bankInst.getPrimaryAccount(this.id);
         const to = bankInst.getPrimaryAccount(domain.id);
         if (!from) throw new Error("Commons has no primary account");
         if (!to) throw new Error(`Domain "${domain.name}" has no primary account`);
-        bankInst.transfer(from.id, to.id, "credits", amount, `fund domain: ${domain.name}`);
+        bankInst.transfer(from.id, to.id, "kin", amount, `fund domain: ${domain.name}`);
     }
 
     /** Transfer all balances from every account of the given actor into the Commons. */
@@ -72,10 +72,8 @@ export class Commonwealth implements IEconomicActor {
         const commonsAccount = bankInst.getPrimaryAccount(this.id);
         if (!commonsAccount) return;
         for (const account of bankInst.getAccounts(actor.getId())) {
-            if (account.credits > 0)
-                bankInst.transfer(account.id, commonsAccount.id, "credits", account.credits, `collect on exit: ${actor.getDisplayName()}`);
-            if (account.fec > 0)
-                bankInst.transfer(account.id, commonsAccount.id, "fec", account.fec, `collect on exit: ${actor.getDisplayName()}`);
+            if (account.kin > 0)
+                bankInst.transfer(account.id, commonsAccount.id, "kin", account.kin, `collect on exit: ${actor.getDisplayName()}`);
         }
     }
 
@@ -86,10 +84,10 @@ export class Commonwealth implements IEconomicActor {
         if (payerAccount) {
             for (const position of this.positions) {
                 if (!position.isActive()) continue;
-                const amount = Math.round(position.creditsPerMonth * 100) / 100;
+                const amount = Math.round(position.kinPerMonth * 100) / 100;
                 if (amount <= 0) continue;
-                if (payerAccount.credits < amount) {
-                    console.warn(`Commons cannot afford payroll for "${position.title}" (needs ${amount}, has ${payerAccount.credits})`);
+                if (payerAccount.kin < amount) {
+                    console.warn(`Commons cannot afford payroll for "${position.title}" (needs ${amount}, has ${payerAccount.kin})`);
                     continue;
                 }
                 const memberAccount = bankInst.getPrimaryAccount(position.memberId!);
@@ -97,7 +95,7 @@ export class Commonwealth implements IEconomicActor {
                     console.warn(`No primary account for position holder ${position.memberId} ("${position.title}")`);
                     continue;
                 }
-                bankInst.transfer(payerAccount.id, memberAccount.id, "credits", amount, `payroll: ${position.title}`);
+                bankInst.transfer(payerAccount.id, memberAccount.id, "kin", amount, `payroll: ${position.title}`);
             }
         }
         for (const domain of this.domains) {
@@ -119,7 +117,7 @@ export class Commonwealth implements IEconomicActor {
     getOutflows(): { commons: number; domains: { name: string; payroll: number }[]; total: number } {
         const commons = this.positions
             .filter(p => p.isActive())
-            .reduce((sum, p) => sum + p.creditsPerMonth, 0);
+            .reduce((sum, p) => sum + p.kinPerMonth, 0);
 
         const domains = this.domains.map(d => ({
             name: d.name,
@@ -139,10 +137,10 @@ export class Commonwealth implements IEconomicActor {
         if (!commonsAccount) return;
 
         for (const account of bankInst.getAllAccounts()) {
-            if (account.exemptFromDemurrage || account.credits <= 0) continue;
-            const amount = Math.round(account.credits * rate * 100) / 100;
+            if (account.exemptFromDemurrage || account.kin <= 0) continue;
+            const amount = Math.round(account.kin * rate * 100) / 100;
             if (amount > 0) {
-                bankInst.transfer(account.id, commonsAccount.id, "credits", amount, "demurrage: commons");
+                bankInst.transfer(account.id, commonsAccount.id, "kin", amount, "demurrage: commons");
             }
         }
     }
@@ -151,8 +149,8 @@ export class Commonwealth implements IEconomicActor {
     calculateDemurrage(rate: number): number {
         let total = 0;
         for (const account of Bank.getInstance().getAllAccounts()) {
-            if (account.exemptFromDemurrage || account.credits <= 0) continue;
-            total += Math.round(account.credits * rate * 100) / 100;
+            if (account.exemptFromDemurrage || account.kin <= 0) continue;
+            total += Math.round(account.kin * rate * 100) / 100;
         }
         return total;
     }

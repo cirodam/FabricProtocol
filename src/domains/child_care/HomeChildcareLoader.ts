@@ -9,7 +9,7 @@ interface RoleRecord {
     title: string;
     description: string;
     memberId: string | null;
-    creditsPerMonth: number;
+    kinPerMonth: number;
     termStartDate: string | null;
     termEndDate: string | null;
 }
@@ -34,7 +34,7 @@ export class HomeChildcareLoader {
             title:           r.title,
             description:     r.description,
             memberId:        r.memberId,
-            creditsPerMonth: r.creditsPerMonth,
+            kinPerMonth: r.kinPerMonth,
             termStartDate:   r.termStartDate?.toISOString() ?? null,
             termEndDate:     r.termEndDate?.toISOString()   ?? null,
         }));
@@ -57,7 +57,7 @@ export class HomeChildcareLoader {
             unit.addMember(staffId);
         }
         for (const rr of r.roles ?? []) {
-            const role = new CommunityRole(rr.title, rr.description, rr.creditsPerMonth);
+            const role = new CommunityRole(rr.title, rr.description, rr.kinPerMonth);
             (role as unknown as Record<string, unknown>)["id"] = rr.id;
             role.memberId      = rr.memberId;
             role.termStartDate = rr.termStartDate ? new Date(rr.termStartDate) : null;

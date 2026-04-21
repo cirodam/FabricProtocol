@@ -4,7 +4,7 @@
  * Manages the community's reserve of external currency (USD).
  *
  * Dollars enter the community through member conversions — members sell dollars
- * to the commonwealth at the current buy rate and receive credits in return.
+ * to the commonwealth at the current buy rate and receive kin in return.
  * Dollars never leave: the reserve is a one-way sink, deployed only through
  * community governance (proposals) for external purchases the community cannot
  * produce internally.
@@ -15,7 +15,7 @@
 export class ExternalReserveDomain {
     private static instance: ExternalReserveDomain;
 
-    /** Credits paid per USD when the community buys dollars from members. */
+    /** Kin paid per USD when the community buys dollars from members. */
     private _buyRate: number = 0.76;
 
     /** USD held in the community's real-world dollar account (off-ledger). */
@@ -44,7 +44,7 @@ export class ExternalReserveDomain {
 
     /**
      * Record an inflow of USD (e.g. a member sold dollars to the community).
-     * Credits should be issued to the member separately via Bank.transfer().
+     * Kin should be issued to the member separately via Bank.transfer().
      */
     recordInflow(usd: number): void {
         if (usd <= 0) throw new Error("Inflow must be positive");
@@ -69,8 +69,8 @@ export class ExternalReserveDomain {
         this._buyOrderActive = true;
         // TODO: create standing marketplace post:
         //   type: "bid", category: "currency", postedBy: Commonwealth.id,
-        //   title: `Community buys USD at ${this._buyRate} credits/dollar`,
-        //   price: this._buyRate (credits per dollar)
+        //   title: `Community buys USD at ${this._buyRate} kin/dollar`,
+        //   price: this._buyRate (kin per dollar)
     }
 
     /**

@@ -5,9 +5,8 @@ interface AccountRecord {
   id: string;
   ownerId: string;
   label: string;
-  credits: number;
-  fec: number;
-  allowNegativeCredits: boolean;
+  kin: number;
+  allowNegativeKin: boolean;
   exemptFromDemurrage: boolean;
   createdAt: string;
 }
@@ -24,9 +23,8 @@ export class AccountLoader {
       id: account.id,
       ownerId: account.ownerId,
       label: account.label,
-      credits: account.credits,
-      fec: account.fec,
-      allowNegativeCredits: account.allowNegativeCredits,
+      kin: account.kin,
+      allowNegativeKin: account.allowNegativeKin,
       exemptFromDemurrage: account.exemptFromDemurrage,
       createdAt: account.createdAt.toISOString(),
     };
@@ -43,13 +41,12 @@ export class AccountLoader {
 
   private fromRecord(r: AccountRecord): Account {
     const stub = { getId: () => r.ownerId, getDisplayName: () => "", getHandle: () => "" };
-    const account = new Account(stub, r.label, r.allowNegativeCredits, r.exemptFromDemurrage);
+    const account = new Account(stub, r.label, r.allowNegativeKin, r.exemptFromDemurrage);
     const a = account as unknown as Record<string, unknown>;
     a["id"] = r.id;
     a["ownerId"] = r.ownerId;
     a["createdAt"] = new Date(r.createdAt);
-    account.credits = r.credits;
-    account.fec = r.fec;
+    account.kin = r.kin ?? (r as unknown as Record<string, number>)["credits"] ?? 0;
     return account;
   }
 }

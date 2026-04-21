@@ -130,8 +130,8 @@ export class FoodDomain extends FunctionalDomain {
     }
 
     // Issue the monthly food credit allowance to every member.
-    // Transfers credits from this domain's account to each member's primary account.
-    issueMonthlyCredits(): void {
+    // Transfers kin from this domain's account to each member's primary account.
+    issueMonthlyKin(): void {
         const amount = this.monthlyFoodAllowance;
         if (amount <= 0) return;
 
@@ -146,13 +146,13 @@ export class FoodDomain extends FunctionalDomain {
 
         const totalNeeded = amount * accounts.length;
         if (totalNeeded === 0) return;
-        if (domainAccount.credits < totalNeeded) {
-            console.warn(`Food domain has insufficient credits to issue monthly allowance (needs ${totalNeeded}, has ${domainAccount.credits})`);
+        if (domainAccount.kin < totalNeeded) {
+            console.warn(`Food domain has insufficient kin to issue monthly allowance (needs ${totalNeeded}, has ${domainAccount.kin})`);
             return;
         }
 
         for (const account of accounts) {
-            bankInst.transfer(domainAccount.id, account.id, "credits", amount, "monthly food allowance");
+            bankInst.transfer(domainAccount.id, account.id, "kin", amount, "monthly food allowance");
         }
     }
 

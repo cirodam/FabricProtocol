@@ -104,7 +104,7 @@ function courierToDto(role: CommunityRole) {
         memberName:      member ? member.getDisplayName() : null,
         handle:          member?.handle ?? null,
         title:           role.title,
-        creditsPerMonth: role.creditsPerMonth,
+        kinPerMonth: role.kinPerMonth,
         termStartDate:   role.termStartDate?.toISOString() ?? null,
     };
 }
@@ -115,12 +115,12 @@ export function listCouriers(_req: Request, res: Response): void {
     res.json({ total: roles.length, couriers: roles.map(courierToDto) });
 }
 
-// POST /courier/couriers  — body: { memberId, title?, creditsPerMonth }
+// POST /courier/couriers  — body: { memberId, title?, kinPerMonth }
 export function addCourier(req: Request, res: Response): void {
-    const { memberId, title, creditsPerMonth } = req.body ?? {};
+    const { memberId, title, kinPerMonth } = req.body ?? {};
     if (typeof memberId !== "string" || !memberId.trim()) { res.status(400).json({ error: "memberId is required" }); return; }
-    const salary = typeof creditsPerMonth === "number" ? creditsPerMonth : Number(creditsPerMonth ?? 0);
-    if (!Number.isFinite(salary) || salary < 0) { res.status(400).json({ error: "creditsPerMonth must be a non-negative number" }); return; }
+    const salary = typeof kinPerMonth === "number" ? kinPerMonth : Number(kinPerMonth ?? 0);
+    if (!Number.isFinite(salary) || salary < 0) { res.status(400).json({ error: "kinPerMonth must be a non-negative number" }); return; }
     if (!MemberService.getInstance().get(memberId)) { res.status(404).json({ error: "Member not found" }); return; }
 
     const role = new CommunityRole(

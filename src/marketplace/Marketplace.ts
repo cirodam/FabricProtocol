@@ -105,14 +105,14 @@ export class Marketplace {
             if (qty > (offer.quantity ?? 0))   throw new Error("Quantity exceeds offer supply");
             if (qty > (request.quantity ?? 0)) throw new Error("Quantity exceeds request demand");
             const total = Math.round(offer.price * qty * 100) / 100;
-            bankInst.transfer(payerAccount.id, payeeAccount.id, "credits", total,
+            bankInst.transfer(payerAccount.id, payeeAccount.id, "kin", total,
                 `marketplace: ${qty}x ${offer.category} @ ${offer.price}`);
             offer.quantity   = (offer.quantity   ?? 0) - qty;
             request.quantity = (request.quantity ?? 0) - qty;
             this.postLoader?.save(offer);
             this.postLoader?.save(request);
         } else {
-            bankInst.transfer(payerAccount.id, payeeAccount.id, "credits", offer.price,
+            bankInst.transfer(payerAccount.id, payeeAccount.id, "kin", offer.price,
                 `marketplace: service ${offer.category}`);
         }
     }

@@ -71,12 +71,12 @@ export class GovernanceService {
     }
 
     // Fund a position at a given monthly rate — requires a passed proposal
-    fundPosition(position: CommunityRole, creditsPerMonth: number, proposalId: string): void {
+    fundPosition(position: CommunityRole, kinPerMonth: number, proposalId: string): void {
         const proposal = this.proposals.get(proposalId);
         if (!proposal || proposal.status !== ProposalStatus.PASSED) {
             throw new Error(`A passed proposal is required to fund a position`);
         }
-        position.creditsPerMonth = creditsPerMonth;
+        position.kinPerMonth = kinPerMonth;
         position.funded = true;
     }
 

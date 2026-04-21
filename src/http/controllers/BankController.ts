@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Bank } from "../../bank/Bank.js";
 import { Currency } from "../../bank/BankTransaction.js";
 
-const CURRENCIES: Currency[] = ["credits", "fec"];
+const CURRENCIES: Currency[] = ["kin"];
 const bank = () => Bank.getInstance();
 
 // GET /accounts/:ownerId
@@ -78,14 +78,13 @@ export function createTransfer(req: Request, res: Response): void {
     }
 }
 
-function toAccountDto(a: { id: string; ownerId: string; label: string; credits: number; fec: number; allowNegativeCredits: boolean; exemptFromDemurrage: boolean; createdAt: Date }) {
+function toAccountDto(a: { id: string; ownerId: string; label: string; kin: number; allowNegativeKin: boolean; exemptFromDemurrage: boolean; createdAt: Date }) {
     return {
         id:                   a.id,
         ownerId:              a.ownerId,
         label:                a.label,
-        credits:              a.credits,
-        fec:                  a.fec,
-        allowNegativeCredits: a.allowNegativeCredits,
+        kin:              a.kin,
+        allowNegativeKin: a.allowNegativeKin,
         exemptFromDemurrage:  a.exemptFromDemurrage,
         createdAt:            a.createdAt,
     };

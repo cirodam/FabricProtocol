@@ -7,18 +7,18 @@ export class CommunityRole {
     memberId: string | null;
     termStartDate: Date | null;
     termEndDate: Date | null;
-    creditsPerMonth: number;
+    kinPerMonth: number;
     funded: boolean;
 
-    constructor(title: string, description: string = "", creditsPerMonth: number = 0) {
+    constructor(title: string, description: string = "", kinPerMonth: number = 0) {
         this.id = randomUUID();
         this.title = title;
         this.description = description;
-        this.creditsPerMonth = creditsPerMonth;
+        this.kinPerMonth = kinPerMonth;
         this.memberId = null;
         this.termStartDate = null;
         this.termEndDate = null;
-        this.funded = creditsPerMonth > 0;
+        this.funded = kinPerMonth > 0;
     }
 
     isActive(): boolean {

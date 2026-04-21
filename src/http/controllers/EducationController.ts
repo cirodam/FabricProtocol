@@ -37,7 +37,7 @@ export function getSchool(req: Request, res: Response): void {
             lastName:        m?.lastName ?? "",
             handle:          m?.handle ?? "",
             roleTitle:       role?.title ?? "",
-            creditsPerMonth: role?.creditsPerMonth ?? 0,
+            kinPerMonth: role?.kinPerMonth ?? 0,
         };
     });
     res.json({ ...schoolToDto(school), staff });
@@ -66,13 +66,13 @@ export function deleteSchool(req: Request, res: Response): void {
     res.status(204).send();
 }
 
-// POST /education/schools/:id/staff  — body: { memberId, title, creditsPerMonth }
+// POST /education/schools/:id/staff  — body: { memberId, title, kinPerMonth }
 export function addSchoolStaff(req: Request, res: Response): void {
     const domain = EducationDomain.getInstance();
     const school = domain.getSchool(req.params.id as string);
     if (!school) { res.status(404).json({ error: "School not found" }); return; }
 
-    const { memberId, title, creditsPerMonth } = req.body ?? {};
+    const { memberId, title, kinPerMonth } = req.body ?? {};
     if (typeof memberId !== "string" || !memberId.trim()) {
         res.status(400).json({ error: "memberId is required" });
         return;
@@ -81,9 +81,9 @@ export function addSchoolStaff(req: Request, res: Response): void {
         res.status(400).json({ error: "title is required" });
         return;
     }
-    const salary = typeof creditsPerMonth === "number" ? creditsPerMonth : Number(creditsPerMonth ?? 0);
+    const salary = typeof kinPerMonth === "number" ? kinPerMonth : Number(kinPerMonth ?? 0);
     if (!Number.isFinite(salary) || salary < 0) {
-        res.status(400).json({ error: "creditsPerMonth must be a non-negative number" });
+        res.status(400).json({ error: "kinPerMonth must be a non-negative number" });
         return;
     }
     if (!MemberService.getInstance().get(memberId)) {
@@ -148,7 +148,7 @@ export function getLibrary(req: Request, res: Response): void {
             lastName:        m?.lastName ?? "",
             handle:          m?.handle ?? "",
             roleTitle:       role?.title ?? "",
-            creditsPerMonth: role?.creditsPerMonth ?? 0,
+            kinPerMonth: role?.kinPerMonth ?? 0,
         };
     });
     res.json({ ...libraryToDto(library), staff });
@@ -177,13 +177,13 @@ export function deleteLibrary(req: Request, res: Response): void {
     res.status(204).send();
 }
 
-// POST /education/libraries/:id/staff  — body: { memberId, title, creditsPerMonth }
+// POST /education/libraries/:id/staff  — body: { memberId, title, kinPerMonth }
 export function addLibraryStaff(req: Request, res: Response): void {
     const domain  = EducationDomain.getInstance();
     const library = domain.getLibrary(req.params.id as string);
     if (!library) { res.status(404).json({ error: "Library not found" }); return; }
 
-    const { memberId, title, creditsPerMonth } = req.body ?? {};
+    const { memberId, title, kinPerMonth } = req.body ?? {};
     if (typeof memberId !== "string" || !memberId.trim()) {
         res.status(400).json({ error: "memberId is required" });
         return;
@@ -192,9 +192,9 @@ export function addLibraryStaff(req: Request, res: Response): void {
         res.status(400).json({ error: "title is required" });
         return;
     }
-    const salary = typeof creditsPerMonth === "number" ? creditsPerMonth : Number(creditsPerMonth ?? 0);
+    const salary = typeof kinPerMonth === "number" ? kinPerMonth : Number(kinPerMonth ?? 0);
     if (!Number.isFinite(salary) || salary < 0) {
-        res.status(400).json({ error: "creditsPerMonth must be a non-negative number" });
+        res.status(400).json({ error: "kinPerMonth must be a non-negative number" });
         return;
     }
     if (!MemberService.getInstance().get(memberId)) {

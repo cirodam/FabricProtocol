@@ -1,7 +1,6 @@
 <script lang="ts">
   interface Summary {
-    credits: number;
-    fec: number;
+    kin: number;
   }
 
   interface DemurrageInfo {
@@ -46,7 +45,8 @@
 
   load();
 
-  function fmt(n: number) {
+  function fmt(n: number | null | undefined) {
+    if (n == null) return '—';
     return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
   }
 
@@ -77,16 +77,9 @@
       <h2>Balance</h2>
       <div class="stats">
         <div class="stat-card">
-          <div class="stat-label">Credits</div>
-          <div class="stat-value">{fmt(summary.credits)}</div>
+          <div class="stat-label">Kin</div>
+          <div class="stat-value">{fmt(summary.kin)}</div>
         </div>
-        {#if summary.fec !== 0}
-          <div class="stat-card">
-            <div class="stat-label">FEC</div>
-            <div class="stat-value">{fmt(summary.fec)}</div>
-            <div class="stat-sub">federation credits</div>
-          </div>
-        {/if}
       </div>
     </section>
   {/if}
@@ -104,7 +97,7 @@
         <div class="stat-card">
           <div class="stat-label">Projected Collection</div>
           <div class="stat-value">{fmt(demurrage.projectedCollection)}</div>
-          <div class="stat-sub">credits at current balances</div>
+          <div class="stat-sub">kin at current balances</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Next Collection</div>
@@ -124,12 +117,12 @@
         <div class="stat-card">
           <div class="stat-label">Total Monthly Payroll</div>
           <div class="stat-value">{fmt(outflows.payroll.total)}</div>
-          <div class="stat-sub">credits / month</div>
+          <div class="stat-sub">kin / month</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Outstanding Allowances</div>
           <div class="stat-value">{fmt(outflows.allowances.total)}</div>
-          <div class="stat-sub">{fmt(outflows.allowances.perMember)} credits per member</div>
+          <div class="stat-sub">{fmt(outflows.allowances.perMember)} kin per member</div>
         </div>
       </div>
 

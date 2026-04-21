@@ -60,7 +60,7 @@ Farmers plant and grow. The Food domain tracks:
 
 ### Harvest Season: Delivery and Credit Issuance
 
-Goods are delivered to the Food domain's storage facilities. Each delivery is weighed, inspected for quality, and recorded. Credits are issued at that moment by the Central Bank, backed by the real goods now in community inventory.
+Goods are delivered to the Food domain's storage facilities. Each delivery is weighed, inspected for quality, and recorded. Kin are issued at that moment by the Central Bank, backed by the real goods now in community inventory.
 
 Partial deliveries receive proportional credit. A farmer who delivered 180kg against a 200kg contract receives 90% of the contracted credit.
 
@@ -120,7 +120,7 @@ Monoculture is the primary risk amplifier for crop disease. Mixed planting, crop
 
 The purchase contract system does something beyond logistics: it makes the community's food needs legible to the people who grow the food, and it makes the growers' economic needs legible to the community.
 
-A farmer who knows the community needs 500kg of dry beans and is willing to pay 4 credits per kg can plan a season with confidence. A community that knows 3 farmers have accepted contracts for a total of 600kg of dry beans can plan its menus with confidence.
+A farmer who knows the community needs 500kg of dry beans and is willing to pay 4 kin per kg can plan a season with confidence. A community that knows 3 farmers have accepted contracts for a total of 600kg of dry beans can plan its menus with confidence.
 
 This mutual legibility — producer and consumer both seeing the same plan — is what replaces the price signal of a commodity market. The price signal in a commodity market is noisy, lagged, and shaped by speculators who eat none of the food. The purchase contract is a direct negotiation between the people who grow the food and the people who eat it.
 

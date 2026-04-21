@@ -44,7 +44,7 @@ export abstract class FunctionalDomain implements IEconomicActor {
     getPayroll(): number {
         const domainPayroll = this.roles
             .filter(r => r.isActive())
-            .reduce((sum, r) => sum + r.creditsPerMonth, 0);
+            .reduce((sum, r) => sum + r.kinPerMonth, 0);
         const unitsPayroll = this.units.reduce((sum, u) => sum + u.getPayroll(), 0);
         return domainPayroll + unitsPayroll;
     }
@@ -56,10 +56,10 @@ export abstract class FunctionalDomain implements IEconomicActor {
         if (!payerAccount) return;
         for (const role of this.roles) {
             if (!role.isActive()) continue;
-            const amount = Math.round(role.creditsPerMonth * 100) / 100;
+            const amount = Math.round(role.kinPerMonth * 100) / 100;
             if (amount <= 0) continue;
-            if (payerAccount.credits < amount) {
-                console.warn(`Domain "${this.name}" cannot afford payroll for "${role.title}" (needs ${amount}, has ${payerAccount.credits})`);
+            if (payerAccount.kin < amount) {
+                console.warn(`Domain "${this.name}" cannot afford payroll for "${role.title}" (needs ${amount}, has ${payerAccount.kin})`);
                 continue;
             }
             const memberAccount = bankInst.getPrimaryAccount(role.memberId!);
@@ -67,7 +67,7 @@ export abstract class FunctionalDomain implements IEconomicActor {
                 console.warn(`No primary account for role holder ${role.memberId} ("${role.title}")`);
                 continue;
             }
-            bankInst.transfer(payerAccount.id, memberAccount.id, "credits", amount, `payroll: ${role.title}`);
+            bankInst.transfer(payerAccount.id, memberAccount.id, "kin", amount, `payroll: ${role.title}`);
         }
         for (const unit of this.units) {
             unit.payMonthly(bankInst);

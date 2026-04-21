@@ -38,7 +38,7 @@ export function getHousehold(req: Request, res: Response): void {
             lastName:        m?.lastName ?? "",
             handle:          m?.handle ?? "",
             roleTitle:       role?.title ?? "",
-            creditsPerMonth: role?.creditsPerMonth ?? 0,
+            kinPerMonth: role?.kinPerMonth ?? 0,
         };
     });
     res.json({ ...householdToDto(household), staff });
@@ -67,22 +67,22 @@ export function deleteHousehold(req: Request, res: Response): void {
     res.status(204).send();
 }
 
-// POST /dependency-care/households/:id/staff  — body: { memberId, title, creditsPerMonth }
+// POST /dependency-care/households/:id/staff  — body: { memberId, title, kinPerMonth }
 export function addHouseholdStaff(req: Request, res: Response): void {
     const domain = DependencyCareDomain.getInstance();
     const household = domain.getHousehold(req.params.id as string);
     if (!household) { res.status(404).json({ error: "Household not found" }); return; }
 
-    const { memberId, title, creditsPerMonth } = req.body ?? {};
+    const { memberId, title, kinPerMonth } = req.body ?? {};
     if (typeof memberId !== "string" || !memberId.trim()) {
         res.status(400).json({ error: "memberId is required" }); return;
     }
     if (typeof title !== "string" || !title.trim()) {
         res.status(400).json({ error: "title is required" }); return;
     }
-    const salary = typeof creditsPerMonth === "number" ? creditsPerMonth : Number(creditsPerMonth ?? 0);
+    const salary = typeof kinPerMonth === "number" ? kinPerMonth : Number(kinPerMonth ?? 0);
     if (!Number.isFinite(salary) || salary < 0) {
-        res.status(400).json({ error: "creditsPerMonth must be a non-negative number" }); return;
+        res.status(400).json({ error: "kinPerMonth must be a non-negative number" }); return;
     }
     if (!MemberService.getInstance().get(memberId)) {
         res.status(404).json({ error: "Member not found" }); return;
@@ -145,7 +145,7 @@ export function getMedicalCareUnit(req: Request, res: Response): void {
             lastName:        m?.lastName ?? "",
             handle:          m?.handle ?? "",
             roleTitle:       role?.title ?? "",
-            creditsPerMonth: role?.creditsPerMonth ?? 0,
+            kinPerMonth: role?.kinPerMonth ?? 0,
         };
     });
     res.json({ ...mcuToDto(unit), staff });
@@ -171,22 +171,22 @@ export function deleteMedicalCareUnit(req: Request, res: Response): void {
     res.status(204).send();
 }
 
-// POST /dependency-care/medical-care-units/:id/staff  — body: { memberId, title, creditsPerMonth }
+// POST /dependency-care/medical-care-units/:id/staff  — body: { memberId, title, kinPerMonth }
 export function addMedicalCareUnitStaff(req: Request, res: Response): void {
     const domain = DependencyCareDomain.getInstance();
     const unit = domain.getMedicalCareUnit(req.params.id as string);
     if (!unit) { res.status(404).json({ error: "Medical care unit not found" }); return; }
 
-    const { memberId, title, creditsPerMonth } = req.body ?? {};
+    const { memberId, title, kinPerMonth } = req.body ?? {};
     if (typeof memberId !== "string" || !memberId.trim()) {
         res.status(400).json({ error: "memberId is required" }); return;
     }
     if (typeof title !== "string" || !title.trim()) {
         res.status(400).json({ error: "title is required" }); return;
     }
-    const salary = typeof creditsPerMonth === "number" ? creditsPerMonth : Number(creditsPerMonth ?? 0);
+    const salary = typeof kinPerMonth === "number" ? kinPerMonth : Number(kinPerMonth ?? 0);
     if (!Number.isFinite(salary) || salary < 0) {
-        res.status(400).json({ error: "creditsPerMonth must be a non-negative number" }); return;
+        res.status(400).json({ error: "kinPerMonth must be a non-negative number" }); return;
     }
     if (!MemberService.getInstance().get(memberId)) {
         res.status(404).json({ error: "Member not found" }); return;
@@ -243,28 +243,28 @@ export function getHomeCaregivingUnit(_req: Request, res: Response): void {
             lastName:        m?.lastName ?? "",
             handle:          m?.handle ?? "",
             roleTitle:       role?.title ?? "",
-            creditsPerMonth: role?.creditsPerMonth ?? 0,
+            kinPerMonth: role?.kinPerMonth ?? 0,
         };
     });
     res.json({ ...hcgToDto(unit), staff });
 }
 
-// POST /dependency-care/home-caregiving/staff  — body: { memberId, title, creditsPerMonth }
+// POST /dependency-care/home-caregiving/staff  — body: { memberId, title, kinPerMonth }
 export function addHomeCaregivingStaff(req: Request, res: Response): void {
     const domain = DependencyCareDomain.getInstance();
     const unit = domain.getHomeCaregiving();
     if (!unit) { res.status(503).json({ error: "Home caregiving not initialised" }); return; }
 
-    const { memberId, title, creditsPerMonth } = req.body ?? {};
+    const { memberId, title, kinPerMonth } = req.body ?? {};
     if (typeof memberId !== "string" || !memberId.trim()) {
         res.status(400).json({ error: "memberId is required" }); return;
     }
     if (typeof title !== "string" || !title.trim()) {
         res.status(400).json({ error: "title is required" }); return;
     }
-    const salary = typeof creditsPerMonth === "number" ? creditsPerMonth : Number(creditsPerMonth ?? 0);
+    const salary = typeof kinPerMonth === "number" ? kinPerMonth : Number(kinPerMonth ?? 0);
     if (!Number.isFinite(salary) || salary < 0) {
-        res.status(400).json({ error: "creditsPerMonth must be a non-negative number" }); return;
+        res.status(400).json({ error: "kinPerMonth must be a non-negative number" }); return;
     }
     if (!MemberService.getInstance().get(memberId)) {
         res.status(404).json({ error: "Member not found" }); return;

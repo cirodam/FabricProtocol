@@ -56,7 +56,7 @@ Functional Units come in two types:
 
 **Enterprise** (member-governed)
 - A cooperative venture organized by members for their own benefit
-- Earns credits from the marketplace
+- Earns kin from the marketplace
 - The commons does not track or manage enterprises internally — they are marketplace participants like any member
 - Enterprise accounting, membership, and profit-sharing are the members' own affair, outside the commons protocol
 - A separate enterprise app could optionally use the Bank and Marketplace as infrastructure

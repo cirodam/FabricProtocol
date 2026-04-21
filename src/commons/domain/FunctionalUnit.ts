@@ -46,7 +46,7 @@ export abstract class FunctionalUnit implements IEconomicActor {
     getPayroll(): number {
         return this.roles
             .filter(r => r.isActive())
-            .reduce((sum, r) => sum + r.creditsPerMonth, 0);
+            .reduce((sum, r) => sum + r.kinPerMonth, 0);
     }
 
     // Pay all active roles from this unit's account.
@@ -55,10 +55,10 @@ export abstract class FunctionalUnit implements IEconomicActor {
         if (!payerAccount) return;
         for (const role of this.roles) {
             if (!role.isActive()) continue;
-            const amount = Math.round(role.creditsPerMonth * 100) / 100;
+            const amount = Math.round(role.kinPerMonth * 100) / 100;
             if (amount <= 0) continue;
-            if (payerAccount.credits < amount) {
-                console.warn(`Unit "${this.name}" cannot afford payroll for "${role.title}" (needs ${amount}, has ${payerAccount.credits})`);
+            if (payerAccount.kin < amount) {
+                console.warn(`Unit "${this.name}" cannot afford payroll for "${role.title}" (needs ${amount}, has ${payerAccount.kin})`);
                 continue;
             }
             const memberAccount = bankInst.getPrimaryAccount(role.memberId!);
@@ -66,7 +66,7 @@ export abstract class FunctionalUnit implements IEconomicActor {
                 console.warn(`No primary account for role holder ${role.memberId} ("${role.title}")`);
                 continue;
             }
-            bankInst.transfer(payerAccount.id, memberAccount.id, "credits", amount, `payroll: ${role.title}`);
+            bankInst.transfer(payerAccount.id, memberAccount.id, "kin", amount, `payroll: ${role.title}`);
         }
     }
 }

@@ -1,0 +1,10 @@
+{
+  "id": "d91ba64a-a29a-4f53-a5fa-0100de5866d5",
+  "ownerId": "e511b595-5e4c-44d8-9448-fea6fc8de4c3",
+  "label": "primary",
+  "kin": 0,
+  "allowNegativeKin": false,
+  "exemptFromDemurrage": false,
+  "createdAt": "2026-04-21T13:12:21.132Z",
+  "kithe": 0
+}

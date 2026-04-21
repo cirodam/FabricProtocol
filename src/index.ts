@@ -122,7 +122,7 @@ async function init(): Promise<void> {
     name: "demurrage",
     intervalMs: every.months(1),
     run: () => {
-      if (CentralBank.getInstance().unrecoveredCredits > 0)
+      if (CentralBank.getInstance().unrecoveredKin > 0)
         CentralBank.getInstance().assessDemurrage(BANK_DEMURRAGE_RATE);
     },
   });
@@ -139,7 +139,7 @@ async function init(): Promise<void> {
   scheduler.register({
     name: "food-allowance",
     intervalMs: every.months(1),
-    run: () => FoodDomain.getInstance().issueMonthlyCredits(),
+    run: () => FoodDomain.getInstance().issueMonthlyKin(),
   });
 
   await scheduler.start();

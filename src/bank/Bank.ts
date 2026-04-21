@@ -41,8 +41,8 @@ export class Bank {
 
     // --- Account management ---
 
-    openAccount(owner: IEconomicActor, label: string, allowNegativeCredits: boolean = false, exemptFromDemurrage: boolean = false): Account {
-        const account = new Account(owner, label, allowNegativeCredits, exemptFromDemurrage);
+    openAccount(owner: IEconomicActor, label: string, allowNegativeKin: boolean = false, exemptFromDemurrage: boolean = false): Account {
+        const account = new Account(owner, label, allowNegativeKin, exemptFromDemurrage);
         this.accounts.set(account.id, account);
 
         const ownerAccounts = this.ownerIndex.get(owner.getId()) ?? [];
@@ -98,14 +98,9 @@ export class Bank {
         if (!to) throw new Error(`Account ${toAccountId} not found`);
 
         const fromBalance = (from as Record<Currency, number>)[currency];
-        if (!from.allowNegativeCredits && currency === "credits" && fromBalance < amount) {
+        if (!from.allowNegativeKin && fromBalance < amount) {
             throw new Error(
-                `Insufficient credits: account ${fromAccountId} has ${fromBalance}, attempted ${amount}`
-            );
-        }
-        if (currency === "fec" && fromBalance < amount) {
-            throw new Error(
-                `Insufficient ${currency}: account ${fromAccountId} has ${fromBalance}, attempted ${amount}`
+                `Insufficient kin: account ${fromAccountId} has ${fromBalance}, attempted ${amount}`
             );
         }
 

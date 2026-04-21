@@ -5,17 +5,16 @@ export class Account {
     readonly id: string;
     readonly ownerId: string;
     readonly label: string;
-    credits: number = 0;
-    fec: number = 0;
-    readonly allowNegativeCredits: boolean;
+    kin: number = 0;
+    readonly allowNegativeKin: boolean;
     readonly exemptFromDemurrage: boolean;
     readonly createdAt: Date;
 
-    constructor(owner: IEconomicActor, label: string, allowNegativeCredits: boolean = false, exemptFromDemurrage: boolean = false) {
+    constructor(owner: IEconomicActor, label: string, allowNegativeKin: boolean = false, exemptFromDemurrage: boolean = false) {
         this.id = randomUUID();
         this.ownerId = owner.getId();
         this.label = label;
-        this.allowNegativeCredits = allowNegativeCredits;
+        this.allowNegativeKin = allowNegativeKin;
         this.exemptFromDemurrage = exemptFromDemurrage;
         this.createdAt = new Date();
     }

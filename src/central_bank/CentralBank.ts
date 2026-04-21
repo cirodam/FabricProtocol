@@ -13,8 +13,8 @@ import { MemberEndowmentLoader } from "./MemberEndowmentLoader.js";
 export class CentralBank implements IEconomicActor {
     private static instance: CentralBank;
 
-    /** Credits issued per person-year (on joining and each anniversary). */
-    static readonly CREDITS_PER_PERSON_YEAR = 10_000;
+    /** Kin issued per person-year (on joining and each anniversary). */
+    static readonly KIN_PER_PERSON_YEAR = 10_000;
 
     readonly id: string;
 
@@ -55,10 +55,10 @@ export class CentralBank implements IEconomicActor {
     getDisplayName(): string { return "Central Bank"; }
     getHandle(): string { return "central_bank"; }
 
-    /** Total credits actually in circulation (magnitude of the bank's negative balance). */
+    /** Total kin actually in circulation (magnitude of the bank's negative balance). */
     get moneyInCirculation(): number {
         const bankAccount = Bank.getInstance().getPrimaryAccount(this.id);
-        return Math.max(0, -(bankAccount?.credits ?? 0));
+        return Math.max(0, -(bankAccount?.kin ?? 0));
     }
 
     /** What money in circulation should be — sum of all active member endowments. */
@@ -68,8 +68,8 @@ export class CentralBank implements IEconomicActor {
         return total;
     }
 
-    /** Credits still floating from departed members we couldn't fully reclaim. */
-    get unrecoveredCredits(): number {
+    /** Kin still floating from departed members we couldn't fully reclaim. */
+    get unrecoveredKin(): number {
         return Math.max(0, this.moneyInCirculation - this.desiredMoneyInCirculation);
     }
 
@@ -80,7 +80,7 @@ export class CentralBank implements IEconomicActor {
 
     /**
      * Issue a membership endowment to a member.
-     * Credits are transferred from the CentralBank account (which goes negative)
+     * Kin are transferred from the CentralBank account (which goes negative)
      * directly to the member's primary account.
      */
     issueEndowment(member: IEconomicActor, amount: number): void {
@@ -95,7 +95,7 @@ export class CentralBank implements IEconomicActor {
         const memberAccount = Bank.getInstance().getPrimaryAccount(member.getId());
         if (!bankAccount) throw new Error("CentralBank has no primary account");
         if (!memberAccount) throw new Error(`Member ${member.getId()} has no primary account`);
-        Bank.getInstance().transfer(bankAccount.id, memberAccount.id, "credits", amount, "endowment issuance");
+        Bank.getInstance().transfer(bankAccount.id, memberAccount.id, "kin", amount, "endowment issuance");
         this.endowmentLoader?.save(e);
     }
 
@@ -115,9 +115,9 @@ export class CentralBank implements IEconomicActor {
         let remaining = e.endowment;
         for (const account of bankInst.getAccounts(member.getId())) {
             if (remaining <= 0) break;
-            const take = Math.min(account.credits, remaining);
+            const take = Math.min(account.kin, remaining);
             if (take > 0) {
-                bankInst.transfer(account.id, bankAccount.id, "credits", take, "endowment reclaim on exit");
+                bankInst.transfer(account.id, bankAccount.id, "kin", take, "endowment reclaim on exit");
                 remaining -= take;
             }
         }
@@ -133,8 +133,8 @@ export class CentralBank implements IEconomicActor {
         if (this.moneyInCirculation <= 0) return 0;
         let total = 0;
         for (const account of Bank.getInstance().getAllAccounts()) {
-            if (account.exemptFromDemurrage || account.credits <= 0) continue;
-            total += Math.round(account.credits * rate * 100) / 100;
+            if (account.exemptFromDemurrage || account.kin <= 0) continue;
+            total += Math.round(account.kin * rate * 100) / 100;
         }
         return total;
     }
@@ -154,10 +154,10 @@ export class CentralBank implements IEconomicActor {
         if (!bankAccount) return;
 
         for (const account of bankInst.getAllAccounts()) {
-            if (account.exemptFromDemurrage || account.credits <= 0) continue;
-            const amount = Math.round(account.credits * rate * 100) / 100;
+            if (account.exemptFromDemurrage || account.kin <= 0) continue;
+            const amount = Math.round(account.kin * rate * 100) / 100;
             if (amount > 0) {
-                bankInst.transfer(account.id, bankAccount.id, "credits", amount, "demurrage: bank recovery");
+                bankInst.transfer(account.id, bankAccount.id, "kin", amount, "demurrage: bank recovery");
             }
         }
     }

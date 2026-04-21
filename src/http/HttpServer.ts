@@ -34,7 +34,7 @@ import networkRoutes from "../network/networkRoutes.js";
  *
  * Mounted routes:
  *   GET    /status                            — community summary
- *   GET    /money-supply                      — credits in circulation
+ *   GET    /money-supply                      — kin in circulation
  *
  *   GET    /members                           — list all members
  *   GET    /members/:id                       — get member by ID

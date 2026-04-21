@@ -4,7 +4,7 @@
   interface MoneySupply {
     moneyInCirculation: number;
     desiredMoneyInCirculation: number;
-    unrecoveredCredits: number;
+    unrecoveredKin: number;
   }
 
   interface Endowment {
@@ -38,7 +38,8 @@
 
   load();
 
-  function fmt(n: number) {
+  function fmt(n: number | null | undefined) {
+    if (n == null) return '—';
     return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
   }
 </script>
@@ -56,16 +57,16 @@
     <div class="stat-card">
       <div class="stat-label">In Circulation</div>
       <div class="stat-value">{fmt(supply.moneyInCirculation)}</div>
-      <div class="stat-sub">credits currently held by members</div>
+      <div class="stat-sub">kin currently held by members</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Target Supply</div>
       <div class="stat-value">{fmt(supply.desiredMoneyInCirculation)}</div>
       <div class="stat-sub">sum of all active endowments</div>
     </div>
-    <div class="stat-card {supply.unrecoveredCredits > 0 ? 'warn' : ''}">
+    <div class="stat-card {supply.unrecoveredKin > 0 ? 'warn' : ''}">
       <div class="stat-label">Unrecovered</div>
-      <div class="stat-value">{fmt(supply.unrecoveredCredits)}</div>
+      <div class="stat-value">{fmt(supply.unrecoveredKin)}</div>
       <div class="stat-sub">from departed members</div>
     </div>
   </div>
