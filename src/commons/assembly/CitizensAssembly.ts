@@ -5,20 +5,18 @@ export interface AssemblySeat {
 
 /**
  * The Citizens Assembly is the community's top-level governing body.
- * It has 50 seats filled by sortition from a linked pool.
+ * It has 50 seats filled by sortition from the full body of members.
  *
  * There is exactly one assembly per community. It is never created or
- * deleted — only its seats and linked pool change over time.
+ * deleted — only its seats change over time.
  */
 export class CitizensAssembly {
     static readonly SIZE = 50;
 
-    poolId: string | null;
     private seats: AssemblySeat[];
 
-    constructor(poolId: string | null = null) {
-        this.poolId = poolId;
-        this.seats  = [];
+    constructor() {
+        this.seats = [];
     }
 
     getSeats(): AssemblySeat[] {

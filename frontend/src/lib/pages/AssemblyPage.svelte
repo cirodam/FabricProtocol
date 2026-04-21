@@ -1,51 +1,24 @@
 <script lang="ts">
-  const { navigate }: { navigate: (path: string) => void } = $props();
-
   interface Seat { memberId: string; seatedAt: string; firstName: string; lastName: string; handle: string; }
-  interface Pool { id: string; name: string; memberCount: number; }
   interface Assembly {
-    poolId: string | null; poolName: string | null;
     size: number; seatCount: number; vacancies: number; seats: Seat[];
   }
 
   let assembly: Assembly | null = $state(null);
-  let allPools: Pool[]          = $state([]);
-  let loading        = $state(true);
-  let error          = $state("");
-  let selectedPoolId = $state("");
-  let poolSaving     = $state(false);
-  let drawWorking    = $state(false);
-  let drawError      = $state("");
+  let loading     = $state(true);
+  let error       = $state("");
+  let drawWorking = $state(false);
+  let drawError   = $state("");
 
   async function load() {
     try {
-      const [aRes, pRes] = await Promise.all([
-        fetch("/api/assembly"),
-        fetch("/api/sortition/pools"),
-      ]);
-      if (!aRes.ok) throw new Error(`${aRes.status}`);
-      assembly       = await aRes.json();
-      allPools       = (await pRes.json()).pools;
-      selectedPoolId = assembly?.poolId ?? "";
+      const res = await fetch("/api/assembly");
+      if (!res.ok) throw new Error(`${res.status}`);
+      assembly = await res.json();
     } catch (e: unknown) {
       error = e instanceof Error ? e.message : "Failed to load";
     } finally {
       loading = false;
-    }
-  }
-
-  async function savePool() {
-    poolSaving = true;
-    try {
-      const res = await fetch("/api/assembly/pool", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ poolId: selectedPoolId || null }),
-      });
-      if (!res.ok) throw new Error(`${res.status}`);
-      await load();
-    } finally {
-      poolSaving = false;
     }
   }
 
@@ -79,7 +52,7 @@
       <span class="badge">Citizens Assembly</span>
       <h1>Citizens Assembly</h1>
     </div>
-    {#if assembly && assembly.vacancies > 0 && assembly.poolId}
+    {#if assembly && assembly.vacancies > 0}
       <button class="primary" onclick={draw} disabled={drawWorking}>
         {drawWorking ? "Drawing…" : `Draw ${assembly.vacancies} seat${assembly.vacancies === 1 ? '' : 's'}`}
       </button>
@@ -99,9 +72,7 @@
     <section class="section">
       <h2>Members</h2>
       {#if assembly.seats.length === 0}
-        <p class="muted">
-          {assembly.poolId ? 'No seats filled yet. Use Draw to select members.' : 'Link a sortition pool below, then draw seats.'}
-        </p>
+        <p class="muted">No seats filled yet. Use Draw to randomly select members.</p>
       {:else}
         <div class="table-wrap">
           <table>
@@ -123,32 +94,6 @@
       {/if}
       {#if assembly.vacancies > 0}
         <p class="vacancy-note">{assembly.vacancies} vacant {assembly.vacancies === 1 ? 'seat' : 'seats'}</p>
-      {/if}
-    </section>
-
-    <!-- Pool -->
-    <section class="section">
-      <h2>Sortition Pool</h2>
-      <div class="pool-row">
-        <select bind:value={selectedPoolId} disabled={poolSaving}>
-          <option value="">— No pool linked —</option>
-          {#each allPools as p (p.id)}
-            <option value={p.id}>{p.name} ({p.memberCount} members)</option>
-          {/each}
-        </select>
-        <button
-          class="primary"
-          onclick={savePool}
-          disabled={poolSaving || selectedPoolId === (assembly.poolId ?? "")}
-        >
-          {poolSaving ? "Saving…" : "Save"}
-        </button>
-      </div>
-      {#if allPools.length === 0}
-        <p class="hint muted">
-          No pools exist yet.
-          <button class="link-btn" onclick={() => navigate('/sortition/pools/new')}>Create a sortition pool →</button>
-        </p>
       {/if}
     </section>
   {/if}
@@ -217,24 +162,7 @@
     color: var(--color-danger, #dc2626);
   }
 
-  .pool-row { display: flex; gap: 0.5rem; align-items: center; }
-  .pool-row select {
-    flex: 1;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--color-border, #e2e8f0);
-    border-radius: 6px;
-    font-size: 0.9rem;
-    background: var(--color-surface, #fff);
-  }
-
-  .hint { margin-top: 0.5rem; font-size: 0.85rem; }
   .muted { color: var(--text-secondary); }
-  .link-btn {
-    background: none; border: none;
-    color: var(--color-primary, #2563eb);
-    cursor: pointer; padding: 0;
-    font-size: inherit; text-decoration: underline;
-  }
 
   button { padding: 0.45rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.875rem; border: 1px solid var(--color-border, #e2e8f0); background: none; }
   button:disabled { opacity: 0.6; cursor: not-allowed; }

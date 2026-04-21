@@ -163,7 +163,7 @@
   {:else if path.startsWith('/sortition/pools/')}
     <SortitionPoolPage id={path.slice('/sortition/pools/'.length)} {navigate} />
   {:else if path === '/assembly'}
-    <AssemblyPage {navigate} />
+    <AssemblyPage />
   {:else if path === '/education'}
     <EducationPage {navigate} />
   {:else if path === '/education/schools/new'}

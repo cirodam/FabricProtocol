@@ -7,7 +7,6 @@ interface SeatRecord {
 }
 
 interface AssemblyRecord {
-    poolId: string | null;
     seats: SeatRecord[];
 }
 
@@ -20,8 +19,7 @@ export class CitizensAssemblyLoader {
 
     save(assembly: CitizensAssembly): void {
         const record: AssemblyRecord = {
-            poolId: assembly.poolId,
-            seats:  assembly.getSeats().map(s => ({
+            seats: assembly.getSeats().map(s => ({
                 memberId: s.memberId,
                 seatedAt: s.seatedAt.toISOString(),
             })),
@@ -36,7 +34,7 @@ export class CitizensAssemblyLoader {
     }
 
     private fromRecord(r: AssemblyRecord): CitizensAssembly {
-        const assembly = new CitizensAssembly(r.poolId ?? null);
+        const assembly = new CitizensAssembly();
         for (const s of r.seats ?? []) {
             (assembly as unknown as { seats: AssemblySeat[] }).seats.push({
                 memberId: s.memberId,
