@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { IEconomicActor } from "../IEconomicActor.js";
 
-export class Account {
+export class BankAccount {
     readonly id: string;
     readonly ownerId: string;
     readonly label: string;

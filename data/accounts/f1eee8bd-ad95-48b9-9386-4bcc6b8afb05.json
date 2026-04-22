@@ -1,0 +1,9 @@
+{
+  "id": "f1eee8bd-ad95-48b9-9386-4bcc6b8afb05",
+  "ownerId": "fe53c167-4d1a-46e8-b29a-52c630fb29c8",
+  "label": "primary",
+  "kin": 0,
+  "allowNegativeKin": false,
+  "exemptFromDemurrage": false,
+  "createdAt": "2026-04-22T21:43:32.689Z"
+}

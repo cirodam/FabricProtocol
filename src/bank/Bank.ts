@@ -1,5 +1,5 @@
 import { IEconomicActor } from "../IEconomicActor.js";
-import { Account } from "./Account.js";
+import { BankAccount } from "./BankAccount.js";
 import { AccountLoader } from "./AccountLoader.js";
 import { BankTransaction, Currency } from "./BankTransaction.js";
 import { TransactionLoader } from "./TransactionLoader.js";
@@ -10,7 +10,7 @@ import { TransactionLoader } from "./TransactionLoader.js";
 export class Bank {
     private static instance: Bank;
 
-    private accounts: Map<string, Account> = new Map();        // keyed by accountId
+    private accounts: Map<string, BankAccount> = new Map();        // keyed by accountId
     private ownerIndex: Map<string, string[]> = new Map();     // ownerId → accountId[]
     private accountLoader: AccountLoader | null = null;
     private transactionLoader: TransactionLoader | null = null;
@@ -41,8 +41,8 @@ export class Bank {
 
     // --- Account management ---
 
-    openAccount(owner: IEconomicActor, label: string, allowNegativeKin: boolean = false, exemptFromDemurrage: boolean = false): Account {
-        const account = new Account(owner, label, allowNegativeKin, exemptFromDemurrage);
+    openAccount(owner: IEconomicActor, label: string, allowNegativeKin: boolean = false, exemptFromDemurrage: boolean = false): BankAccount {
+        const account = new BankAccount(owner, label, allowNegativeKin, exemptFromDemurrage);
         this.accounts.set(account.id, account);
 
         const ownerAccounts = this.ownerIndex.get(owner.getId()) ?? [];
@@ -53,21 +53,21 @@ export class Bank {
         return account;
     }
 
-    getAccount(accountId: string): Account | undefined {
+    getAccount(accountId: string): BankAccount | undefined {
         return this.accounts.get(accountId);
     }
 
-    getAccounts(ownerId: string): Account[] {
+    getAccounts(ownerId: string): BankAccount[] {
         const ids = this.ownerIndex.get(ownerId) ?? [];
         return ids.map((id) => this.accounts.get(id)!);
     }
 
     // Returns the first account labelled "primary" for the given owner.
-    getPrimaryAccount(ownerId: string): Account | undefined {
+    getPrimaryAccount(ownerId: string): BankAccount | undefined {
         return this.getAccounts(ownerId).find((a) => a.label === "primary");
     }
 
-    getAllAccounts(): Account[] {
+    getAllAccounts(): BankAccount[] {
         return Array.from(this.accounts.values());
     }
 

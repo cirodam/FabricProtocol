@@ -1,4 +1,4 @@
-import { Account } from "./Account.js";
+import { BankAccount } from "./BankAccount.js";
 import { FileStore } from "../storage/FileStore.js";
 
 interface AccountRecord {
@@ -18,7 +18,7 @@ export class AccountLoader {
     this.store = new FileStore(dataDir);
   }
 
-  save(account: Account): void {
+  save(account: BankAccount): void {
     const record: AccountRecord = {
       id: account.id,
       ownerId: account.ownerId,
@@ -31,7 +31,7 @@ export class AccountLoader {
     this.store.write(account.id, record);
   }
 
-  loadAll(): Account[] {
+  loadAll(): BankAccount[] {
     return this.store.readAll<AccountRecord>().map(r => this.fromRecord(r));
   }
 
@@ -39,11 +39,11 @@ export class AccountLoader {
     return this.store.delete(accountId);
   }
 
-  private fromRecord(r: AccountRecord): Account {
+  private fromRecord(r: AccountRecord): BankAccount {
     const stub = { getId: () => r.ownerId, getDisplayName: () => "", getHandle: () => "" };
     // Backward compat: field was previously called allowNegativeCredits
     const allowNeg = r.allowNegativeKin ?? (r as unknown as Record<string, unknown>)["allowNegativeCredits"] ?? false;
-    const account = new Account(stub, r.label, allowNeg as boolean, r.exemptFromDemurrage);
+    const account = new BankAccount(stub, r.label, allowNeg as boolean, r.exemptFromDemurrage);
     const a = account as unknown as Record<string, unknown>;
     a["id"] = r.id;
     a["ownerId"] = r.ownerId;
