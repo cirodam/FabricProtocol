@@ -6,7 +6,7 @@ interface AccountRecord {
   ownerId: string;
   label: string;
   kin: number;
-  allowNegativeKin: boolean;
+  overdraftLimit: number;
   exemptFromDemurrage: boolean;
   createdAt: string;
 }
@@ -24,7 +24,7 @@ export class AccountLoader {
       ownerId: account.ownerId,
       label: account.label,
       kin: account.kin,
-      allowNegativeKin: account.allowNegativeKin,
+      overdraftLimit: account.overdraftLimit,
       exemptFromDemurrage: account.exemptFromDemurrage,
       createdAt: account.createdAt.toISOString(),
     };
@@ -41,9 +41,17 @@ export class AccountLoader {
 
   private fromRecord(r: AccountRecord): BankAccount {
     const stub = { getId: () => r.ownerId, getDisplayName: () => "", getHandle: () => "" };
-    // Backward compat: field was previously called allowNegativeCredits
-    const allowNeg = r.allowNegativeKin ?? (r as unknown as Record<string, unknown>)["allowNegativeCredits"] ?? false;
-    const account = new BankAccount(stub, r.label, allowNeg as boolean, r.exemptFromDemurrage);
+    // Backward compat: old boolean fields mapped to 0 (no overdraft) or -Infinity (unlimited)
+    const rec = r as unknown as Record<string, unknown>;
+    let overdraftLimit: number;
+    if (typeof r.overdraftLimit === "number") {
+      overdraftLimit = r.overdraftLimit;
+    } else if (r.overdraftLimit === null || rec["allowNegativeKin"] === true || rec["allowNegativeCredits"] === true) {
+      overdraftLimit = -Infinity;
+    } else {
+      overdraftLimit = 0;
+    }
+    const account = new BankAccount(stub, r.label, overdraftLimit, r.exemptFromDemurrage);
     const a = account as unknown as Record<string, unknown>;
     a["id"] = r.id;
     a["ownerId"] = r.ownerId;

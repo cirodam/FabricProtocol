@@ -24,7 +24,7 @@ export abstract class FunctionalUnit implements IEconomicActor {
         this.id = randomUUID();
         this.name = name;
         this.description = description;
-        Bank.getInstance().openAccount(this, "primary", false, false);
+        Bank.getInstance().openAccount(this, "primary", 0, false);
     }
 
     getId(): string { return this.id; }

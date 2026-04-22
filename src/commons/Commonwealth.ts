@@ -23,7 +23,7 @@ export class Commonwealth implements IEconomicActor {
     private constructor() {
         this.id = "00000000-0000-0000-0000-000000000002"; // stable singleton ID
         if (!Bank.getInstance().getPrimaryAccount(this.id)) {
-            Bank.getInstance().openAccount(this, "primary", false, true);
+            Bank.getInstance().openAccount(this, "primary", 0, true);
         }
         this.ledger = LedgerService.getInstance().openLedger(this, "primary");
     }

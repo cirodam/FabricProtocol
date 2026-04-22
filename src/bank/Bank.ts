@@ -41,8 +41,8 @@ export class Bank {
 
     // --- Account management ---
 
-    openAccount(owner: IEconomicActor, label: string, allowNegativeKin: boolean = false, exemptFromDemurrage: boolean = false): BankAccount {
-        const account = new BankAccount(owner, label, allowNegativeKin, exemptFromDemurrage);
+    openAccount(owner: IEconomicActor, label: string, overdraftLimit: number = 0, exemptFromDemurrage: boolean = false): BankAccount {
+        const account = new BankAccount(owner, label, overdraftLimit, exemptFromDemurrage);
         this.accounts.set(account.id, account);
 
         const ownerAccounts = this.ownerIndex.get(owner.getId()) ?? [];
@@ -98,9 +98,9 @@ export class Bank {
         if (!to) throw new Error(`Account ${toAccountId} not found`);
 
         const fromBalance = (from as Record<Currency, number>)[currency];
-        if (!from.allowNegativeKin && fromBalance < amount) {
+        if (fromBalance - amount < from.overdraftLimit) {
             throw new Error(
-                `Insufficient kin: account ${fromAccountId} has ${fromBalance}, attempted ${amount}`
+                `Insufficient kin: account ${fromAccountId} has ${fromBalance}, limit ${from.overdraftLimit}, attempted ${amount}`
             );
         }
 

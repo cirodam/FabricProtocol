@@ -22,7 +22,7 @@ export abstract class FunctionalDomain implements IEconomicActor {
         this.name = name;
         this.description = description;
         if (!Bank.getInstance().getPrimaryAccount(this.id)) {
-            Bank.getInstance().openAccount(this, "primary", false, true);
+            Bank.getInstance().openAccount(this, "primary", 0, true);
         }
     }
 

@@ -28,7 +28,7 @@ export class CentralBank implements IEconomicActor {
     private constructor() {
         this.id = "00000000-0000-0000-0000-000000000001"; // stable singleton ID
         if (!Bank.getInstance().getPrimaryAccount(this.id)) {
-            Bank.getInstance().openAccount(this, "primary", true, true);
+            Bank.getInstance().openAccount(this, "primary", -Infinity, true);
         }
     }
 
