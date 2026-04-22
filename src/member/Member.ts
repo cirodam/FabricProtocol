@@ -20,6 +20,7 @@ export class Member implements IEconomicActor {
     guardianId: string | null;
     phone: string | null;        // E.164, e.g. "+15551234567". null if no phone.
     pinHash: string | null;      // SHA-256 hex of PIN. null until set.
+    passwordHash: string | null; // Argon2 hash of web password. null until set.
     languages: LanguageProficiency[];
     constructor(
         firstName: string,
@@ -38,6 +39,7 @@ export class Member implements IEconomicActor {
         this.guardianId = null;
         this.phone = null;
         this.pinHash = null;
+        this.passwordHash = null;
         this.languages = [];
     }
 

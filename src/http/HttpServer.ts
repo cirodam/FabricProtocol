@@ -1,5 +1,6 @@
 
 import express, { Application } from "express";
+import session from "express-session";
 import { Server } from "http";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -33,6 +34,7 @@ import calendarRoutes from "./routes/calendarRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import referendumRoutes from "./routes/referendumRoutes.js";
 import networkRoutes from "../network/networkRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 /**
  * HTTP REST API server.
@@ -68,6 +70,16 @@ export class HttpServer {
 
     constructor(private readonly port: number = 3000) {
         this.app = express();
+        this.app.use(session({
+            secret: process.env.SESSION_SECRET ?? "change-me-in-production",
+            resave: false,
+            saveUninitialized: false,
+            cookie: {
+                httpOnly: true,
+                sameSite: "strict",
+                // secure: true — enable when served over HTTPS
+            },
+        }));
         this.app.use(express.json({
             verify: (req, _res, buf) => {
                 (req as typeof req & { rawBody: string }).rawBody = buf.toString("utf-8");
@@ -109,6 +121,7 @@ export class HttpServer {
         this.app.use("/api/messages", messageRoutes);
         this.app.use("/api/referenda", referendumRoutes);
         this.app.use("/api/node", networkRoutes);
+        this.app.use("/api/auth", authRoutes);
 
         // Serve the Svelte frontend (production build)
         const frontendDist = join(__dirname, "../../frontend/dist");
