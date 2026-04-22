@@ -1,7 +1,7 @@
 <script lang="ts">
   const { navigate }: { navigate: (path: string) => void } = $props();
 
-  interface Pool {
+  interface Guild {
     id: string;
     name: string;
     description: string;
@@ -9,16 +9,16 @@
     createdAt: string;
   }
 
-  let pools: Pool[] = $state([]);
+  let guilds: Guild[] = $state([]);
   let loading = $state(true);
   let error: string | null = $state(null);
 
   async function load() {
     try {
-      const res = await fetch('/api/sortition/pools');
+      const res = await fetch('/api/guilds');
       if (!res.ok) throw new Error(`${res.status}`);
       const data = await res.json();
-      pools = data.pools;
+      guilds = data.guilds;
     } catch (e) {
       error = (e as Error).message;
     } finally {
@@ -30,7 +30,8 @@
 </script>
 
 <div class="page-header">
-  <h1>Sortition</h1>
+  <h1>Guilds</h1>
+  <p class="intro">Guilds are community-recognized groups organized around a shared domain or trade — farmers, healthcare workers, educators, firefighters, caregivers, and so on. Each guild's members are eligible to be drawn by sortition to fill seats on the domain's governing council.</p>
 </div>
 
 {#if loading}
@@ -40,11 +41,11 @@
 {:else}
   <section class="section">
     <div class="section-header">
-      <h2>Pools <span class="count">{pools.length}</span></h2>
-      <button class="new-btn" onclick={() => navigate('/sortition/pools/new')}>+ New pool</button>
+      <h2>Guilds <span class="count">{guilds.length}</span></h2>
+      <button class="new-btn" onclick={() => navigate('/guilds/new')}>+ New guild</button>
     </div>
-    {#if pools.length === 0}
-      <p class="muted">No sortition pools yet.</p>
+    {#if guilds.length === 0}
+      <p class="muted">No guilds yet.</p>
     {:else}
       <div class="table-wrap">
         <table>
@@ -52,12 +53,12 @@
             <tr><th>Name</th><th>Description</th><th class="num">Members</th><th>Created</th></tr>
           </thead>
           <tbody>
-            {#each pools as p (p.id)}
-              <tr class="clickable" onclick={() => navigate(`/sortition/pools/${p.id}`)}>
-                <td class="name">{p.name}</td>
-                <td class="muted">{p.description || '—'}</td>
-                <td class="num">{p.memberCount}</td>
-                <td class="muted">{new Date(p.createdAt).toLocaleDateString()}</td>
+            {#each guilds as g (g.id)}
+              <tr class="clickable" onclick={() => navigate(`/guilds/${g.id}`)}>
+                <td class="name">{g.name}</td>
+                <td class="muted">{g.description || '—'}</td>
+                <td class="num">{g.memberCount}</td>
+                <td class="muted">{new Date(g.createdAt).toLocaleDateString()}</td>
               </tr>
             {/each}
           </tbody>
@@ -68,7 +69,8 @@
 {/if}
 
 <style>
-  h1 { margin: 0 0 12px; font-size: 22px; font-weight: 600; }
+  h1 { margin: 0 0 8px; font-size: 22px; font-weight: 600; }
+  .intro { margin: 0 0 20px; font-size: 0.9rem; color: var(--text-secondary); max-width: 600px; line-height: 1.5; }
   .muted { color: var(--text-secondary); }
   .error { color: var(--color-danger, #dc2626); font-size: 0.9rem; }
 

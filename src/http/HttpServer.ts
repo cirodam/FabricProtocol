@@ -23,7 +23,7 @@ import courierRoutes from "./routes/courierRoutes.js";
 import dependencyCareRoutes from "./routes/dependencyCareRoutes.js";
 import childCareRoutes from "./routes/childCareRoutes.js";
 import fireRoutes from "./routes/fireRoutes.js";
-import sortitionRoutes from "./routes/sortitionRoutes.js";
+import guildRoutes from "./routes/guildRoutes.js";
 import councilRoutes from "./routes/councilRoutes.js";
 import assemblyRoutes from "./routes/assemblyRoutes.js";
 import constitutionRoutes from "./routes/constitutionRoutes.js";
@@ -99,7 +99,7 @@ export class HttpServer {
         this.app.use("/api/dependency-care", dependencyCareRoutes);
         this.app.use("/api/child-care", childCareRoutes);
         this.app.use("/api/fire", fireRoutes);
-        this.app.use("/api/sortition", sortitionRoutes);
+        this.app.use("/api/guilds", guildRoutes);
         this.app.use("/api/councils", councilRoutes);
         this.app.use("/api/assembly", assemblyRoutes);
         this.app.use("/api/constitution", constitutionRoutes);

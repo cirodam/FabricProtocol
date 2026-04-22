@@ -23,9 +23,9 @@
   import HomeCaregivingPage from './lib/pages/HomeCaregivingPage.svelte';
   import ChildCarePage from './lib/pages/ChildCarePage.svelte';
   import HomeChildcarePage from './lib/pages/HomeChildcarePage.svelte';
-  import SortitionPage from './lib/pages/SortitionPage.svelte';
-  import SortitionPoolPage from './lib/pages/SortitionPoolPage.svelte';
-  import AddSortitionPoolPage from './lib/pages/AddSortitionPoolPage.svelte';
+  import GuildsPage from './lib/pages/GuildsPage.svelte';
+  import GuildDetailPage from './lib/pages/GuildDetailPage.svelte';
+  import AddGuildPage from './lib/pages/AddGuildPage.svelte';
   import AssemblyPage from './lib/pages/AssemblyPage.svelte';
   import ConstitutionPage from './lib/pages/ConstitutionPage.svelte';
   import ProvisioningPage from './lib/pages/ProvisioningPage.svelte';
@@ -83,14 +83,11 @@
   <button class:active={path === '/applications'} onclick={() => navigate('/applications')}>Applications</button>
   <button class:active={path.startsWith('/calendar')} onclick={() => navigate('/calendar')}>Calendar</button>
   <button class:active={path.startsWith('/messages')} onclick={() => navigate('/messages')}>Messages</button>
-  <button class:active={path.startsWith('/referenda')} onclick={() => navigate('/referenda')}>Referenda</button>
   <button class:active={path === '/accounts'} onclick={() => navigate('/accounts')}>Accounts</button>
   <button class:active={path.startsWith('/marketplace')} onclick={() => navigate('/marketplace')}>Marketplace</button>
   <button class:active={path === '/central-bank'} onclick={() => navigate('/central-bank')}>Central Bank</button>
+  <button class:active={path === '/demographics'} onclick={() => navigate('/demographics')}>Demographics</button>
   <button class:active={path.startsWith('/commonwealth')} onclick={() => navigate('/commonwealth')}>Commonwealth</button>
-  <button class:active={path.startsWith('/sortition')} onclick={() => navigate('/sortition')}>Sortition</button>
-  <button class:active={path === '/assembly'} onclick={() => navigate('/assembly')}>Assembly</button>
-  <button class:active={path === '/constitution'} onclick={() => navigate('/constitution')}>Constitution</button>
   <button class:active={path === '/settings'} onclick={() => navigate('/settings')}>Settings</button>
 </nav>
 
@@ -136,7 +133,7 @@
   {:else if path === '/provisioning'}
     <ProvisioningPage {navigate} />
   {:else if path === '/demographics'}
-    <DemographicsPage {navigate} />
+    <DemographicsPage />
   {:else if path === '/food'}
     <FoodPage {navigate} />
   {:else if path === '/food/kitchens/new'}
@@ -187,12 +184,12 @@
     <AddFireCompanyPage {navigate} />
   {:else if path.startsWith('/fire/companies/')}
     <FireCompanyPage id={path.slice('/fire/companies/'.length)} {navigate} />
-  {:else if path === '/sortition'}
-    <SortitionPage {navigate} />
-  {:else if path === '/sortition/pools/new'}
-    <AddSortitionPoolPage {navigate} />
-  {:else if path.startsWith('/sortition/pools/')}
-    <SortitionPoolPage id={path.slice('/sortition/pools/'.length)} {navigate} />
+  {:else if path === '/guilds'}
+    <GuildsPage {navigate} />
+  {:else if path === '/guilds/new'}
+    <AddGuildPage {navigate} />
+  {:else if path.startsWith('/guilds/')}
+    <GuildDetailPage id={path.slice('/guilds/'.length)} {navigate} />
   {:else if path === '/assembly'}
     <AssemblyPage />
   {:else if path === '/constitution'}

@@ -2,18 +2,18 @@
   const { id, navigate }: { id: string; navigate: (path: string) => void } = $props();
 
   interface Member { id: string; firstName: string; lastName: string; handle: string; }
-  interface Pool {
+  interface Guild {
     id: string; name: string; description: string;
     memberCount: number; createdAt: string; members: Member[];
   }
 
-  let pool: Pool | null       = $state(null);
+  let guild: Guild | null      = $state(null);
   let allMembers: Member[]    = $state([]);
   let loading = $state(true);
   let error: string | null    = $state(null);
 
   let availableMembers = $derived(
-    allMembers.filter(m => !pool?.members.some(p => p.id === m.id))
+    allMembers.filter(m => !guild?.members.some(gm => gm.id === m.id))
   );
 
   // add form
@@ -33,13 +33,13 @@
 
   async function load() {
     try {
-      const [poolRes, membersRes] = await Promise.all([
-        fetch(`/api/sortition/pools/${id}`),
+      const [guildRes, membersRes] = await Promise.all([
+        fetch(`/api/guilds/${id}`),
         fetch("/api/members"),
       ]);
-      if (!poolRes.ok) throw new Error(`${poolRes.status}`);
+      if (!guildRes.ok) throw new Error(`${guildRes.status}`);
       if (!membersRes.ok) throw new Error(`${membersRes.status}`);
-      pool       = await poolRes.json();
+      guild      = await guildRes.json();
       allMembers = await membersRes.json();
     } catch (e) {
       error = (e as Error).message;
@@ -53,7 +53,7 @@
     if (!addMemberId) { addError = "Please select a member"; return; }
     addWorking = true; addError = "";
     try {
-      const res = await fetch(`/api/sortition/pools/${id}/members`, {
+      const res = await fetch(`/api/guilds/${id}/members`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ memberId: addMemberId.trim() }),
@@ -73,7 +73,7 @@
   }
 
   async function removeMember(memberId: string) {
-    const res = await fetch(`/api/sortition/pools/${id}/members/${memberId}`, { method: "DELETE" });
+    const res = await fetch(`/api/guilds/${id}/members/${memberId}`, { method: "DELETE" });
     if (res.ok) { drawn = drawn.filter(d => d.id !== memberId); await load(); }
   }
 
@@ -81,7 +81,7 @@
     e.preventDefault();
     drawWorking = true; drawError = ""; drawn = [];
     try {
-      const res = await fetch(`/api/sortition/pools/${id}/draw`, {
+      const res = await fetch(`/api/guilds/${id}/draw`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ count: drawCount }),
@@ -99,35 +99,35 @@
     }
   }
 
-  async function deletePool() {
+  async function deleteGuild() {
     deleteWorking = true;
-    const res = await fetch(`/api/sortition/pools/${id}`, { method: "DELETE" });
-    if (res.ok) { navigate("/sortition"); } else { deleteWorking = false; }
+    const res = await fetch(`/api/guilds/${id}`, { method: "DELETE" });
+    if (res.ok) { navigate("/guilds"); } else { deleteWorking = false; }
   }
 
   load();
 </script>
 
 <div class="page">
-  <button class="back-link" onclick={() => navigate("/sortition")}>← Sortition</button>
+  <button class="back-link" onclick={() => navigate("/guilds")}>← Guilds</button>
 
   {#if loading}
     <p class="muted">Loading…</p>
-  {:else if error || !pool}
-    <p class="error">{error ?? "Pool not found"}</p>
+  {:else if error || !guild}
+    <p class="error">{error ?? "Guild not found"}</p>
   {:else}
     <div class="header">
       <div>
-        <span class="badge">Sortition Pool</span>
-        <h1>{pool.name}</h1>
-        {#if pool.description}<p class="desc">{pool.description}</p>{/if}
+        <span class="badge">Guild</span>
+        <h1>{guild.name}</h1>
+        {#if guild.description}<p class="desc">{guild.description}</p>{/if}
       </div>
       <div class="header-actions">
         {#if !confirmDelete}
-          <button class="danger-outline" onclick={() => confirmDelete = true}>Delete pool</button>
+          <button class="danger-outline" onclick={() => confirmDelete = true}>Delete guild</button>
         {:else}
           <span class="confirm-text">Delete permanently?</span>
-          <button class="danger" onclick={deletePool} disabled={deleteWorking}>
+          <button class="danger" onclick={deleteGuild} disabled={deleteWorking}>
             {deleteWorking ? "Deleting…" : "Yes, delete"}
           </button>
           <button onclick={() => confirmDelete = false}>Cancel</button>
@@ -143,9 +143,9 @@
         <div class="draw-row">
           <label>
             Count
-            <input type="number" bind:value={drawCount} min="1" max={pool.memberCount || 1} disabled={drawWorking} />
+            <input type="number" bind:value={drawCount} min="1" max={guild.memberCount || 1} disabled={drawWorking} />
           </label>
-          <button type="submit" class="primary" disabled={drawWorking || pool.memberCount === 0}>
+          <button type="submit" class="primary" disabled={drawWorking || guild.memberCount === 0}>
             {drawWorking ? "Drawing…" : "Draw"}
           </button>
         </div>
@@ -165,17 +165,17 @@
     <!-- Members section -->
     <section class="section">
       <div class="section-header">
-        <h2>Members <span class="count">{pool.memberCount}</span></h2>
+        <h2>Members <span class="count">{guild.memberCount}</span></h2>
       </div>
 
-      {#if pool.members.length === 0}
+      {#if guild.members.length === 0}
         <p class="muted">No members yet.</p>
       {:else}
         <div class="table-wrap">
           <table>
             <thead><tr><th>Name</th><th>Handle</th><th></th></tr></thead>
             <tbody>
-              {#each pool.members as m (m.id)}
+              {#each guild.members as m (m.id)}
                 <tr>
                   <td>{m.firstName} {m.lastName}</td>
                   <td class="muted">{m.handle || '—'}</td>
@@ -194,7 +194,7 @@
         {#if addError}<p class="error">{addError}</p>{/if}
         <div class="add-row">
           <select bind:value={addMemberId} disabled={addWorking || availableMembers.length === 0}>
-            <option value="">{availableMembers.length === 0 ? 'All members already in pool' : 'Select a member…'}</option>
+            <option value="">{availableMembers.length === 0 ? 'All members already in guild' : 'Select a member…'}</option>
             {#each availableMembers as m (m.id)}
               <option value={m.id}>{m.firstName} {m.lastName}{m.handle ? ` (${m.handle})` : ''}</option>
             {/each}

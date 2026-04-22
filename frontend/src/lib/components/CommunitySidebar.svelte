@@ -4,7 +4,7 @@
   const governanceLinks = [
     { label: 'Assembly',     path: '/assembly' },
     { label: 'Referenda',    path: '/referenda' },
-    { label: 'Sortition',    path: '/sortition' },
+    { label: 'Guilds',      path: '/guilds' },
     { label: 'Constitution', path: '/constitution' },
   ];
 
@@ -17,7 +17,6 @@
     { label: 'Dependency Care',  path: '/dependency-care' },
     { label: 'Fire',             path: '/fire' },
     { label: 'Provisioning',     path: '/provisioning' },
-    { label: 'Demographics',     path: '/demographics' },
   ];
 
   function isActive(linkPath: string): boolean {

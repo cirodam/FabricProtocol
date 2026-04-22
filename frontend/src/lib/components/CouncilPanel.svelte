@@ -2,31 +2,31 @@
   const { domainId, navigate }: { domainId: string; navigate: (path: string) => void } = $props();
 
   interface Seat { memberId: string; seatedAt: string; firstName: string; lastName: string; handle: string; }
-  interface Pool { id: string; name: string; memberCount: number; }
+  interface Guild { id: string; name: string; memberCount: number; }
   interface Council {
     domainId: string; domainName: string; poolId: string | null; poolName: string | null;
     size: number; seatCount: number; vacancies: number; seats: Seat[];
   }
 
   let council: Council | null = $state(null);
-  let allPools: Pool[]        = $state([]);
+  let allGuilds: Guild[]      = $state([]);
   let loading        = $state(true);
   let error          = $state("");
-  let selectedPoolId = $state("");
-  let poolSaving     = $state(false);
+  let selectedGuildId = $state("");
+  let guildSaving    = $state(false);
   let drawWorking    = $state(false);
   let drawError      = $state("");
 
   async function load() {
     try {
-      const [cRes, pRes] = await Promise.all([
+      const [cRes, gRes] = await Promise.all([
         fetch(`/api/councils/${domainId}`),
-        fetch("/api/sortition/pools"),
+        fetch("/api/guilds"),
       ]);
       if (!cRes.ok) throw new Error(`${cRes.status}`);
-      council        = await cRes.json();
-      allPools       = (await pRes.json()).pools;
-      selectedPoolId = council?.poolId ?? "";
+      council         = await cRes.json();
+      allGuilds       = (await gRes.json()).guilds;
+      selectedGuildId = council?.poolId ?? "";
     } catch (e: unknown) {
       error = e instanceof Error ? e.message : "Failed to load";
     } finally {
@@ -34,18 +34,18 @@
     }
   }
 
-  async function savePool() {
-    poolSaving = true;
+  async function saveGuild() {
+    guildSaving = true;
     try {
       const res = await fetch(`/api/councils/${domainId}/pool`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ poolId: selectedPoolId || null }),
+        body: JSON.stringify({ poolId: selectedGuildId || null }),
       });
       if (!res.ok) throw new Error(`${res.status}`);
       await load();
     } finally {
-      poolSaving = false;
+      guildSaving = false;
     }
   }
 
@@ -94,7 +94,7 @@
 
     {#if council.seats.length === 0}
       <p class="muted empty">
-        {council.poolId ? 'No seats filled. Use Draw to select members.' : 'Link a sortition pool below, then draw seats.'}
+        {council.poolId ? 'No seats filled. Use Draw to select members.' : 'Link a guild below, then draw seats.'}
       </p>
     {:else}
       <div class="table-wrap">
@@ -121,24 +121,24 @@
     {/if}
 
     <div class="pool-row">
-      <select bind:value={selectedPoolId} disabled={poolSaving}>
-        <option value="">— No pool linked —</option>
-        {#each allPools as p (p.id)}
-          <option value={p.id}>{p.name} ({p.memberCount} members)</option>
+      <select bind:value={selectedGuildId} disabled={guildSaving}>
+        <option value="">— No guild linked —</option>
+        {#each allGuilds as g (g.id)}
+          <option value={g.id}>{g.name} ({g.memberCount} members)</option>
         {/each}
       </select>
       <button
         class="primary"
-        onclick={savePool}
-        disabled={poolSaving || selectedPoolId === (council.poolId ?? "")}
+        onclick={saveGuild}
+        disabled={guildSaving || selectedGuildId === (council.poolId ?? "")}
       >
-        {poolSaving ? "Saving…" : "Save pool"}
+        {guildSaving ? "Saving…" : "Save guild"}
       </button>
     </div>
-    {#if allPools.length === 0}
+    {#if allGuilds.length === 0}
       <p class="hint">
-        No sortition pools yet.
-        <button class="link-btn" onclick={() => navigate('/sortition/pools/new')}>Create one →</button>
+        No guilds yet.
+        <button class="link-btn" onclick={() => navigate('/guilds/new')}>Create one →</button>
       </p>
     {/if}
   {/if}

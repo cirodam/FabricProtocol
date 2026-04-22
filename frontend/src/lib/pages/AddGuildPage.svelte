@@ -11,7 +11,7 @@
     if (!name.trim()) { error = "Name is required"; return; }
     working = true; error = "";
     try {
-      const res = await fetch("/api/sortition/pools", {
+      const res = await fetch("/api/guilds", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), description: description.trim() }),
@@ -21,34 +21,34 @@
         throw new Error(d.error ?? `HTTP ${res.status}`);
       }
       const data = await res.json();
-      navigate(`/sortition/pools/${data.id}`);
+      navigate(`/guilds/${data.id}`);
     } catch (e: unknown) {
-      error = e instanceof Error ? e.message : "Failed to create pool";
+      error = e instanceof Error ? e.message : "Failed to create guild";
       working = false;
     }
   }
 </script>
 
 <div class="page">
-  <button class="back-link" onclick={() => navigate("/sortition")}>← Sortition</button>
-  <h1>New Sortition Pool</h1>
+  <button class="back-link" onclick={() => navigate("/guilds")}>← Guilds</button>
+  <h1>New Guild</h1>
 
   <form onsubmit={submit} class="form">
     {#if error}<p class="error">{error}</p>{/if}
 
     <label>
       <span>Name <span class="req">*</span></span>
-      <input type="text" bind:value={name} placeholder="e.g. Budget Review Panel" disabled={working} />
+      <input type="text" bind:value={name} placeholder="e.g. Farmers, Medical Workers, Fire Department" disabled={working} />
     </label>
 
     <label>
       <span>Description</span>
-      <textarea bind:value={description} rows="3" placeholder="Purpose, eligibility criteria, notes…" disabled={working}></textarea>
+      <textarea bind:value={description} rows="3" placeholder="Who this guild represents, eligibility criteria, notes…" disabled={working}></textarea>
     </label>
 
     <div class="actions">
-      <button type="button" onclick={() => navigate("/sortition")} disabled={working}>Cancel</button>
-      <button type="submit" class="primary" disabled={working || !name.trim()}>{working ? "Creating…" : "Create pool"}</button>
+      <button type="button" onclick={() => navigate("/guilds")} disabled={working}>Cancel</button>
+      <button type="submit" class="primary" disabled={working || !name.trim()}>{working ? "Creating…" : "Create guild"}</button>
     </div>
   </form>
 </div>

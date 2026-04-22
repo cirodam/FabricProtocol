@@ -1,21 +1,15 @@
 import { randomUUID } from "crypto";
 
 /**
- * A SortitionPool is a named roster of members from which a random selection
- * (sortition) can be drawn to fill a deliberative body, jury, or other
- * governance role.
+ * A Guild is a community-recognized body of members organized around a shared
+ * domain or trade. Members of a guild are eligible to be drawn by sortition
+ * to fill seats on the domain's governing council.
  *
- * Sortition — selection by lot — is one of the oldest democratic mechanisms.
- * Ancient Athens used it to staff most public offices. Contemporary citizen
- * assembly practice (Ireland, France, Canada) selects panels stratified by
- * demographic criteria. In a community economy, pools provide a transparent,
- * bias-resistant way to constitute councils, review panels, and oversight
- * committees without the campaign dynamics of competitive election.
- *
- * A pool simply holds a roster. The draw logic is kept separate so callers
- * can apply stratification, exclusion rules, or weighting before selecting.
+ * Communities may name their guilds whatever fits their context — "Farmers",
+ * "Medical Workers", "Fire Department", "Caregivers" — the guild concept is
+ * the same: a formally recognized group whose members have a governance role.
  */
-export class SortitionPool {
+export class Guild {
     readonly id: string;
     readonly createdAt: Date;
     name: string;

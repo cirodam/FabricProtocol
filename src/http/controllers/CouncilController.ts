@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { CouncilService } from "../../commons/council/CouncilService.js";
 import { DomainCouncil } from "../../commons/council/DomainCouncil.js";
-import { SortitionService } from "../../commons/sortition/SortitionService.js";
+import { GuildService } from "../../commons/sortition/GuildService.js";
 import { MemberService } from "../../member/MemberService.js";
 
 function councilToDto(c: DomainCouncil) {
@@ -37,7 +37,7 @@ export function getCouncil(req: Request, res: Response): void {
             handle:    m?.handle ?? "",
         };
     });
-    const pool = council.poolId ? SortitionService.getInstance().getPool(council.poolId) : null;
+    const pool = council.poolId ? GuildService.getInstance().getGuild(council.poolId) : null;
     res.json({
         ...councilToDto(council),
         seats,
@@ -100,8 +100,8 @@ export function setPool(req: Request, res: Response): void {
         if (typeof poolId !== "string" || !poolId.trim()) {
             res.status(400).json({ error: "poolId must be a non-empty string or null" }); return;
         }
-        if (!SortitionService.getInstance().getPool(poolId)) {
-            res.status(404).json({ error: "Sortition pool not found" }); return;
+        if (!GuildService.getInstance().getGuild(poolId)) {
+            res.status(404).json({ error: "Guild not found" }); return;
         }
         council.poolId = poolId.trim();
     } else {
@@ -118,10 +118,10 @@ export function drawSeats(req: Request, res: Response): void {
     if (!council) { res.status(404).json({ error: "Council not found" }); return; }
 
     if (!council.poolId) {
-        res.status(409).json({ error: "No sortition pool linked to this council" }); return;
+        res.status(409).json({ error: "No guild linked to this council" }); return;
     }
-    const pool = SortitionService.getInstance().getPool(council.poolId);
-    if (!pool) { res.status(404).json({ error: "Linked sortition pool not found" }); return; }
+    const pool = GuildService.getInstance().getGuild(council.poolId);
+    if (!pool) { res.status(404).json({ error: "Linked guild not found" }); return; }
 
     const vacancies = council.vacancies;
     if (vacancies === 0) {
