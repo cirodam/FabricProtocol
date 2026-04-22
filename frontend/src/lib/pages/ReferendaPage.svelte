@@ -1,4 +1,6 @@
 <script lang="ts">
+  import CommunitySidebar from '../components/CommunitySidebar.svelte';
+
   const { navigate } = $props<{ navigate: (to: string) => void }>();
 
   type ReferendumDto = {
@@ -61,7 +63,9 @@
   const closed = $derived(referenda.filter(r => r.status === 'closed' || r.status === 'cancelled'));
 </script>
 
-<div class="page">
+<div class="domain-layout">
+  <CommunitySidebar {navigate} />
+  <div class="page">
   <div class="page-header">
     <h1>Referenda</h1>
     <button class="btn-primary" onclick={() => navigate('/referenda/new')}>+ New Referendum</button>
@@ -122,10 +126,12 @@
       </div>
     {/if}
   {/if}
+  </div>
 </div>
 
 <style>
-  .page { max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+  .domain-layout { display: flex; flex: 1; min-height: 0; }
+  .page { flex: 1; max-width: 960px; margin: 0 auto; padding: 1.5rem; }
   .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
   h1 { margin: 0; font-size: 1.5rem; }
   .section-heading { font-size: 1rem; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .05em; margin: 1.5rem 0 0.75rem; }

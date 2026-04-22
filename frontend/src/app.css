@@ -41,6 +41,8 @@ nav {
 nav .brand {
   font-weight: 600;
   margin-right: 16px;
+  cursor: pointer;
+  user-select: none;
 }
 
 nav button {

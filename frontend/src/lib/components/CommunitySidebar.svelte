@@ -1,22 +1,20 @@
 <script lang="ts">
   const { navigate }: { navigate: (to: string) => void } = $props();
 
-  const governanceLinks = [
-    { label: 'Assembly',     path: '/assembly' },
-    { label: 'Referenda',    path: '/referenda' },
-    { label: 'Guilds',      path: '/guilds' },
-    { label: 'Constitution', path: '/constitution' },
+  const economyLinks = [
+    { label: 'Commonwealth', path: '/commonwealth' },
+    { label: 'Central Bank', path: '/commonwealth/central-bank' },
   ];
 
-  const domainLinks = [
-    { label: 'Food',             path: '/food' },
-    { label: 'Housing',          path: '/housing' },
-    { label: 'Healthcare',       path: '/healthcare' },
-    { label: 'Education',        path: '/education' },
-    { label: 'Child Care',       path: '/child-care' },
-    { label: 'Dependency Care',  path: '/dependency-care' },
-    { label: 'Fire',             path: '/fire' },
-    { label: 'Provisioning',     path: '/provisioning' },
+  const governanceLinks = [
+    { label: 'Referenda',    path: '/referenda' },
+  ];
+
+  const adminLinks = [
+    { label: 'Members',      path: '/admin/members' },
+    { label: 'Applications', path: '/admin/applications' },
+    { label: 'Accounts',     path: '/admin/accounts' },
+    { label: 'Settings',     path: '/admin/settings' },
   ];
 
   function isActive(linkPath: string): boolean {
@@ -26,6 +24,16 @@
 </script>
 
 <aside class="community-sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-heading">Economy</div>
+    {#each economyLinks as link}
+      <button
+        class="sidebar-link"
+        class:active={isActive(link.path)}
+        onclick={() => navigate(link.path)}
+      >{link.label}</button>
+    {/each}
+  </div>
   <div class="sidebar-section">
     <div class="sidebar-heading">Governance</div>
     {#each governanceLinks as link}
@@ -37,8 +45,8 @@
     {/each}
   </div>
   <div class="sidebar-section">
-    <div class="sidebar-heading">Domains</div>
-    {#each domainLinks as link}
+    <div class="sidebar-heading">Admin</div>
+    {#each adminLinks as link}
       <button
         class="sidebar-link"
         class:active={isActive(link.path)}

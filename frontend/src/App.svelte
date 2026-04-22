@@ -55,6 +55,7 @@
   import AddCommunityKitchenPage from './lib/pages/AddCommunityKitchenPage.svelte';
   import MillPage from './lib/pages/MillPage.svelte';
   import AddMillPage from './lib/pages/AddMillPage.svelte';
+  import AdminPage from './lib/pages/AdminPage.svelte';
 
   function getPath() {
     return window.location.pathname;
@@ -77,33 +78,18 @@
 </script>
 
 <nav>
-  <span class="brand">LocalCommunity</span>
-  <button class:active={path === '/'} onclick={() => navigate('/')}>Home</button>
-  <button class:active={path === '/members'} onclick={() => navigate('/members')}>Members</button>
-  <button class:active={path === '/applications'} onclick={() => navigate('/applications')}>Applications</button>
+  <span class="brand" role="button" tabindex="0" onclick={() => navigate('/')} onkeydown={(e) => e.key === 'Enter' && navigate('/')}>LocalCommunity</span>
   <button class:active={path.startsWith('/calendar')} onclick={() => navigate('/calendar')}>Calendar</button>
   <button class:active={path.startsWith('/messages')} onclick={() => navigate('/messages')}>Messages</button>
-  <button class:active={path === '/accounts'} onclick={() => navigate('/accounts')}>Accounts</button>
   <button class:active={path.startsWith('/marketplace')} onclick={() => navigate('/marketplace')}>Marketplace</button>
-  <button class:active={path === '/central-bank'} onclick={() => navigate('/central-bank')}>Central Bank</button>
-  <button class:active={path === '/demographics'} onclick={() => navigate('/demographics')}>Demographics</button>
   <button class:active={path.startsWith('/commonwealth')} onclick={() => navigate('/commonwealth')}>Commonwealth</button>
-  <button class:active={path === '/settings'} onclick={() => navigate('/settings')}>Settings</button>
 </nav>
 
 <main>
   {#if path === '/'}
     <HomePage />
-  {:else if path === '/members'}
-    <MembersPage {navigate} />
-  {:else if path === '/accounts'}
-    <AccountsPage {navigate} />
-  {:else if path.startsWith('/accounts/')}
-    <AccountPage id={path.slice('/accounts/'.length)} {navigate} />
-  {:else if path === '/applications/new'}
-    <AddApplicationPage {navigate} />
-  {:else if path === '/applications'}
-    <ApplicationsPage {navigate} />
+  {:else if path.startsWith('/admin')}
+    <AdminPage {navigate} {path} />
   {:else if path === '/calendar/new'}
     <AddEventPage {navigate} />
   {:else if path === '/calendar'}
@@ -118,18 +104,14 @@
     <ReferendumDetailPage {navigate} id={path.slice('/referenda/'.length)} />
   {:else if path === '/referenda'}
     <ReferendaPage {navigate} />
-  {:else if path.startsWith('/members/')}
-    <MemberPage id={path.slice('/members/'.length)} {navigate} />
   {:else if path === '/marketplace'}
     <MarketplacePage {navigate} />
   {:else if path === '/marketplace/new'}
     <AddPostPage {navigate} />
   {:else if path.startsWith('/marketplace/')}
     <PostPage id={path.slice('/marketplace/'.length)} {navigate} />
-  {:else if path === '/central-bank'}
-    <CentralBankPage {navigate} />
-  {:else if path === '/commonwealth'}
-    <CommonwealthPage {navigate} />
+  {:else if path.startsWith('/commonwealth')}
+    <CommonwealthPage {navigate} {path} />
   {:else if path === '/provisioning'}
     <ProvisioningPage {navigate} />
   {:else if path === '/demographics'}

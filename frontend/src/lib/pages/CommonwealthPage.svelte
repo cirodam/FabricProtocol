@@ -1,7 +1,8 @@
 <script lang="ts">
   import CommunitySidebar from '../components/CommunitySidebar.svelte';
+  import CentralBankPage from './CentralBankPage.svelte';
 
-  const { navigate }: { navigate: (to: string) => void } = $props();
+  const { navigate, path }: { navigate: (to: string) => void; path: string } = $props();
 
   interface Summary {
     kin: number;
@@ -70,6 +71,9 @@
 <div class="domain-layout">
   <CommunitySidebar {navigate} />
 
+  {#if path === '/commonwealth/central-bank'}
+    <CentralBankPage {navigate} />
+  {:else}
   <div class="domain-main">
     <div class="page-header">
       <h1>Commonwealth</h1>
@@ -169,6 +173,7 @@
       {/if}
     {/if}
   </div>
+  {/if}
 </div>
 
 <style>

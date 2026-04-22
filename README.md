@@ -51,3 +51,4 @@ This framework tries to combine all three. The mutual aid society's model of col
 | 1.3 | [Structural Incentives](docs/1.3%20-%20Structural%20Incentives.md) |
 | 1.4 | [The Floor](docs/1.4%20-%20The%20Floor.md) |
 | 1.5 | [Bowling Alone](docs/1.5%20-%20Bowling%20Alone.md) |
+| 1.6 | [Self-Governance](docs/1.6%20-%20democracy.md) |

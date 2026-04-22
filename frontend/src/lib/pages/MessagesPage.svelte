@@ -16,11 +16,23 @@
 
   type Tab = 'inbox' | 'sent' | 'announcements';
 
+  type MemberItem = { id: string; firstName: string; lastName: string; handle: string };
+
   let tab: Tab = $state('inbox');
   let messages: MessageDto[] = $state([]);
+  let members: MemberItem[] = $state([]);
   let selected: MessageDto | null = $state(null);
   let loading = $state(false);
   let error = $state('');
+
+  async function loadMembers() {
+    try {
+      const res = await fetch('/api/members');
+      if (res.ok) members = await res.json();
+    } catch { /* ignore */ }
+  }
+
+  $effect(() => { void loadMembers(); });
 
   async function loadMessages() {
     if (!memberId) return;

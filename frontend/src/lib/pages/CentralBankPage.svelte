@@ -7,28 +7,39 @@
     unrecoveredKin: number;
   }
 
-  interface Endowment {
-    memberId: string;
-    memberName: string;
-    handle: string;
-    endowment: number;
+  interface Member {
+    id: string;
+    birthDate: string;
+    personYears: number;
   }
 
   let supply: MoneySupply | null = $state(null);
-  let endowments: Endowment[] = $state([]);
+  let population = $state(0);
+  let totalPersonYears = $state(0);
+  let averageAge = $state(0);
   let loading = $state(true);
   let error: string | null = $state(null);
 
   async function load() {
     try {
-      const [supplyRes, endowRes] = await Promise.all([
+      const [supplyRes, membersRes] = await Promise.all([
         fetch('/api/money-supply'),
-        fetch('/api/endowments'),
+        fetch('/api/members'),
       ]);
       if (!supplyRes.ok) throw new Error(`money-supply: ${supplyRes.status}`);
-      if (!endowRes.ok) throw new Error(`endowments: ${endowRes.status}`);
+      if (!membersRes.ok) throw new Error(`members: ${membersRes.status}`);
       supply = await supplyRes.json();
-      endowments = await endowRes.json();
+      const members: Member[] = await membersRes.json();
+      population = members.length;
+      totalPersonYears = members.reduce((sum, m) => sum + (m.personYears ?? 0), 0);
+      if (members.length > 0) {
+        const now = Date.now();
+        const totalAge = members.reduce((sum, m) => {
+          const age = (now - new Date(m.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000);
+          return sum + age;
+        }, 0);
+        averageAge = totalAge / members.length;
+      }
     } catch (e) {
       error = (e as Error).message;
     } finally {
@@ -44,15 +55,25 @@
   }
 </script>
 
+<div class="domain-main">
 <div class="page-header">
   <h1>Central Bank</h1>
 </div>
+
+<p class="intro">
+  The central bank manages the community's currency supply. Unlike a conventional bank, it does not lend money or earn interest.
+  Its only function is to issue kin — one person-year's worth — to each member as they join and accumulate time in the community,
+  and to recover unspent kin when a member departs. The money supply is therefore anchored directly to the size and longevity of
+  the community itself.
+</p>
 
 {#if loading}
   <p class="muted">Loading…</p>
 {:else if error}
   <p class="error">{error}</p>
 {:else if supply}
+  <h2>Currency Supply</h2>
+  <p class="section-desc">How much kin is in circulation, what the community's target supply is, and whether any kin is outstanding from departed members.</p>
   <div class="stats">
     <div class="stat-card">
       <div class="stat-label">In Circulation</div>
@@ -71,35 +92,39 @@
     </div>
   </div>
 
-  {#if endowments.length > 0}
-    <h2>Member Endowments</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Member</th>
-            <th class="num">Endowment</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each endowments as e (e.memberId)}
-            <tr>
-              <td>
-                <button class="link-btn" onclick={() => navigate(`/members/${e.memberId}`)}>
-                  {e.memberName}
-                </button>
-                <span class="handle muted">@{e.handle}</span>
-              </td>
-              <td class="num">{fmt(e.endowment)}</td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
+  <h2>Population</h2>
+  <p class="section-desc">The money supply is a function of who is here. These figures show the demographic foundation the currency is built on.</p>
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Members</div>
+      <div class="stat-value">{population}</div>
+      <div class="stat-sub">current population</div>
     </div>
-  {/if}
+    <div class="stat-card">
+      <div class="stat-label">Person-Years</div>
+      <div class="stat-value">{fmt(Math.floor(totalPersonYears))}</div>
+      <div class="stat-sub">total lived experience</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Average Age</div>
+      <div class="stat-value">{population > 0 ? fmt(averageAge) : '—'}</div>
+      <div class="stat-sub">years</div>
+    </div>
+  </div>
+
+  <h2>Demurrage</h2>
+  <p class="section-desc">
+    The money supply expands as the population grows and contracts as it shrinks — inflation and deflation are a
+    natural consequence of community size, not monetary mismanagement. Demurrage is a periodic holding fee deducted
+    from balances. At a minimum it is used to bring circulation back in line with the target when the supply runs high.
+    The community can also choose to run a higher demurrage rate, with the collected kin flowing into a common fund
+    to support collective needs — a community kitchen, for example.
+  </p>
 {/if}
+</div>
 
 <style>
+  .domain-main { flex: 1; min-width: 0; overflow-y: auto; padding: 24px; }
   .page-header {
     display: flex;
     align-items: baseline;
@@ -149,50 +174,24 @@
     color: var(--text-muted);
   }
 
-  .table-wrap {
-    overflow-x: auto;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--surface);
-  }
-
-  table { width: 100%; border-collapse: collapse; }
-
-  th {
-    text-align: left;
-    padding: 10px 16px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
-  }
-
-  td {
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
-  }
-
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: color-mix(in srgb, var(--accent) 4%, transparent); }
-
-  .num { text-align: right; font-variant-numeric: tabular-nums; }
-
-  .link-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    color: var(--accent);
-    font-size: 14px;
-    cursor: pointer;
-  }
-
-  .link-btn:hover { text-decoration: underline; }
-
-  .handle { font-family: monospace; font-size: 13px; margin-left: 6px; }
-
   .muted { color: var(--text-muted); }
   .error { color: #ef4444; }
+
+  .intro {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 680px;
+    margin: 0 0 32px;
+  }
+
+  h2 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+
+  .section-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 680px;
+    margin: 0 0 16px;
+  }
 </style>
