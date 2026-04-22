@@ -56,12 +56,17 @@
   import MillPage from './lib/pages/MillPage.svelte';
   import AddMillPage from './lib/pages/AddMillPage.svelte';
   import AdminPage from './lib/pages/AdminPage.svelte';
+  import CreateAccountPage from './lib/pages/CreateAccountPage.svelte';
+  import LoginPage from './lib/pages/LoginPage.svelte';
 
   function getPath() {
     return window.location.pathname;
   }
 
   let path = $state(getPath());
+
+  const authPaths = ['/login', '/create-account'];
+  const hideNav = $derived(authPaths.includes(path));
 
   function getMemberId() {
     return new URLSearchParams(window.location.search).get('as') ?? '';
@@ -72,22 +77,63 @@
     history.pushState({}, '', to);
     path = to;
     currentMemberId = getMemberId();
+    loadSession();
   }
 
   window.addEventListener('popstate', () => { path = getPath(); currentMemberId = getMemberId(); });
+
+  // Session state
+  let sessionHandle = $state<string | null>(null);
+
+  async function loadSession() {
+    try {
+      const res = await fetch('/api/auth/me');
+      if (!res.ok) { sessionHandle = null; return; }
+      const { memberId } = await res.json();
+      // Fetch the member's handle
+      const mRes = await fetch(`/api/members/${memberId}`);
+      if (mRes.ok) {
+        const m = await mRes.json();
+        sessionHandle = m.handle ?? null;
+      }
+    } catch {
+      sessionHandle = null;
+    }
+  }
+
+  async function logout() {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    sessionHandle = null;
+    navigate('/login');
+  }
+
+  loadSession();
 </script>
 
+{#if !hideNav}
 <nav>
   <span class="brand" role="button" tabindex="0" onclick={() => navigate('/')} onkeydown={(e) => e.key === 'Enter' && navigate('/')}>LocalCommunity</span>
   <button class:active={path.startsWith('/calendar')} onclick={() => navigate('/calendar')}>Calendar</button>
-  <button class:active={path.startsWith('/messages')} onclick={() => navigate('/messages')}>Messages</button>
   <button class:active={path.startsWith('/marketplace')} onclick={() => navigate('/marketplace')}>Marketplace</button>
   <button class:active={path.startsWith('/commonwealth')} onclick={() => navigate('/commonwealth')}>Commonwealth</button>
+  <div class="nav-spacer"></div>
+  <button class:active={path.startsWith('/messages')} onclick={() => navigate('/messages')}>Messages</button>
+  {#if sessionHandle}
+    <span class="nav-handle">@{sessionHandle}</span>
+    <button class="nav-logout" onclick={logout}>Log out</button>
+  {:else}
+    <button onclick={() => navigate('/login')}>Log in</button>
+  {/if}
 </nav>
+{/if}
 
 <main>
   {#if path === '/'}
     <HomePage />
+  {:else if path === '/login'}
+    <LoginPage {navigate} />
+  {:else if path === '/create-account'}
+    <CreateAccountPage {navigate} />
   {:else if path.startsWith('/admin')}
     <AdminPage {navigate} {path} />
   {:else if path === '/calendar/new'}

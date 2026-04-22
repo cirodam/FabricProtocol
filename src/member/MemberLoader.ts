@@ -14,6 +14,7 @@ interface MemberRecord {
   guardianId: string | null;
   phone: string | null;
   pinHash: string | null;
+  passwordHash: string | null;
   languages: LanguageProficiency[];
 }
 
@@ -36,6 +37,7 @@ export class MemberLoader {
       guardianId: member.guardianId,
       phone: member.phone,
       pinHash: member.pinHash,
+      passwordHash: member.passwordHash,
       languages: member.languages,
     };
     this.store.write(member.id, record);
@@ -63,6 +65,7 @@ export class MemberLoader {
     m.guardianId = r.guardianId;
     m.phone = r.phone;
     m.pinHash = r.pinHash ?? null;
+    m.passwordHash = r.passwordHash ?? null;
     m.languages = r.languages ?? [];
     return m;
   }

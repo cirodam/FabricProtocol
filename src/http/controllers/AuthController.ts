@@ -45,6 +45,29 @@ export function logout(req: Request, res: Response): void {
     });
 }
 
+// POST /auth/create-account
+// Body: { handle, password }
+export function createAccount(req: Request, res: Response): void {
+    const { handle, password } = req.body ?? {};
+
+    if (typeof handle !== "string" || !handle.trim()) {
+        res.status(400).json({ error: "handle is required" });
+        return;
+    }
+    if (typeof password !== "string" || password.length < 8) {
+        res.status(400).json({ error: "password must be at least 8 characters" });
+        return;
+    }
+
+    const ok = service().setPassword(handle.trim().toLowerCase(), password);
+    if (!ok) {
+        res.status(404).json({ error: "No member with that handle" });
+        return;
+    }
+
+    res.json({ ok: true });
+}
+
 // GET /auth/me
 export function me(req: Request, res: Response): void {
     if (!req.session.memberId) {
