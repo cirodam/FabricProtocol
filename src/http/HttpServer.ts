@@ -102,7 +102,7 @@ export class HttpServer {
         this.app.use("/api/marketplace", marketplaceRoutes);
         this.app.use("/api/food", foodRoutes);
         this.app.use("/api/housing", housingRoutes);
-        this.app.use("/api/commonwealth", commonwealthRoutes);
+        this.app.use("/api/community", commonwealthRoutes);
         this.app.use("/api/healthcare", healthcareRoutes);
         this.app.use("/api/education", educationRoutes);
         this.app.use("/api/admin", adminRoutes);

@@ -2,8 +2,8 @@
   const { navigate }: { navigate: (to: string) => void } = $props();
 
   const economyLinks = [
-    { label: 'Commonwealth', path: '/commonwealth' },
-    { label: 'Central Bank', path: '/commonwealth/central-bank' },
+    { label: 'Community', path: '/community' },
+    { label: 'Central Bank', path: '/community/central-bank' },
   ];
 
   const governanceLinks = [

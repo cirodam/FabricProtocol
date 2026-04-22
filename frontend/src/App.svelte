@@ -115,7 +115,7 @@
   <span class="brand" role="button" tabindex="0" onclick={() => navigate('/')} onkeydown={(e) => e.key === 'Enter' && navigate('/')}>LocalCommunity</span>
   <button class:active={path.startsWith('/calendar')} onclick={() => navigate('/calendar')}>Calendar</button>
   <button class:active={path.startsWith('/marketplace')} onclick={() => navigate('/marketplace')}>Marketplace</button>
-  <button class:active={path.startsWith('/commonwealth')} onclick={() => navigate('/commonwealth')}>Commonwealth</button>
+  <button class:active={path.startsWith('/community')} onclick={() => navigate('/community')}>Community</button>
   <div class="nav-spacer"></div>
   <button class:active={path.startsWith('/messages')} onclick={() => navigate('/messages')}>Messages</button>
   {#if sessionHandle}
@@ -156,7 +156,7 @@
     <AddPostPage {navigate} />
   {:else if path.startsWith('/marketplace/')}
     <PostPage id={path.slice('/marketplace/'.length)} {navigate} />
-  {:else if path.startsWith('/commonwealth')}
+  {:else if path.startsWith('/community')}
     <CommonwealthPage {navigate} {path} />
   {:else if path === '/provisioning'}
     <ProvisioningPage {navigate} />

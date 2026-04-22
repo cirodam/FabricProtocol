@@ -31,9 +31,9 @@
   async function load() {
     try {
       const [sumRes, demRes, outRes] = await Promise.all([
-        fetch('/api/commonwealth/summary'),
-        fetch('/api/commonwealth/demurrage'),
-        fetch('/api/commonwealth/outflows'),
+        fetch('/api/community/summary'),
+        fetch('/api/community/demurrage'),
+        fetch('/api/community/outflows'),
       ]);
       if (!sumRes.ok) throw new Error(`summary: ${sumRes.status}`);
       if (!demRes.ok) throw new Error(`demurrage: ${demRes.status}`);
@@ -71,12 +71,12 @@
 <div class="domain-layout">
   <CommunitySidebar {navigate} />
 
-  {#if path === '/commonwealth/central-bank'}
+  {#if path === '/community/central-bank'}
     <CentralBankPage {navigate} />
   {:else}
   <div class="domain-main">
     <div class="page-header">
-      <h1>Commonwealth</h1>
+      <h1>Community</h1>
     </div>
 
     {#if loading}
@@ -99,7 +99,7 @@
       {#if demurrage}
         <section class="section">
           <h2>Commons Levy</h2>
-          <p class="section-desc">A monthly charge on all non-exempt credit balances. Funds flow into the Commonwealth to cover community expenses.</p>
+          <p class="section-desc">A monthly charge on all non-exempt credit balances. Funds flow into the community fund to cover shared expenses.</p>
           <div class="stats">
             <div class="stat-card">
               <div class="stat-label">Monthly Rate</div>
@@ -148,7 +148,7 @@
             <tbody>
               {#if outflows.payroll.commons > 0}
                 <tr>
-                  <td>Commonwealth (governance)</td>
+                  <td>Community (governance)</td>
                   <td class="num">{fmt(outflows.payroll.commons)}</td>
                 </tr>
               {/if}
