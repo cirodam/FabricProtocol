@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { readdirSync, unlinkSync, existsSync } from "fs";
+import { readdirSync, unlinkSync, existsSync, statSync } from "fs";
 import { join } from "path";
 import { Commonwealth } from "../../commons/Commonwealth.js";
 import { DomainSettings } from "../../settings/DomainSettings.js";
@@ -20,36 +20,48 @@ const DOMAIN_DATA_DIRS: Record<string, string[]> = {
 /**
  * Directories whose *.json files are deleted on a "clear all" reset.
  * data/network/ is intentionally excluded — it holds node identity and keys.
+ * data/settings/ is intentionally excluded — it holds domain enable/disable config.
  */
 const DATA_DIRS = [
     "data/accounts",
-    "data/courier/requests",
+    "data/assembly",
+    "data/calendar",
+    "data/child-care",
+    "data/constitution",
+    "data/councils",
+    "data/courier",
+    "data/dependency-care",
+    "data/education",
     "data/endowment-profiles",
     "data/food",
-    "data/food/kitchens",
-    "data/food/mills",
-    "data/food/purchasing",
-    "data/education/schools",
-    "data/education/libraries",
     "data/groups",
-    "data/healthcare/clinics",
-    "data/healthcare/dental-clinics",
+    "data/healthcare",
     "data/housing",
     "data/locations",
     "data/members",
+    "data/messages",
     "data/posts",
+    "data/referenda",
     "data/scheduler",
+    "data/social-insurance",
+    "data/sortition",
     "data/trader-profiles",
     "data/transactions",
 ];
 
 function clearDir(dir: string): number {
     if (!existsSync(dir)) return 0;
-    const files = readdirSync(dir).filter(f => f.endsWith(".json"));
-    for (const f of files) {
-        unlinkSync(join(dir, f));
+    let count = 0;
+    for (const entry of readdirSync(dir)) {
+        const full = join(dir, entry);
+        if (statSync(full).isDirectory()) {
+            count += clearDir(full);
+        } else if (entry.endsWith(".json")) {
+            unlinkSync(full);
+            count++;
+        }
     }
-    return files.length;
+    return count;
 }
 
 /**

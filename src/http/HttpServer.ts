@@ -45,6 +45,7 @@ import authRoutes from "./routes/authRoutes.js";
 import currencyBoardRoutes from "./routes/currencyBoardRoutes.js";
 import socialInsuranceRoutes from "./routes/socialInsuranceRoutes.js";
 import unitRoutes from "./routes/unitRoutes.js";
+import setupRoutes from "./routes/setupRoutes.js";
 
 /**
  * HTTP REST API server.
@@ -106,6 +107,7 @@ export class HttpServer {
             });
         });
 
+        this.app.use("/api/setup", setupRoutes);
         this.app.use("/api/members", memberRoutes);
         this.app.use("/api", bankRoutes);
         this.app.use("/api", centralBankRoutes);

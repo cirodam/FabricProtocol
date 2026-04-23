@@ -4,16 +4,20 @@ import { Commonwealth } from "../../commons/Commonwealth.js";
 import { Constitution } from "../../commons/Constitution.js";
 import { MemberService } from "../../member/MemberService.js";
 import { Scheduler } from "../../scheduler/Scheduler.js";
+import { SocialInsuranceBank } from "../../social_insurance/SocialInsuranceBank.js";
 
 const cb = () => CentralBank.getInstance();
 
 // GET /money-supply
 export function getMoneySupply(_req: Request, res: Response): void {
     const bank = cb();
+    const retirementPool = SocialInsuranceBank.getInstance().poolBalance;
     res.json({
         moneyInCirculation:        bank.moneyInCirculation,
         desiredMoneyInCirculation: bank.desiredMoneyInCirculation,
-        unrecoveredKin:        bank.unrecoveredKin,
+        unrecoveredKin:            bank.unrecoveredKin,
+        retirementPool,
+        activeCirculation:         bank.moneyInCirculation - retirementPool,
     });
 }
 

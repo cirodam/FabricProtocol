@@ -1,0 +1,9 @@
+{
+  "id": "8a86969a-a30c-4f25-86e2-0e25e659d5ca",
+  "fromAccountId": "0414792d-0329-45e4-aa6e-1c7da7d0ef96",
+  "toAccountId": "b02cc525-912c-4c1d-941c-ae3803df735d",
+  "currency": "kin",
+  "amount": 300000,
+  "memo": "retirement pool: contribution",
+  "timestamp": "2026-04-23T22:47:48.048Z"
+}

@@ -1,9 +1,0 @@
-{
-  "id": "3f11ab65-a8d0-495a-b3d4-85939fca687e",
-  "fromAccountId": "a9480eda-c446-4522-8353-6b17a473a6ae",
-  "toAccountId": "a72f8d5f-b37f-42cf-88a5-18b6e1c69229",
-  "currency": "kin",
-  "amount": 640000,
-  "memo": "retirement pool: backfill",
-  "timestamp": "2026-04-23T16:47:49.336Z"
-}

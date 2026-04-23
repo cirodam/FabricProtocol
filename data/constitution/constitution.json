@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "adoptedAt": "2026-04-21T15:10:24.916Z",
+  "adoptedAt": "2026-04-23T22:47:19.101Z",
   "parameters": {
     "kinPerPersonYear": {
       "value": 10000,
@@ -49,7 +49,7 @@
     },
     "thresholdSimpleMajority": {
       "value": 0.51,
-      "authority": "citizens-assembly",
+      "authority": "referendum",
       "description": "Fraction of total members required to pass a simple majority proposal.",
       "constraints": {
         "min": 0.51,
@@ -58,7 +58,7 @@
     },
     "thresholdSupermajority": {
       "value": 0.67,
-      "authority": "citizens-assembly",
+      "authority": "referendum",
       "description": "Fraction of total members required to pass a supermajority proposal.",
       "constraints": {
         "min": 0.6,
@@ -67,7 +67,7 @@
     },
     "thresholdNearConsensus": {
       "value": 0.9,
-      "authority": "citizens-assembly",
+      "authority": "referendum",
       "description": "Fraction of total members required to pass a near-consensus proposal.",
       "constraints": {
         "min": 0.8,
@@ -76,7 +76,7 @@
     },
     "deliberationPeriodDays": {
       "value": 3,
-      "authority": "council",
+      "authority": "assembly",
       "description": "Minimum days before a proposal vote can close.",
       "constraints": {
         "min": 1,
@@ -85,7 +85,7 @@
     },
     "bankDemurrageRate": {
       "value": 0.02,
-      "authority": "citizens-assembly",
+      "authority": "referendum",
       "description": "Monthly rate at which the Central Bank applies demurrage to recover unanchored kin.",
       "constraints": {
         "min": 0,
@@ -94,7 +94,7 @@
     },
     "demurrageFloor": {
       "value": 1000,
-      "authority": "citizens-assembly",
+      "authority": "referendum",
       "description": "Balance floor below which no demurrage is charged. Only the portion of an account balance above this threshold is subject to the levy or bank demurrage. Expressed in kin. Protects small balances — roughly one month of person-year income — from being eroded.",
       "constraints": {
         "min": 0,
@@ -114,26 +114,110 @@
       "value": 0.005,
       "authority": "referendum",
       "description": "Fraction of the retirement pool distributed each month across all current retirees. E.g. 0.005 = 0.5% of pool per month.",
-      "constraints": { "min": 0.001, "max": 0.02 }
+      "constraints": {
+        "min": 0.001,
+        "max": 0.02
+      }
     },
     "birthdayCirculationFraction": {
       "value": 0,
       "authority": "referendum",
-      "description": "Fraction of each birthday person-year issuance paid directly to the member's primary account as circulating kin. The remainder goes to the retirement pool.",
-      "constraints": { "min": 0, "max": 0.5 }
+      "description": "Fraction of each birthday person-year issuance paid directly to the member's primary account as circulating kin. The remainder goes to the retirement pool. E.g. 0.1 = 10% direct, 90% to pool.",
+      "constraints": {
+        "min": 0,
+        "max": 0.5
+      }
     },
     "communityBudget": {
       "value": 200,
       "authority": "referendum",
-      "description": "Kin minted directly into the Commonwealth account each month as a community savings injection.",
-      "constraints": { "min": 0, "max": 10000 }
+      "description": "Kin minted directly into the Commonwealth account each month as a community savings injection. Provides starting liquidity for public employment before demurrage collections build up.",
+      "constraints": {
+        "min": 0,
+        "max": 10000
+      }
     },
     "communityEndowment": {
       "value": 50000,
       "authority": "referendum",
-      "description": "Kin minted per new member as a community liquidity endowment. 49,000 goes to the Commonwealth, 1,000 to the member. Burned on departure.",
-      "constraints": { "min": 0, "max": 500000 }
+      "description": "Kin minted per new member as a community liquidity endowment. 49,000 goes to the Commonwealth, 1,000 to the member's primary account. Burned when the member departs. Total rises and falls with population.",
+      "constraints": {
+        "min": 0,
+        "max": 500000
+      }
     }
   },
-  "amendments": []
+  "amendments": [],
+  "authorityMap": [
+    {
+      "action": "admit-member",
+      "body": "assembly",
+      "description": "Admitting a new member to the community"
+    },
+    {
+      "action": "suspend-member",
+      "body": "assembly",
+      "description": "Suspending a member pending review"
+    },
+    {
+      "action": "exclude-member",
+      "body": "referendum",
+      "description": "Permanently excluding a member"
+    },
+    {
+      "action": "change-levy-rate",
+      "body": "referendum",
+      "description": "Changing the commons levy rate"
+    },
+    {
+      "action": "change-demurrage-rate",
+      "body": "referendum",
+      "description": "Changing the bank demurrage rate"
+    },
+    {
+      "action": "change-demurrage-floor",
+      "body": "referendum",
+      "description": "Changing the demurrage-free balance floor"
+    },
+    {
+      "action": "amend-constitution",
+      "body": "referendum",
+      "description": "Amending the constitution"
+    },
+    {
+      "action": "join-federation",
+      "body": "referendum",
+      "description": "Joining a federation"
+    },
+    {
+      "action": "leave-federation",
+      "body": "referendum",
+      "description": "Leaving a federation"
+    },
+    {
+      "action": "split-council",
+      "body": "assembly",
+      "description": "Splitting a multi-domain council into two"
+    },
+    {
+      "action": "allocate-domain-budget",
+      "body": "assembly",
+      "description": "Setting budget envelopes for domains"
+    },
+    {
+      "action": "declare-domain-emergency",
+      "body": "council",
+      "description": "Declaring a domain emergency (assembly ratifies within 72h)"
+    },
+    {
+      "action": "change-market-schedule",
+      "body": "council",
+      "description": "Changing market day schedule"
+    },
+    {
+      "action": "enact-domain-statute",
+      "body": "council",
+      "description": "Enacting an operating rule within a domain"
+    }
+  ]
 }

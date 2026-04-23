@@ -5,6 +5,8 @@
     moneyInCirculation: number;
     desiredMoneyInCirculation: number;
     unrecoveredKin: number;
+    retirementPool: number;
+    activeCirculation: number;
   }
 
   interface Member {
@@ -78,7 +80,17 @@
     <div class="stat-card">
       <div class="stat-label">In Circulation</div>
       <div class="stat-value">{fmt(supply.moneyInCirculation)}</div>
-      <div class="stat-sub">kin currently held by members</div>
+      <div class="stat-sub">total kin issued and unburned</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Active Circulation</div>
+      <div class="stat-value">{fmt(supply.activeCirculation)}</div>
+      <div class="stat-sub">kin available to spend</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Retirement Pool</div>
+      <div class="stat-value">{fmt(supply.retirementPool)}</div>
+      <div class="stat-sub">deferred; exempt from demurrage</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Target Supply</div>

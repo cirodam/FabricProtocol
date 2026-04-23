@@ -49,6 +49,7 @@
   import AdminPage from './lib/pages/AdminPage.svelte';
   import CreateAccountPage from './lib/pages/CreateAccountPage.svelte';
   import LoginPage from './lib/pages/LoginPage.svelte';
+  import SetupPage from './lib/pages/SetupPage.svelte';
   import FunctionalUnitPage from './lib/pages/FunctionalUnitPage.svelte';
   import AddFunctionalUnitPage from './lib/pages/AddFunctionalUnitPage.svelte';
 
@@ -58,7 +59,7 @@
 
   let path = $state(getPath());
 
-  const authPaths = ['/login', '/create-account'];
+  const authPaths = ['/login', '/create-account', '/setup'];
   const hideNav = $derived(authPaths.includes(path));
 
   function getMemberId() {
@@ -80,6 +81,14 @@
 
   async function loadSession() {
     try {
+      const setupRes = await fetch('/api/setup');
+      if (setupRes.ok) {
+        const { isSetup } = await setupRes.json();
+        if (!isSetup && path !== '/setup') {
+          navigate('/setup');
+          return;
+        }
+      }
       const res = await fetch('/api/auth/me');
       if (!res.ok) { sessionHandle = null; return; }
       const { memberId } = await res.json();
@@ -123,6 +132,8 @@
 <main>
   {#if path === '/'}
     <HomePage />
+  {:else if path === '/setup'}
+    <SetupPage {navigate} />
   {:else if path === '/login'}
     <LoginPage {navigate} />
   {:else if path === '/create-account'}

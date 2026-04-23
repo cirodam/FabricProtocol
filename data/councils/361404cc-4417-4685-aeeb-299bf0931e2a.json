@@ -1,0 +1,12 @@
+{
+  "id": "361404cc-4417-4685-aeeb-299bf0931e2a",
+  "name": "Sustenance Council",
+  "domainIds": [
+    "food",
+    "agriculture",
+    "water"
+  ],
+  "targetSize": 5,
+  "poolId": null,
+  "seats": []
+}

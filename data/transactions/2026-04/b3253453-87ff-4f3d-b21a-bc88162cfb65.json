@@ -1,9 +1,0 @@
-{
-  "id": "b3253453-87ff-4f3d-b21a-bc88162cfb65",
-  "fromAccountId": "3f16438d-4d7e-47e2-8854-00c4cbb5b657",
-  "toAccountId": "2fc54b32-e1fb-4535-84fc-0bb84a8bedeb",
-  "currency": "credits",
-  "amount": 1000,
-  "memo": "endowment reclaim on exit",
-  "timestamp": "2026-04-20T01:33:56.689Z"
-}

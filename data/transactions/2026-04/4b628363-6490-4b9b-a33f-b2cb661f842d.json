@@ -1,9 +1,0 @@
-{
-  "id": "4b628363-6490-4b9b-a33f-b2cb661f842d",
-  "fromAccountId": "a9480eda-c446-4522-8353-6b17a473a6ae",
-  "toAccountId": "74f21a93-2206-4f70-af20-4e2cfcc319c1",
-  "currency": "kin",
-  "amount": 640000,
-  "memo": "endowment issuance",
-  "timestamp": "2026-04-21T16:28:30.441Z"
-}
