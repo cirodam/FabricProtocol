@@ -76,12 +76,29 @@ async function init(): Promise<void> {
   CentralBank.getInstance().init(new MemberEndowmentLoader("data/endowment-profiles"));
   CentralBank.getInstance().demurrageRate = constitution.bankDemurrageRate;
   SocialInsuranceBank.getInstance().init(new SocialInsuranceMemberLoader("data/social-insurance"));
+  // Restore poolIssued from persisted records so desiredMoneyInCirculation is correct on startup.
+  CentralBank.getInstance().restorePoolIssued(SocialInsuranceBank.getInstance().getTotalPoolContributed());
   MemberService.getInstance().init(new MemberLoader("data/members"));
   // Backfill pool contributions for members who predate the social insurance system.
   SocialInsuranceBank.getInstance().backfillMembers(
     MemberService.getInstance().getAll(),
     constitution.kinPerPersonYear,
+    constitution.birthdayCirculationFraction,
   );
+  // Backfill community endowment for pre-existing members (idempotent via communityEndowmentTotal check).
+  {
+    const endowment = constitution.communityEndowment;
+    if (endowment > 0) {
+      for (const member of MemberService.getInstance().getAll()) {
+        CentralBank.getInstance().issueCommunityEndowment(
+          member,
+          Commonwealth.getInstance(),
+          endowment,
+          constitution.demurrageFloor,
+        );
+      }
+    }
+  }
   ApplicationService.getInstance().init(new MemberApplicationLoader("data/members/applications"));
   CalendarService.getInstance().init(new CalendarEventLoader("data/calendar"));
   CalendarService.getInstance().seedDefaults();
@@ -146,7 +163,10 @@ async function init(): Promise<void> {
     intervalMs: every.months(1),
     run: () => {
       const floor = constitution.demurrageFloor;
-      Commonwealth.getInstance().assessDemurrage(Commonwealth.getInstance().computedLevyRate(floor), floor);
+      Commonwealth.getInstance().assessDemurrage(
+        Commonwealth.getInstance().computedLevyRate(floor, constitution.communityBudget),
+        floor,
+      );
     },
   });
   scheduler.register({

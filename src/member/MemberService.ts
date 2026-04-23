@@ -39,9 +39,16 @@ export class MemberService {
     this.members.set(member.id, member);
     Bank.getInstance().openAccount(member, "primary");
     const age = Math.floor((Date.now() - member.birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-    // Back-debt goes to the retirement pool, not the member's primary account.
-    // This prevents a large immediate injection into the money supply.
-    SocialInsuranceBank.getInstance().depositContribution(member, age * Constitution.getInstance().kinPerPersonYear);
+    const fraction = Constitution.getInstance().birthdayCirculationFraction;
+    SocialInsuranceBank.getInstance().depositContribution(member, age * Constitution.getInstance().kinPerPersonYear, fraction);
+    const endowment = Constitution.getInstance().communityEndowment;
+    if (endowment > 0)
+      CentralBank.getInstance().issueCommunityEndowment(
+        member,
+        Commonwealth.getInstance(),
+        endowment,
+        Constitution.getInstance().demurrageFloor,
+      );
     this.loader?.save(member);
   }
 
@@ -109,7 +116,8 @@ export class MemberService {
       const isBirthday =
         member.birthDate.getMonth() === mm && member.birthDate.getDate() === dd;
       if (isBirthday) {
-        SocialInsuranceBank.getInstance().depositContribution(member, Constitution.getInstance().kinPerPersonYear);
+        const fraction = Constitution.getInstance().birthdayCirculationFraction;
+        SocialInsuranceBank.getInstance().depositContribution(member, Constitution.getInstance().kinPerPersonYear, fraction);
       }
     }
   }
@@ -126,6 +134,14 @@ export class MemberService {
     Marketplace.getInstance().removePostsByPoster(member.getId());
     SocialInsuranceBank.getInstance().settleDeath(member);
     CentralBank.getInstance().reclaimEndowment(member);
+    const endowment = Constitution.getInstance().communityEndowment;
+    if (endowment > 0)
+      CentralBank.getInstance().reclaimCommunityEndowment(
+        member,
+        Commonwealth.getInstance(),
+        endowment,
+        Constitution.getInstance().demurrageFloor,
+      );
     Commonwealth.getInstance().collect(member);
 
     Bank.getInstance().closeAccounts(member.getId());

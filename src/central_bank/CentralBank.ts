@@ -32,6 +32,13 @@ export class CentralBank implements IEconomicActor {
      */
     private poolIssued: number = 0;
 
+    /**
+     * Aggregate community endowment: 50,000 kin per current member.
+     * Rises on join, falls on departure. Included in desiredMoneyInCirculation
+     * so the money supply tracks population automatically.
+     */
+    private communityEndowmentTotal: number = 0;
+
     private constructor() {
         this.id = "00000000-0000-0000-0000-000000000001"; // stable singleton ID
         if (!Bank.getInstance().getPrimaryAccount(this.id)) {
@@ -68,16 +75,103 @@ export class CentralBank implements IEconomicActor {
         return Math.max(0, -(bankAccount?.kin ?? 0));
     }
 
-    /** What money in circulation should be — sum of all active member endowments plus pool-backed kin. */
+    /** What money in circulation should be — sum of all active member endowments, pool-backed kin, and community endowment. */
     get desiredMoneyInCirculation(): number {
         let total = 0;
         for (const e of this.endowments.values()) total += e.endowment;
-        return total + this.poolIssued;
+        return total + this.poolIssued + this.communityEndowmentTotal;
     }
 
     /** Kin still floating from departed members we couldn't fully reclaim. */
     get unrecoveredKin(): number {
         return Math.max(0, this.moneyInCirculation - this.desiredMoneyInCirculation);
+    }
+
+    /**
+     * Issue the community endowment for a new member.
+     * Mints `amount` kin: memberShare (1,000) → member's primary account,
+     * remainder → Commonwealth primary account.
+     * communityEndowmentTotal rises by `amount`.
+     */
+    issueCommunityEndowment(
+        member: IEconomicActor,
+        commonwealth: IEconomicActor,
+        amount: number,
+        memberShare: number,
+    ): void {
+        // Idempotent — skip if already issued for this member.
+        let e = this.endowments.get(member.getId());
+        if (e?.communityEndowmentIssued) {
+            this.communityEndowmentTotal += amount; // restore total from persisted records at startup
+            return;
+        }
+        const bankInst = Bank.getInstance();
+        const bankAccount = bankInst.getPrimaryAccount(this.id);
+        const memberAccount = bankInst.getPrimaryAccount(member.getId());
+        const cwAccount = bankInst.getPrimaryAccount(commonwealth.getId());
+        if (!bankAccount)  throw new Error("CentralBank has no primary account");
+        if (!memberAccount) throw new Error(`Member ${member.getId()} has no primary account`);
+        if (!cwAccount)    throw new Error("Commonwealth has no primary account");
+        const cwShare = amount - memberShare;
+        if (memberShare > 0)
+            bankInst.transfer(bankAccount.id, memberAccount.id, "kin", memberShare, "community endowment: member share");
+        if (cwShare > 0)
+            bankInst.transfer(bankAccount.id, cwAccount.id, "kin", cwShare, "community endowment: commonwealth share");
+        this.communityEndowmentTotal += amount;
+        if (!e) {
+            e = new MemberEndowment(member.getId());
+            this.endowments.set(e.memberId, e);
+        }
+        e.communityEndowmentIssued = true;
+        this.endowmentLoader?.save(e);
+    }
+
+    /**
+     * Reclaim the community endowment for a departing member.
+     * Attempts to burn `amount` kin from the member's and commonwealth's accounts.
+     * Any unrecoverable portion (already spent/demurraged) is left as a
+     * temporary overshoot that demurrage will absorb naturally.
+     * communityEndowmentTotal falls by `amount` regardless.
+     */
+    reclaimCommunityEndowment(
+        member: IEconomicActor,
+        commonwealth: IEconomicActor,
+        amount: number,
+        memberShare: number,
+    ): void {
+        const bankInst = Bank.getInstance();
+        const bankAccount = bankInst.getPrimaryAccount(this.id);
+        if (!bankAccount) return;
+        let remaining = amount;
+        // Reclaim from member first
+        for (const account of bankInst.getAccounts(member.getId())) {
+            if (remaining <= 0) break;
+            const take = Math.min(account.kin, remaining);
+            if (take > 0) {
+                bankInst.transfer(account.id, bankAccount.id, "kin", take, "community endowment reclaim: member");
+                remaining -= take;
+            }
+        }
+        // Reclaim remainder from Commonwealth (up to cwShare)
+        const cwShare = amount - memberShare;
+        const cwReclaim = Math.min(cwShare, remaining);
+        if (cwReclaim > 0) {
+            const cwAccount = bankInst.getPrimaryAccount(commonwealth.getId());
+            if (cwAccount) {
+                const take = Math.min(cwAccount.kin, cwReclaim);
+                if (take > 0)
+                    bankInst.transfer(cwAccount.id, bankAccount.id, "kin", take, "community endowment reclaim: commonwealth");
+            }
+        }
+        this.communityEndowmentTotal = Math.max(0, this.communityEndowmentTotal - amount);
+    }
+
+    /**
+     * Restore poolIssued from persisted SocialInsuranceBank records at startup.
+     * Must be called after SocialInsuranceBank.init().
+     */
+    restorePoolIssued(total: number): void {
+        this.poolIssued = total;
     }
 
     /**

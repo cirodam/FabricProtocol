@@ -26,7 +26,7 @@ export class SocialInsuranceBank implements IEconomicActor {
     private static instance: SocialInsuranceBank;
 
     /** Stable singleton ID — never reused. */
-    readonly id = "00000000-0000-0000-0000-000000000002";
+    readonly id = "00000000-0000-0000-0000-000000000003";
 
     private records: Map<string, SocialInsuranceMember> = new Map();
     private loader: SocialInsuranceMemberLoader | null = null;
@@ -56,13 +56,20 @@ export class SocialInsuranceBank implements IEconomicActor {
     getDisplayName(): string { return "Social Insurance Bank"; }
     getHandle(): string { return "social_insurance"; }
 
+    /** Sum of all poolContributed across every member record. Used to restore CentralBank.poolIssued on startup. */
+    getTotalPoolContributed(): number {
+        let total = 0;
+        for (const r of this.records.values()) total += r.poolContributed;
+        return total;
+    }
+
     /**
      * Backfill pool contributions for members who joined before the social
      * insurance system existed. Calculates each member's expected contribution
      * (age × kinPerPersonYear) and mints the deficit into the pool.
      * Safe to call on every startup — no-ops for members already fully contributed.
      */
-    backfillMembers(members: Member[], kinPerPersonYear: number): void {
+    backfillMembers(members: Member[], kinPerPersonYear: number, circulationFraction: number = 0): void {
         const now = Date.now();
         const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;
         for (const member of members) {
@@ -71,9 +78,14 @@ export class SocialInsuranceBank implements IEconomicActor {
             const r = this.records.get(member.getId()) ?? new SocialInsuranceMember(member.getId());
             const deficit = expected - r.poolContributed;
             if (deficit > 0) {
-                r.poolContributed += deficit;
+                const directAmount = Math.round(deficit * circulationFraction);
+                const poolAmount = deficit - directAmount;
+                r.poolContributed += poolAmount;
                 if (!this.records.has(member.getId())) this.records.set(r.memberId, r);
-                CentralBank.getInstance().mintToPool(this.poolAccountId, deficit, "retirement pool: backfill");
+                if (poolAmount > 0)
+                    CentralBank.getInstance().mintToPool(this.poolAccountId, poolAmount, "retirement pool: backfill");
+                if (directAmount > 0)
+                    CentralBank.getInstance().issueEndowment(member, directAmount);
                 this.loader?.save(r);
             }
         }
@@ -92,18 +104,25 @@ export class SocialInsuranceBank implements IEconomicActor {
     }
 
     /**
-     * Mint kin into the pool on behalf of a member (join back-debt or birthday).
-     * The CentralBank records the issuance so desiredMoneyInCirculation stays
-     * accurate.
+     * Mint kin on behalf of a member (join back-debt or birthday).
+     * A fraction (birthdayCirculationFraction) goes directly to the member's
+     * primary account as circulating kin; the remainder goes to the pool.
      */
-    depositContribution(member: Member, amount: number): void {
+    depositContribution(member: Member, amount: number, circulationFraction: number = 0): void {
         let r = this.records.get(member.getId());
         if (!r) {
             r = new SocialInsuranceMember(member.getId());
             this.records.set(r.memberId, r);
         }
-        r.poolContributed += amount;
-        CentralBank.getInstance().mintToPool(this.poolAccountId, amount, "retirement pool: contribution");
+        const directAmount = Math.round(amount * circulationFraction);
+        const poolAmount = amount - directAmount;
+        if (poolAmount > 0) {
+            r.poolContributed += poolAmount;
+            CentralBank.getInstance().mintToPool(this.poolAccountId, poolAmount, "retirement pool: contribution");
+        }
+        if (directAmount > 0) {
+            CentralBank.getInstance().issueEndowment(member, directAmount);
+        }
         this.loader?.save(r);
     }
 

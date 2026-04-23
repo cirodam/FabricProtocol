@@ -114,10 +114,25 @@
       "value": 0.005,
       "authority": "referendum",
       "description": "Fraction of the retirement pool distributed each month across all current retirees. E.g. 0.005 = 0.5% of pool per month.",
-      "constraints": {
-        "min": 0.001,
-        "max": 0.02
-      }
+      "constraints": { "min": 0.001, "max": 0.02 }
+    },
+    "birthdayCirculationFraction": {
+      "value": 0,
+      "authority": "referendum",
+      "description": "Fraction of each birthday person-year issuance paid directly to the member's primary account as circulating kin. The remainder goes to the retirement pool.",
+      "constraints": { "min": 0, "max": 0.5 }
+    },
+    "communityBudget": {
+      "value": 200,
+      "authority": "referendum",
+      "description": "Kin minted directly into the Commonwealth account each month as a community savings injection.",
+      "constraints": { "min": 0, "max": 10000 }
+    },
+    "communityEndowment": {
+      "value": 50000,
+      "authority": "referendum",
+      "description": "Kin minted per new member as a community liquidity endowment. 49,000 goes to the Commonwealth, 1,000 to the member. Burned on departure.",
+      "constraints": { "min": 0, "max": 500000 }
     }
   },
   "amendments": []

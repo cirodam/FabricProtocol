@@ -154,6 +154,27 @@ export const DEFAULT_CONSTITUTION: ConstitutionDocument = {
                 "Fraction of the retirement pool distributed each month across all current retirees. E.g. 0.005 = 0.5% of pool per month.",
             constraints: { min: 0.001, max: 0.02 },
         },
+        birthdayCirculationFraction: {
+            value: 0,
+            authority: "referendum",
+            description:
+                "Fraction of each birthday person-year issuance paid directly to the member's primary account as circulating kin. The remainder goes to the retirement pool. E.g. 0.1 = 10% direct, 90% to pool.",
+            constraints: { min: 0, max: 0.5 },
+        },
+        communityBudget: {
+            value: 200,
+            authority: "referendum",
+            description:
+                "Kin minted directly into the Commonwealth account each month as a community savings injection. Provides starting liquidity for public employment before demurrage collections build up.",
+            constraints: { min: 0, max: 10_000 },
+        },
+        communityEndowment: {
+            value: 50_000,
+            authority: "referendum",
+            description:
+                "Kin minted per new member as a community liquidity endowment. 49,000 goes to the Commonwealth, 1,000 to the member's primary account. Burned when the member departs. Total rises and falls with population.",
+            constraints: { min: 0, max: 500_000 },
+        },
     },
     amendments: [],
     authorityMap: [
@@ -275,6 +296,9 @@ export class Constitution {
     get kinPerPersonYear(): number        { return this.get<number>("kinPerPersonYear"); }
     get retirementAge(): number           { return this.get<number>("retirementAge"); }
     get retirementPayoutRate(): number    { return this.get<number>("retirementPayoutRate"); }
+    get birthdayCirculationFraction(): number { return this.get<number>("birthdayCirculationFraction"); }
+    get communityBudget(): number             { return this.get<number>("communityBudget"); }
+    get communityEndowment(): number          { return this.get<number>("communityEndowment"); }
 
     /** Which governance body must authorize the given action. Returns null if not in the map. */
     getRequiredBody(action: string): GovernanceBody | null {

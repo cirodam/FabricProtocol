@@ -161,16 +161,18 @@ export class Commonwealth implements IEconomicActor {
     }
 
     /**
-     * Derives the levy rate needed to exactly cover monthly outflows,
-     * given that only balances above `floor` are taxable.
-     * rate = totalOutflows / taxableSupply(floor)
-     * Returns 0 if there are no outflows or no taxable balances.
+     * Derives the levy rate needed to cover monthly outflows plus an optional
+     * savings target (e.g. the community budget). The savings target is treated
+     * as additional dues — no new money is created.
+     * rate = (outflows + savingsTarget) / taxableSupply(floor)
+     * Returns 0 if there is nothing to collect or no taxable balances.
      */
-    computedLevyRate(floor: number = 0): number {
+    computedLevyRate(floor: number = 0, savingsTarget: number = 0): number {
         const outflows = this.getOutflows().total;
-        if (outflows === 0) return 0;
+        const target = outflows + savingsTarget;
+        if (target === 0) return 0;
         const supply = this.taxableSupply(floor);
         if (supply === 0) return 0;
-        return outflows / supply;
+        return target / supply;
     }
 }

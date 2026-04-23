@@ -2,9 +2,8 @@
   "id": "c79320e3-6c6a-460e-b37d-1b8e3c916e50",
   "ownerId": "f5f09372-6385-4184-be7d-9a1b8cec921b",
   "label": "primary",
-  "allowNegativeCredits": false,
+  "kin": 311000,
+  "overdraftLimit": 0,
   "exemptFromDemurrage": false,
-  "createdAt": "2026-04-20T19:58:56.691Z",
-  "kin": 310000,
-  "kithe": 0
+  "createdAt": "2026-04-20T19:58:56.691Z"
 }

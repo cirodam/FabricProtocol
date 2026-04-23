@@ -4,6 +4,7 @@ import { FileStore } from "../storage/FileStore.js";
 interface MemberEndowmentRecord {
   memberId: string;
   endowment: number;
+  communityEndowmentIssued?: boolean;
 }
 
 export class MemberEndowmentLoader {
@@ -17,6 +18,7 @@ export class MemberEndowmentLoader {
     const record: MemberEndowmentRecord = {
       memberId: e.memberId,
       endowment: e.endowment,
+      communityEndowmentIssued: e.communityEndowmentIssued,
     };
     this.store.write(e.memberId, record);
   }
@@ -25,6 +27,7 @@ export class MemberEndowmentLoader {
     return this.store.readAll<MemberEndowmentRecord>().map(r => {
       const e = new MemberEndowment(r.memberId);
       e.endowment = r.endowment;
+      e.communityEndowmentIssued = r.communityEndowmentIssued ?? false;
       return e;
     });
   }
