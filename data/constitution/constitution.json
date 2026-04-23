@@ -92,23 +92,6 @@
         "max": 0.1
       }
     },
-    "commonsLevyRate": {
-      "value": 0.02,
-      "authority": "citizens-assembly",
-      "description": "Monthly commons levy rate applied to all non-exempt member accounts. Funds flow to the Commonwealth.",
-      "constraints": {
-        "min": 0,
-        "max": 0.1
-      }
-    },
-    "monthlyFoodAllowance": {
-      "value": 200,
-      "authority": "citizens-assembly",
-      "description": "Kin paid to each member per month from the Food domain as an unconditional food allowance. This is a community policy decision — not a monetary definition. The community decides how much of the commons to distribute to members each month.",
-      "constraints": {
-        "min": 0
-      }
-    }
   },
   "amendments": []
 }

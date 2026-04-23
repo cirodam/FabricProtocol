@@ -53,7 +53,6 @@
     const v = param.value as number;
     if (key.includes('Rate') || key.startsWith('threshold')) return (v * 100).toFixed(1) + '%';
     if (key === 'deliberationPeriodDays') return v + (v === 1 ? ' day' : ' days');
-    if (key === 'monthlyFoodAllowance') return v.toLocaleString() + ' kin / month';
     return v.toLocaleString();
   }
 

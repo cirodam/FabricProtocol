@@ -7,7 +7,6 @@ import { CommunityKitchen } from "./CommunityKitchen.js";
 import { CommunityKitchenLoader } from "./CommunityKitchenLoader.js";
 import { Mill } from "./Mill.js";
 import { MillLoader } from "./MillLoader.js";
-import { Constitution } from "../../commons/Constitution.js";
 
 export class FoodDomain extends FunctionalDomain {
     private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000003";
@@ -90,11 +89,20 @@ export class FoodDomain extends FunctionalDomain {
         this.millLoader?.delete(id);
     }
 
+    getMonthlyFoodAllowance(): number {
+        return this.loader?.load().monthlyFoodAllowance ?? 0;
+    }
+
+    setMonthlyFoodAllowance(value: number): void {
+        const settings = this.loader?.load() ?? { monthlyFoodAllowance: 0 };
+        settings.monthlyFoodAllowance = value;
+        this.loader?.save(settings);
+    }
+
     // Issue the monthly food allowance to every member from this domain's account.
-    // The amount is governed by the Constitution (monthlyFoodAllowance), set by the Citizens Assembly.
     // Kin flows from the Food domain's account — funded by the commons — to each member's primary account.
     issueMonthlyKin(): void {
-        const amount = Constitution.getInstance().monthlyFoodAllowance;
+        const amount = this.getMonthlyFoodAllowance();
         if (amount <= 0) return;
 
         const bankInst = Bank.getInstance();
@@ -120,7 +128,7 @@ export class FoodDomain extends FunctionalDomain {
 
     /** Total kin committed to food allowances each month (perMember × memberCount). */
     monthlyAllowanceTotal(): number {
-        const amount = Constitution.getInstance().monthlyFoodAllowance;
+        const amount = this.getMonthlyFoodAllowance();
         const memberCount = MemberService.getInstance().getAll().length;
         return amount * memberCount;
     }

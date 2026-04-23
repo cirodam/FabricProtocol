@@ -131,22 +131,6 @@ export const DEFAULT_CONSTITUTION: ConstitutionDocument = {
                 "Monthly rate at which the Central Bank applies demurrage to recover unanchored kin.",
             constraints: { min: 0, max: 0.10 },
         },
-        commonsLevyRate: {
-            value: 0.02,
-            authority: "referendum",
-            description:
-                "Monthly commons levy rate applied to all non-exempt member accounts. Funds flow to the Commonwealth.",
-            constraints: { min: 0, max: 0.10 },
-        },
-
-        // ── Basic income ─────────────────────────────────────────────────────
-        monthlyFoodAllowance: {
-            value: 833,
-            authority: "assembly",
-            description:
-                "Kin paid to each member per month from the Food domain as an unconditional food allowance. This is a community policy decision — not a monetary definition. The community decides how much of the commons to distribute to members each month.",
-            constraints: { min: 0 },
-        },
     },
     amendments: [],
     authorityMap: [
@@ -155,7 +139,6 @@ export const DEFAULT_CONSTITUTION: ConstitutionDocument = {
         { action: "exclude-member",           body: "referendum", description: "Permanently excluding a member" },
         { action: "change-levy-rate",         body: "referendum", description: "Changing the commons levy rate" },
         { action: "change-demurrage-rate",    body: "referendum", description: "Changing the bank demurrage rate" },
-        { action: "change-food-allowance",    body: "assembly",   description: "Changing the monthly food allowance" },
         { action: "amend-constitution",       body: "referendum", description: "Amending the constitution" },
         { action: "join-federation",          body: "referendum", description: "Joining a federation" },
         { action: "leave-federation",         body: "referendum", description: "Leaving a federation" },
@@ -264,9 +247,7 @@ export class Constitution {
 
     get deliberationPeriodDays(): number  { return this.get<number>("deliberationPeriodDays"); }
     get bankDemurrageRate(): number       { return this.get<number>("bankDemurrageRate"); }
-    get commonsLevyRate(): number         { return this.get<number>("commonsLevyRate"); }
     get kinPerPersonYear(): number        { return this.get<number>("kinPerPersonYear"); }
-    get monthlyFoodAllowance(): number    { return this.get<number>("monthlyFoodAllowance"); }
 
     /** Which governance body must authorize the given action. Returns null if not in the map. */
     getRequiredBody(action: string): GovernanceBody | null {

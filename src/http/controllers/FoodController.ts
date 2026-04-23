@@ -5,10 +5,9 @@ import { FoodDomain } from "../../domains/food/FoodDomain.js";
 import { CommunityKitchen } from "../../domains/food/CommunityKitchen.js";
 import { Mill } from "../../domains/food/Mill.js";
 import { CommunityRole } from "../../commons/CommunityRole.js";
-import { Constitution } from "../../commons/Constitution.js";
 
 function settingsDto() {
-    const monthlyFoodAllowance = Constitution.getInstance().monthlyFoodAllowance;
+    const monthlyFoodAllowance = FoodDomain.getInstance().getMonthlyFoodAllowance();
     const memberCount = MemberService.getInstance().getAll().length;
     return {
         monthlyFoodAllowance,
@@ -37,6 +36,17 @@ export function getRequirements(_req: Request, res: Response): void {
 
 // GET /food/settings
 export function getSettings(_req: Request, res: Response): void {
+    res.json(settingsDto());
+}
+
+// PUT /food/settings
+export function updateSettings(req: Request, res: Response): void {
+    const { monthlyFoodAllowance } = req.body;
+    if (typeof monthlyFoodAllowance !== 'number' || monthlyFoodAllowance < 0) {
+        res.status(400).json({ error: 'monthlyFoodAllowance must be a non-negative number' });
+        return;
+    }
+    FoodDomain.getInstance().setMonthlyFoodAllowance(monthlyFoodAllowance);
     res.json(settingsDto());
 }
 
