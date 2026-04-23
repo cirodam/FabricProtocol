@@ -9,6 +9,7 @@
 
   const governanceLinks = [
     { label: 'Referenda',    path: '/referenda' },
+    { label: 'Constitution', path: '/constitution' },
   ];
 
   const adminLinks = [
