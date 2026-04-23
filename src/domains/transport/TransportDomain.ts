@@ -1,5 +1,6 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
 import { TransitRoute } from "./TransitRoute.js";
+import { CommunityRole } from "../../commons/CommunityRole.js";
 
 /**
  * The Transport domain runs scheduled people-mover routes within the community.
@@ -21,10 +22,19 @@ import { TransitRoute } from "./TransitRoute.js";
  * member communities to connect their hubs.
  */
 export class TransportDomain extends FunctionalDomain {
+    private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000015";
+    private static instance: TransportDomain;
+
     private routes: Map<string, TransitRoute> = new Map();
 
-    constructor() {
-        super("Transport", "Runs scheduled people-mover routes within the community.");
+    private constructor() {
+        super("Transport", "Runs scheduled people-mover routes within the community.", TransportDomain.DOMAIN_ID);
+        this.addRole(new CommunityRole("Transit Coordinator", "Schedules routes, assigns operators, and ensures reliable people-mover coverage across the community.", 700));
+    }
+
+    static getInstance(): TransportDomain {
+        if (!TransportDomain.instance) TransportDomain.instance = new TransportDomain();
+        return TransportDomain.instance;
     }
 
     // ── Routes ─────────────────────────────────────────────────────────────────

@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
 import { Event } from "./Event.js";
+import { CommunityRole } from "../../commons/CommunityRole.js";
 
 // The Enrichment domain coordinates the cultural and recreational life of the community:
 // festivals, theatrical performances, film screenings, music, art, games, and celebrations.
@@ -15,10 +16,19 @@ import { Event } from "./Event.js";
 //   - A sports and recreation facility
 //   - A workshop space for art and craft
 export class EnrichmentDomain extends FunctionalDomain {
+    private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000016";
+    private static instance: EnrichmentDomain;
+
     private events: Event[] = [];
 
-    constructor() {
-        super("Enrichment", "Coordinates cultural events, recreation, and community celebration.");
+    private constructor() {
+        super("Enrichment", "Coordinates cultural events, recreation, and community celebration.", EnrichmentDomain.DOMAIN_ID);
+        this.addRole(new CommunityRole("Enrichment Coordinator", "Plans community events, manages venues, and coordinates cultural programming.", 700));
+    }
+
+    static getInstance(): EnrichmentDomain {
+        if (!EnrichmentDomain.instance) EnrichmentDomain.instance = new EnrichmentDomain();
+        return EnrichmentDomain.instance;
     }
 
     // Schedule a new event.

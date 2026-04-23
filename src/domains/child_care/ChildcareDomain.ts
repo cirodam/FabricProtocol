@@ -1,4 +1,5 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
+import { CommunityRole } from "../../commons/CommunityRole.js";
 import { ChildcareProfile } from "./ChildcareProfile.js";
 import { HomeChildcare } from "./HomeChildcare.js";
 import { HomeChildcareLoader } from "./HomeChildcareLoader.js";
@@ -21,6 +22,11 @@ export class ChildcareDomain extends FunctionalDomain {
 
     private constructor() {
         super("Childcare", "Provides care and early education for children in the community.", ChildcareDomain.DOMAIN_ID);
+        this.addRole(new CommunityRole(
+            "Childcare Coordinator",
+            "Organises home childcare programs, recruits and supports caregivers, and ensures children under five have access to safe, nurturing care.",
+            700,
+        ));
     }
 
     static getInstance(): ChildcareDomain {

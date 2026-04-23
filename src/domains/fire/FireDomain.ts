@@ -1,6 +1,7 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
 import { FireCompany } from "./FireCompany.js";
 import { FireCompanyLoader } from "./FireCompanyLoader.js";
+import { CommunityRole } from "../../commons/CommunityRole.js";
 
 /**
  * The Fire domain protects the community from fire and provides emergency rescue services.
@@ -30,6 +31,7 @@ export class FireDomain extends FunctionalDomain {
 
     private constructor() {
         super("Fire", "Protects the community from fire and provides emergency rescue and first response services.", FireDomain.DOMAIN_ID);
+        this.addRole(new CommunityRole("Fire Chief", "Leads fire companies, coordinates emergency response, and maintains equipment readiness.", 700));
     }
 
     static getInstance(): FireDomain {

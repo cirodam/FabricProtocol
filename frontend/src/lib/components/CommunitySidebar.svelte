@@ -22,11 +22,21 @@
   ];
 
   const domainLinks = [
-    { label: 'Agriculture',    path: '/agriculture' },
-    { label: 'Education',      path: '/education' },
-    { label: 'Food',           path: '/food' },
-    { label: 'Healthcare',     path: '/healthcare' },
-    { label: 'Communications', path: '/communications' },
+    { label: 'Agriculture',     path: '/agriculture' },
+    { label: 'Child Care',      path: '/child-care' },
+    { label: 'Communications',  path: '/communications' },
+    { label: 'Courier',         path: '/courier' },
+    { label: 'Deathcare',       path: '/deathcare' },
+    { label: 'Dependency Care', path: '/dependency-care' },
+    { label: 'Education',       path: '/education' },
+    { label: 'Enrichment',      path: '/enrichment' },
+    { label: 'Fire',            path: '/fire' },
+    { label: 'Food',            path: '/food' },
+    { label: 'Healthcare',      path: '/healthcare' },
+    { label: 'Housing',         path: '/housing' },
+    { label: 'Sanitation',      path: '/sanitation' },
+    { label: 'Transport',       path: '/transport' },
+    { label: 'Water',           path: '/water' },
   ];
 
   function isActive(linkPath: string): boolean {

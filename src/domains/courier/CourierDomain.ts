@@ -1,6 +1,7 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
 import { DeliveryRequest } from "./DeliveryRequest.js";
 import { DeliveryRequestLoader } from "./DeliveryRequestLoader.js";
+import { CommunityRole } from "../../commons/CommunityRole.js";
 
 /**
  * The Courier domain handles the movement of physical goods and documents within
@@ -22,6 +23,7 @@ export class CourierDomain extends FunctionalDomain {
 
     private constructor() {
         super("Courier", "Moves physical goods and documents within the community on demand.", CourierDomain.DOMAIN_ID);
+        this.addRole(new CommunityRole("Courier Coordinator", "Manages courier scheduling, delivery queue, and courier staff.", 700));
     }
 
     static getInstance(): CourierDomain {

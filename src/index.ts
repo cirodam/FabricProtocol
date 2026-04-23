@@ -39,6 +39,9 @@ import { ChildcareDomain } from "./domains/child_care/ChildcareDomain.js";
 import { HomeChildcareLoader } from "./domains/child_care/HomeChildcareLoader.js";
 import { FireDomain } from "./domains/fire/FireDomain.js";
 import { FireCompanyLoader } from "./domains/fire/FireCompanyLoader.js";
+import { DeathcareDomain } from "./domains/deathcare/DeathcareDomain.js";
+import { TransportDomain } from "./domains/transport/TransportDomain.js";
+import { EnrichmentDomain } from "./domains/enrichment/EnrichmentDomain.js";
 import { ProvisioningDomain } from "./domains/provisioning/ProvisioningDomain.js";
 import { ApplicationService } from "./member/ApplicationService.js";
 import { MemberApplicationLoader } from "./member/MemberApplicationLoader.js";
@@ -59,6 +62,8 @@ import { ReferendumService } from "./referendum/ReferendumService.js";
 import { ReferendumLoader } from "./referendum/ReferendumLoader.js";
 import { CommunicationsDomain } from "./domains/communications/CommunicationsDomain.js";
 import { AgricultureDomain } from "./domains/agriculture/AgricultureDomain.js";
+import { SanitationDomain } from "./domains/sanitation/SanitationDomain.js";
+import { WaterDomain } from "./domains/water/WaterDomain.js";
 import { CommunityRole } from "./commons/CommunityRole.js";
 import { SocialInsuranceBank } from "./social_insurance/SocialInsuranceBank.js";
 import { SocialInsuranceMemberLoader } from "./social_insurance/SocialInsuranceMemberLoader.js";
@@ -136,6 +141,8 @@ async function init(): Promise<void> {
   CommunicationsDomain.getInstance().addRole(communityOrganizerRole);
   commonwealth.addDomain(CommunicationsDomain.getInstance());
   commonwealth.addDomain(AgricultureDomain.getInstance());
+  commonwealth.addDomain(SanitationDomain.getInstance());
+  commonwealth.addDomain(WaterDomain.getInstance());
   commonwealth.addDomain(HousingDomain.getInstance());
   commonwealth.addDomain(FoodDomain.getInstance());
   commonwealth.addDomain(HealthcareDomain.getInstance());
@@ -143,6 +150,10 @@ async function init(): Promise<void> {
   commonwealth.addDomain(CourierDomain.getInstance());
   commonwealth.addDomain(DependencyCareDomain.getInstance());
   commonwealth.addDomain(ProvisioningDomain.getInstance());
+  commonwealth.addDomain(FireDomain.getInstance());
+  commonwealth.addDomain(DeathcareDomain.getInstance());
+  commonwealth.addDomain(TransportDomain.getInstance());
+  commonwealth.addDomain(EnrichmentDomain.getInstance());
 
   // ── Scheduler ────────────────────────────────────────────────────────────────
   const scheduler = new Scheduler("data/scheduler");

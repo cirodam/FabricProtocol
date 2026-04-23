@@ -1,4 +1,5 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
+import { CommunityRole } from "../../commons/CommunityRole.js";
 import { DependencyCareProfile, CareNeeds } from "./DependencyCareProfile.js";
 import { SharedHousehold } from "./SharedHousehold.js";
 import { SharedHouseholdLoader } from "./SharedHouseholdLoader.js";
@@ -19,6 +20,11 @@ export class DependencyCareDomain extends FunctionalDomain {
 
     private constructor() {
         super("DependencyCare", "Supports members with chronic illness, disability, or other ongoing care needs.", DependencyCareDomain.DOMAIN_ID);
+        this.addRole(new CommunityRole(
+            "Dependency Care Coordinator",
+            "Coordinates shared households, medical care units, and home caregiving programs; ensures members with chronic illness, disability, or ageing needs receive consistent support.",
+            700,
+        ));
     }
 
     static getInstance(): DependencyCareDomain {

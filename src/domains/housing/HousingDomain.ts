@@ -2,6 +2,7 @@ import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
 import { HousingUnit } from "./HousingUnit.js";
 import { HousingUnitLoader } from "./HousingUnitLoader.js";
 import { MemberService } from "../../member/MemberService.js";
+import { CommunityRole } from "../../commons/CommunityRole.js";
 
 export class HousingDomain extends FunctionalDomain {
     private static instance: HousingDomain;
@@ -11,6 +12,7 @@ export class HousingDomain extends FunctionalDomain {
     constructor() {
         super("Housing", "Manages community housing stock and member accommodation.",
             "00000000-0000-0000-0000-000000000001");
+        this.addRole(new CommunityRole("Housing Coordinator", "Oversees housing stock, allocation, and habitability standards.", 700));
     }
 
     static getInstance(): HousingDomain {

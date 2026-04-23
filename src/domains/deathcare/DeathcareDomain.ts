@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
+import { CommunityRole } from "../../commons/CommunityRole.js";
 
 export type BodyDisposition = "natural_burial" | "cremation" | "other";
 
@@ -49,10 +50,21 @@ export class DeceasedRecord {
  * precautions, and with MemberService on the discharge of deceased members.
  */
 export class DeathcareDomain extends FunctionalDomain {
+    private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000014";
+    private static instance: DeathcareDomain;
+
     private records: Map<string, DeceasedRecord> = new Map();
 
-    constructor() {
-        super("Deathcare", "Ensures dignified handling of deceased community members and maintenance of burial grounds.");
+    private constructor() {
+        super("Deathcare", "Ensures dignified handling of deceased community members and maintenance of burial grounds.", DeathcareDomain.DOMAIN_ID);
+        this.addRole(new CommunityRole("Deathcare Coordinator", "Oversees burial grounds, handles deceased records, and coordinates with Healthcare on infectious precautions.", 700));
+    }
+
+    static getInstance(): DeathcareDomain {
+        if (!DeathcareDomain.instance) {
+            DeathcareDomain.instance = new DeathcareDomain();
+        }
+        return DeathcareDomain.instance;
     }
 
     registerDeath(memberId: string, memberName: string, notes: string = ""): DeceasedRecord {

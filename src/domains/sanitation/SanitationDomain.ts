@@ -1,4 +1,5 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
+import { CommunityRole } from "../../commons/CommunityRole.js";
 
 /**
  * The Sanitation domain manages waste, hygiene infrastructure, and disease prevention.
@@ -15,7 +16,21 @@ import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
  * because it is community infrastructure, not a market service.
  */
 export class SanitationDomain extends FunctionalDomain {
+    private static instance: SanitationDomain;
+
     constructor() {
         super("Sanitation", "Manages waste, hygiene infrastructure, and disease prevention for the community.");
+        this.addRole(new CommunityRole(
+            "Sanitation Coordinator",
+            "Oversees waste collection, sewage management, composting, hygiene supply distribution, and sanitation infrastructure maintenance.",
+            700,
+        ));
+    }
+
+    static getInstance(): SanitationDomain {
+        if (!SanitationDomain.instance) {
+            SanitationDomain.instance = new SanitationDomain();
+        }
+        return SanitationDomain.instance;
     }
 }

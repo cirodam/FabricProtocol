@@ -15,9 +15,15 @@
   import FoodPage from './lib/pages/FoodPage.svelte';
   import CommunicationsPage from './lib/pages/CommunicationsPage.svelte';
   import AgriculturePage from './lib/pages/AgriculturePage.svelte';
+  import SanitationPage from './lib/pages/SanitationPage.svelte';
+  import WaterPage from './lib/pages/WaterPage.svelte';
   import HousingPage from './lib/pages/HousingPage.svelte';
   import HousingUnitPage from './lib/pages/HousingUnitPage.svelte';
   import AddHousingUnitPage from './lib/pages/AddHousingUnitPage.svelte';
+  import CourierPage from './lib/pages/CourierPage.svelte';
+  import DeathcarePage from './lib/pages/DeathcarePage.svelte';
+  import TransportPage from './lib/pages/TransportPage.svelte';
+  import EnrichmentPage from './lib/pages/EnrichmentPage.svelte';
   import DependencyCarePage from './lib/pages/DependencyCarePage.svelte';
   import SharedHouseholdPage from './lib/pages/SharedHouseholdPage.svelte';
   import AddSharedHouseholdPage from './lib/pages/AddSharedHouseholdPage.svelte';
@@ -173,6 +179,10 @@
     <CommunicationsPage {navigate} {path} />
   {:else if path === '/agriculture'}
     <AgriculturePage {navigate} {path} />
+  {:else if path === '/sanitation'}
+    <SanitationPage {navigate} />
+  {:else if path === '/water'}
+    <WaterPage {navigate} />
   {:else if path === '/food/kitchens/new'}
     <AddCommunityKitchenPage {navigate} />
   {:else if path.startsWith('/food/kitchens/')}
@@ -187,6 +197,14 @@
     <AddHousingUnitPage {navigate} />
   {:else if path.startsWith('/housing/')}
     <HousingUnitPage id={path.slice('/housing/'.length)} {navigate} />
+  {:else if path === '/courier'}
+    <CourierPage {navigate} />
+  {:else if path === '/deathcare'}
+    <DeathcarePage {navigate} />
+  {:else if path === '/transport'}
+    <TransportPage {navigate} />
+  {:else if path === '/enrichment'}
+    <EnrichmentPage {navigate} />
   {:else if path === '/dependency-care'}
     <DependencyCarePage {navigate} />
   {:else if path === '/dependency-care/households/new'}

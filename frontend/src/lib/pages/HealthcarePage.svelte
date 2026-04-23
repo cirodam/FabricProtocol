@@ -97,7 +97,7 @@
     <p class="error">{error}</p>
   {:else}
     <section class="section">
-      <h2>Domain Roles</h2>
+      <h2>Roles</h2>
       {#if roles.length === 0}
         <p class="muted">No roles defined.</p>
       {:else}
@@ -187,7 +187,8 @@
 
 <style>
   .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; }
-  .page-header h1 { margin: 0; }
+  h1 { margin: 0; font-size: 22px; font-weight: 600; }
+  h2 { margin: 0 0 12px; font-size: 16px; font-weight: 600; }
   .subtitle { margin: 0.25rem 0 0; color: var(--color-muted, #888); font-size: 0.95rem; }
 
   .section { margin-bottom: 2.5rem; }

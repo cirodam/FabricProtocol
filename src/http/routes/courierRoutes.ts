@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
     listRequests, getRequest, createRequest, cancelRequest, completeRequest, deleteRequest,
     listCouriers, addCourier,
+    listRoles, createRole, removeRole, assignRole, unassignRole,
 } from "../controllers/CourierController.js";
 
 const router = Router();
@@ -17,5 +18,12 @@ router.delete("/requests/:id",        deleteRequest);
 // Couriers (staff)
 router.get("/couriers",  listCouriers);
 router.post("/couriers", addCourier);
+
+// Domain roles
+router.get("/roles",               listRoles);
+router.post("/roles",              createRole);
+router.delete("/roles/:id",        removeRole);
+router.post("/roles/:id/assign",   assignRole);
+router.delete("/roles/:id/assign", unassignRole);
 
 export default router;
