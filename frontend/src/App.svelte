@@ -78,6 +78,18 @@
 
   // Session state
   let sessionHandle = $state<string | null>(null);
+  let communityName = $state('Community');
+
+  async function loadCommunityName() {
+    try {
+      const res = await fetch('/api/constitution');
+      if (res.ok) {
+        const doc = await res.json();
+        communityName = doc.communityName ?? 'Community';
+        document.title = communityName;
+      }
+    } catch { /* keep default */ }
+  }
 
   async function loadSession() {
     try {
@@ -110,11 +122,12 @@
   }
 
   loadSession();
+  loadCommunityName();
 </script>
 
 {#if !hideNav}
 <nav>
-  <span class="brand" role="button" tabindex="0" onclick={() => navigate('/')} onkeydown={(e) => e.key === 'Enter' && navigate('/')}>LocalCommunity</span>
+  <span class="brand" role="button" tabindex="0" onclick={() => navigate('/')} onkeydown={(e) => e.key === 'Enter' && navigate('/')}>{communityName}</span>
   <button class:active={path.startsWith('/calendar')} onclick={() => navigate('/calendar')}>Calendar</button>
   <button class:active={path.startsWith('/marketplace')} onclick={() => navigate('/marketplace')}>Marketplace</button>
   <button class:active={path.startsWith('/community')} onclick={() => navigate('/community')}>Community</button>

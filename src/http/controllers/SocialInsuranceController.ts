@@ -21,7 +21,9 @@ export function getSocialInsuranceSummary(_req: Request, res: Response): void {
 
     const poolBalance = bank.poolBalance;
     const monthlyInflow = Math.round((allMembers.length * 10_000) / 12);
-    const monthlyOutflow = Math.round(poolBalance * payoutRate);
+    const monthlyOutflow = eligibleMembers.length > 0
+        ? Math.round(poolBalance * payoutRate)
+        : 0;
     const perRetireeMonthly = eligibleMembers.length > 0
         ? Math.floor(Math.floor(poolBalance * payoutRate) / eligibleMembers.length)
         : 0;

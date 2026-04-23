@@ -14,20 +14,26 @@
 
   let status: Status | null = $state(null);
   let totalPersonYears = $state(0);
+  let communityName = $state('Community');
   let loading = $state(true);
   let error: string | null = $state(null);
 
   async function load() {
     try {
-      const [statusRes, membersRes] = await Promise.all([
+      const [statusRes, membersRes, constitutionRes] = await Promise.all([
         fetch('/api/status'),
         fetch('/api/members'),
+        fetch('/api/constitution'),
       ]);
       if (!statusRes.ok) throw new Error(`status ${statusRes.status}`);
       if (!membersRes.ok) throw new Error(`members ${membersRes.status}`);
       status = await statusRes.json();
       const members: Member[] = await membersRes.json();
       totalPersonYears = members.reduce((sum, m) => sum + (m.personYears ?? 0), 0);
+      if (constitutionRes.ok) {
+        const doc = await constitutionRes.json();
+        communityName = doc.communityName ?? 'Community';
+      }
     } catch (e) {
       error = (e as Error).message;
     } finally {
@@ -46,7 +52,7 @@
 
 <div class="home-hero">
   <div class="hero-inner">
-    <h1 class="hero-title">LocalCommunity</h1>
+    <h1 class="hero-title">{communityName}</h1>
     {#if status}
       <p class="hero-stats">
         <span class="hero-num members">{fmt(status.members)}</span> people with

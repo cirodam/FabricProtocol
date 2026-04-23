@@ -24,6 +24,7 @@
   interface ConstitutionDoc {
     version: number;
     adoptedAt: string;
+    communityName: string;
     parameters: Record<string, Parameter>;
     amendments: Amendment[];
   }
@@ -94,6 +95,7 @@
   <div>
     <span class="badge">Governance</span>
     <h1>Constitution</h1>
+    {#if doc}<p class="community-name-label">{doc.communityName}</p>{/if}
   </div>
   {#if doc}
     <div class="meta-info">
@@ -233,6 +235,8 @@
   }
 
   h1 { margin: 0; font-size: 22px; font-weight: 600; }
+
+  .community-name-label { margin: 2px 0 0; font-size: 13px; color: var(--text-secondary); }
 
   .meta-info {
     display: flex;
