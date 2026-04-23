@@ -1,4 +1,5 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
+import { CommunityRole } from "../../commons/CommunityRole.js";
 import { School } from "./School.js";
 import { SchoolLoader } from "./SchoolLoader.js";
 import { Library } from "./Library.js";
@@ -37,6 +38,11 @@ export class EducationDomain extends FunctionalDomain {
     constructor() {
         super("Education", "Organizes learning, skill transfer, and knowledge infrastructure for the community.",
             "00000000-0000-0000-0000-000000000005");
+        this.addRole(new CommunityRole(
+            "Education Coordinator",
+            "Coordinates community schools, libraries, and learning programs; ensures members have access to education at all life stages.",
+            700,
+        ));
     }
 
     static getInstance(): EducationDomain {

@@ -22,7 +22,10 @@
   ];
 
   const domainLinks = [
+    { label: 'Agriculture',    path: '/agriculture' },
+    { label: 'Education',      path: '/education' },
     { label: 'Food',           path: '/food' },
+    { label: 'Healthcare',     path: '/healthcare' },
     { label: 'Communications', path: '/communications' },
   ];
 

@@ -14,6 +14,7 @@
   import DemographicsPage from './lib/pages/DemographicsPage.svelte';
   import FoodPage from './lib/pages/FoodPage.svelte';
   import CommunicationsPage from './lib/pages/CommunicationsPage.svelte';
+  import AgriculturePage from './lib/pages/AgriculturePage.svelte';
   import HousingPage from './lib/pages/HousingPage.svelte';
   import HousingUnitPage from './lib/pages/HousingUnitPage.svelte';
   import AddHousingUnitPage from './lib/pages/AddHousingUnitPage.svelte';
@@ -170,6 +171,8 @@
     <FoodPage {navigate} />
   {:else if path === '/communications'}
     <CommunicationsPage {navigate} {path} />
+  {:else if path === '/agriculture'}
+    <AgriculturePage {navigate} {path} />
   {:else if path === '/food/kitchens/new'}
     <AddCommunityKitchenPage {navigate} />
   {:else if path.startsWith('/food/kitchens/')}

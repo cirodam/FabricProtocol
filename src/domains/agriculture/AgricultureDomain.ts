@@ -1,4 +1,5 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
+import { CommunityRole } from "../../commons/CommunityRole.js";
 
 /**
  * The Agriculture domain organizes food production for the community.
@@ -20,7 +21,26 @@ import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
  * enough of its own food that outside supply chains are a supplement, not a lifeline.
  */
 export class AgricultureDomain extends FunctionalDomain {
-    constructor() {
+    private static instance: AgricultureDomain;
+
+    private constructor() {
         super("Agriculture", "Organizes food production, cultivation, and agricultural knowledge for the community.");
+        this.addRole(new CommunityRole(
+            "Agriculture Coordinator",
+            "Coordinates relationships with local farmers and producers, tracks seasonal growing plans, and connects agricultural output to the food domain.",
+            700,
+        ));
+        this.addRole(new CommunityRole(
+            "Agriculture Coordinator",
+            "Coordinates relationships with local farmers and producers, tracks seasonal growing plans, and connects agricultural output to the food domain.",
+            700,
+        ));
+    }
+
+    static getInstance(): AgricultureDomain {
+        if (!AgricultureDomain.instance) {
+            AgricultureDomain.instance = new AgricultureDomain();
+        }
+        return AgricultureDomain.instance;
     }
 }

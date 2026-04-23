@@ -2,7 +2,8 @@ import { Router } from "express";
 import { listSchools, getSchool, createSchool, deleteSchool,
          addSchoolStaff, removeSchoolStaff,
          listLibraries, getLibrary, createLibrary, deleteLibrary,
-         addLibraryStaff, removeLibraryStaff } from "../controllers/EducationController.js";
+         addLibraryStaff, removeLibraryStaff,
+         listRoles, createRole, removeRole, assignRole, unassignRole } from "../controllers/EducationController.js";
 
 const router = Router();
 
@@ -19,5 +20,11 @@ router.post("/libraries",                        createLibrary);
 router.delete("/libraries/:id",                  deleteLibrary);
 router.post("/libraries/:id/staff",              addLibraryStaff);
 router.delete("/libraries/:id/staff/:memberId",  removeLibraryStaff);
+
+router.get("/roles",               listRoles);
+router.post("/roles",              createRole);
+router.delete("/roles/:id",        removeRole);
+router.post("/roles/:id/assign",   assignRole);
+router.delete("/roles/:id/assign", unassignRole);
 
 export default router;

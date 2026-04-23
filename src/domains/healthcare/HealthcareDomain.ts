@@ -1,4 +1,5 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
+import { CommunityRole } from "../../commons/CommunityRole.js";
 import { Clinic } from "./Clinic.js";
 import { ClinicLoader } from "./ClinicLoader.js";
 import { DentalClinic } from "./DentalClinic.js";
@@ -12,6 +13,11 @@ export class HealthcareDomain extends FunctionalDomain {
     constructor() {
         super("Healthcare", "Provides medical care and health services to community members.",
             "00000000-0000-0000-0000-000000000004");
+        this.addRole(new CommunityRole(
+            "Healthcare Coordinator",
+            "Coordinates community health services, liaises with clinics and practitioners, and ensures members can access care.",
+            700,
+        ));
     }
 
     static getInstance(): HealthcareDomain {

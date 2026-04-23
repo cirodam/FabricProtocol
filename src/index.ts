@@ -58,6 +58,7 @@ import { MessageLoader } from "./messaging/MessageLoader.js";
 import { ReferendumService } from "./referendum/ReferendumService.js";
 import { ReferendumLoader } from "./referendum/ReferendumLoader.js";
 import { CommunicationsDomain } from "./domains/communications/CommunicationsDomain.js";
+import { AgricultureDomain } from "./domains/agriculture/AgricultureDomain.js";
 import { CommunityRole } from "./commons/CommunityRole.js";
 import { SocialInsuranceBank } from "./social_insurance/SocialInsuranceBank.js";
 import { SocialInsuranceMemberLoader } from "./social_insurance/SocialInsuranceMemberLoader.js";
@@ -134,6 +135,7 @@ async function init(): Promise<void> {
   const communityOrganizerRole = new CommunityRole("Community Organizer", "Coordinates community events, outreach, and internal communications.", 800);
   CommunicationsDomain.getInstance().addRole(communityOrganizerRole);
   commonwealth.addDomain(CommunicationsDomain.getInstance());
+  commonwealth.addDomain(AgricultureDomain.getInstance());
   commonwealth.addDomain(HousingDomain.getInstance());
   commonwealth.addDomain(FoodDomain.getInstance());
   commonwealth.addDomain(HealthcareDomain.getInstance());
