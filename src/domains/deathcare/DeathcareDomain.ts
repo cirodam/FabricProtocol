@@ -50,7 +50,7 @@ export class DeceasedRecord {
  * precautions, and with MemberService on the discharge of deceased members.
  */
 export class DeathcareDomain extends FunctionalDomain {
-    private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000014";
+    private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000017";
     private static instance: DeathcareDomain;
 
     private records: Map<string, DeceasedRecord> = new Map();

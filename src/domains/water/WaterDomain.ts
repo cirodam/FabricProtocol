@@ -22,7 +22,7 @@ export class WaterDomain extends FunctionalDomain {
     private static instance: WaterDomain;
 
     constructor() {
-        super("Water", "Manages freshwater extraction, treatment, storage, distribution, and irrigation for the community.");
+        super("Water", "Manages freshwater extraction, treatment, storage, distribution, and irrigation for the community.", "00000000-0000-0000-0000-000000000009");
         this.addRole(new CommunityRole(
             "Water Coordinator",
             "Oversees water source management, treatment, storage, distribution infrastructure, irrigation coordination, and water quality monitoring.",

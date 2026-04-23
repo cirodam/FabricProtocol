@@ -21,23 +21,39 @@
     { label: 'Settings',     path: '/admin/settings' },
   ];
 
-  const domainLinks = [
-    { label: 'Agriculture',     path: '/agriculture' },
-    { label: 'Child Care',      path: '/child-care' },
-    { label: 'Communications',  path: '/communications' },
-    { label: 'Courier',         path: '/courier' },
-    { label: 'Deathcare',       path: '/deathcare' },
-    { label: 'Dependency Care', path: '/dependency-care' },
-    { label: 'Education',       path: '/education' },
-    { label: 'Enrichment',      path: '/enrichment' },
-    { label: 'Fire',            path: '/fire' },
-    { label: 'Food',            path: '/food' },
-    { label: 'Healthcare',      path: '/healthcare' },
-    { label: 'Housing',         path: '/housing' },
-    { label: 'Sanitation',      path: '/sanitation' },
-    { label: 'Transport',       path: '/transport' },
-    { label: 'Water',           path: '/water' },
+  const allDomainLinks = [
+    { label: 'Agriculture',     path: '/agriculture',     id: '00000000-0000-0000-0000-000000000007' },
+    { label: 'Child Care',      path: '/child-care',      id: '00000000-0000-0000-0000-000000000012' },
+    { label: 'Communications',  path: '/communications',  id: '00000000-0000-0000-0000-000000000006' },
+    { label: 'Courier',         path: '/courier',         id: '00000000-0000-0000-0000-000000000010' },
+    { label: 'Deathcare',       path: '/deathcare',       id: '00000000-0000-0000-0000-000000000017' },
+    { label: 'Dependency Care', path: '/dependency-care', id: '00000000-0000-0000-0000-000000000011' },
+    { label: 'Education',       path: '/education',       id: '00000000-0000-0000-0000-000000000005' },
+    { label: 'Enrichment',      path: '/enrichment',      id: '00000000-0000-0000-0000-000000000016' },
+    { label: 'Fire',            path: '/fire',            id: '00000000-0000-0000-0000-000000000013' },
+    { label: 'Food',            path: '/food',            id: '00000000-0000-0000-0000-000000000003' },
+    { label: 'Healthcare',      path: '/healthcare',      id: '00000000-0000-0000-0000-000000000004' },
+    { label: 'Housing',         path: '/housing',         id: '00000000-0000-0000-0000-000000000001' },
+    { label: 'Sanitation',      path: '/sanitation',      id: '00000000-0000-0000-0000-000000000008' },
+    { label: 'Transport',       path: '/transport',       id: '00000000-0000-0000-0000-000000000015' },
+    { label: 'Water',           path: '/water',           id: '00000000-0000-0000-0000-000000000009' },
   ];
+
+  // Fetch enabled domain IDs; fall back to showing all if the request fails.
+  let enabledIds = $state<Set<string> | null>(null);
+
+  fetch('/api/admin/domains')
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then((data: { id: string; enabled: boolean }[]) => {
+      enabledIds = new Set(data.filter(d => d.enabled).map(d => d.id));
+    })
+    .catch(() => { enabledIds = null; });
+
+  const domainLinks = $derived(
+    enabledIds === null
+      ? allDomainLinks
+      : allDomainLinks.filter(l => enabledIds!.has(l.id))
+  );
 
   function isActive(linkPath: string): boolean {
     if (path === linkPath) return true;

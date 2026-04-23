@@ -19,7 +19,7 @@ export class SanitationDomain extends FunctionalDomain {
     private static instance: SanitationDomain;
 
     constructor() {
-        super("Sanitation", "Manages waste, hygiene infrastructure, and disease prevention for the community.");
+        super("Sanitation", "Manages waste, hygiene infrastructure, and disease prevention for the community.", "00000000-0000-0000-0000-000000000008");
         this.addRole(new CommunityRole(
             "Sanitation Coordinator",
             "Oversees waste collection, sewage management, composting, hygiene supply distribution, and sanitation infrastructure maintenance.",

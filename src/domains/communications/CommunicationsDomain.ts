@@ -7,7 +7,7 @@ export class CommunicationsDomain extends FunctionalDomain {
     private static instance: CommunicationsDomain;
 
     private constructor() {
-        super("Communications", "Manages community communications infrastructure: radio stations, internet access points, postal hubs, and similar facilities.");
+        super("Communications", "Manages community communications infrastructure: radio stations, internet access points, postal hubs, and similar facilities.", "00000000-0000-0000-0000-000000000006");
     }
 
     static getInstance(): CommunicationsDomain {

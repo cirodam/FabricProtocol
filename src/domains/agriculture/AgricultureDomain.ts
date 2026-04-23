@@ -24,7 +24,7 @@ export class AgricultureDomain extends FunctionalDomain {
     private static instance: AgricultureDomain;
 
     private constructor() {
-        super("Agriculture", "Organizes food production, cultivation, and agricultural knowledge for the community.");
+        super("Agriculture", "Organizes food production, cultivation, and agricultural knowledge for the community.", "00000000-0000-0000-0000-000000000007");
         this.addRole(new CommunityRole(
             "Agriculture Coordinator",
             "Coordinates relationships with local farmers and producers, tracks seasonal growing plans, and connects agricultural output to the food domain.",
