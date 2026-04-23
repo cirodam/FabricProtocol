@@ -1,10 +1,9 @@
 import { IEconomicActor } from "../IEconomicActor.js";
 import { Bank } from "../bank/Bank.js";
 import { CommunityRole } from "./CommunityRole.js";
-import { FunctionalDomain } from "./domain/FunctionalDomain.js";
+import { FunctionalDomain, BudgetLineItem } from "./domain/FunctionalDomain.js";
 import { LedgerService } from "../ledger/LedgerService.js";
 import { AssetLedger } from "../ledger/AssetLedger.js";
-import { FoodDomain } from "../domains/food/FoodDomain.js";
 
 // The Commons represents the community's collective investment in itself.
 // It holds pooled kin used to meet basic needs, provide care for dependents,
@@ -34,7 +33,7 @@ export class Commonwealth implements IEconomicActor {
     }
 
     getId(): string { return this.id; }
-    getDisplayName(): string { return "Commons"; }
+    getDisplayName(): string { return "Community"; }
     getHandle(): string { return "commons"; }
 
     addPosition(position: CommunityRole): void {
@@ -102,67 +101,75 @@ export class Commonwealth implements IEconomicActor {
     }
 
     /**
-     * Returns monthly budget obligations broken down by category.
+     * Returns monthly budget obligations broken down by domain.
      *
      * Shape:
      *   {
-     *     foodAllowance: number,     // universal member food allowance (per member × count)
-     *     commons:       number,     // positions held at the Commonwealth level
-     *     domains:       { name, payroll }[],
-     *     total:         number
+     *     commons:  { lineItems: BudgetLineItem[]; total: number },
+     *     domains:  { name: string; lineItems: BudgetLineItem[]; total: number }[],
+     *     total:    number
      *   }
      */
-    getOutflows(): { foodAllowance: number; commons: number; domains: { name: string; payroll: number }[]; total: number } {
-        const foodAllowance = FoodDomain.getInstance().monthlyAllowanceTotal();
-
-        const commons = this.positions
+    getOutflows(): {
+        commons: { lineItems: BudgetLineItem[]; total: number };
+        domains: { name: string; handle: string; lineItems: BudgetLineItem[]; total: number }[];
+        total: number;
+    } {
+        const commonsLineItems: BudgetLineItem[] = this.positions
             .filter(p => p.isActive())
-            .reduce((sum, p) => sum + p.kinPerMonth, 0);
+            .map(p => ({ label: p.title, amount: p.kinPerMonth }));
+        const commonsTotal = commonsLineItems.reduce((sum, i) => sum + i.amount, 0);
 
-        const domains = this.domains.map(d => ({
-            name: d.name,
-            payroll: d.getPayroll(),
-        }));
+        const domains = this.domains.map(d => {
+            const budget = d.getBudget();
+            return { name: d.getDisplayName(), handle: d.getHandle(), lineItems: budget.lineItems, total: budget.total };
+        });
 
-        const total = foodAllowance + commons + domains.reduce((sum, d) => sum + d.payroll, 0);
-
-        return { foodAllowance, commons, domains, total };
+        const total = commonsTotal + domains.reduce((sum, d) => sum + d.total, 0);
+        return { commons: { lineItems: commonsLineItems, total: commonsTotal }, domains, total };
     }
 
     // Collect demurrage from all non-exempt accounts into the Commons primary account.
+    // Only the portion of each balance above `floor` is taxable.
     // Always runs — commons levy is unconditional.
-    assessDemurrage(rate: number): void {
+    assessDemurrage(rate: number, floor: number = 0): void {
         const bankInst = Bank.getInstance();
         const commonsAccount = bankInst.getPrimaryAccount(this.id);
         if (!commonsAccount) return;
 
         for (const account of bankInst.getAllAccounts()) {
             if (account.exemptFromDemurrage || account.kin <= 0) continue;
-            const amount = Math.round(account.kin * rate * 100) / 100;
+            const taxable = Math.max(0, account.kin - floor);
+            const amount = Math.round(taxable * rate * 100) / 100;
             if (amount > 0) {
-                bankInst.transfer(account.id, commonsAccount.id, "kin", amount, "demurrage: commons");
+                bankInst.transfer(account.id, commonsAccount.id, "kin", amount, "demurrage: community");
             }
         }
     }
 
-    /** Total kin held in non-exempt accounts — the base against which the levy is applied. */
-    taxableSupply(): number {
+    /**
+     * Total kin above the floor in non-exempt accounts — the actual tax base for the levy.
+     * floor defaults to 0 (full balance is taxable, matching the old behaviour).
+     */
+    taxableSupply(floor: number = 0): number {
         let total = 0;
         for (const account of Bank.getInstance().getAllAccounts()) {
-            if (!account.exemptFromDemurrage && account.kin > 0) total += account.kin;
+            if (!account.exemptFromDemurrage && account.kin > 0)
+                total += Math.max(0, account.kin - floor);
         }
         return total;
     }
 
     /**
-     * Derives the levy rate needed to exactly cover monthly outflows.
-     * rate = totalOutflows / taxableSupply
+     * Derives the levy rate needed to exactly cover monthly outflows,
+     * given that only balances above `floor` are taxable.
+     * rate = totalOutflows / taxableSupply(floor)
      * Returns 0 if there are no outflows or no taxable balances.
      */
-    computedLevyRate(): number {
+    computedLevyRate(floor: number = 0): number {
         const outflows = this.getOutflows().total;
         if (outflows === 0) return 0;
-        const supply = this.taxableSupply();
+        const supply = this.taxableSupply(floor);
         if (supply === 0) return 0;
         return outflows / supply;
     }

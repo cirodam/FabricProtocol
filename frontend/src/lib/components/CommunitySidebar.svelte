@@ -20,6 +20,11 @@
     { label: 'Settings',     path: '/admin/settings' },
   ];
 
+  const domainLinks = [
+    { label: 'Food',           path: '/food' },
+    { label: 'Communications', path: '/communications' },
+  ];
+
   function isActive(linkPath: string): boolean {
     if (path === linkPath) return true;
     // These paths are prefixes of sibling links, so require exact match only
@@ -43,6 +48,16 @@
   <div class="sidebar-section">
     <div class="sidebar-heading">Governance</div>
     {#each governanceLinks as link}
+      <button
+        class="sidebar-link"
+        class:active={isActive(link.path)}
+        onclick={() => navigate(link.path)}
+      >{link.label}</button>
+    {/each}
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-heading">Domains</div>
+    {#each domainLinks as link}
       <button
         class="sidebar-link"
         class:active={isActive(link.path)}

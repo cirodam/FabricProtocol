@@ -57,6 +57,8 @@ import { MessageService } from "./messaging/MessageService.js";
 import { MessageLoader } from "./messaging/MessageLoader.js";
 import { ReferendumService } from "./referendum/ReferendumService.js";
 import { ReferendumLoader } from "./referendum/ReferendumLoader.js";
+import { CommunicationsDomain } from "./domains/communications/CommunicationsDomain.js";
+import { CommunityRole } from "./commons/CommunityRole.js";
 
 
 async function init(): Promise<void> {
@@ -104,6 +106,9 @@ async function init(): Promise<void> {
 
   // ── Register domains with Commonwealth ──────────────────────────────────────
   const commonwealth = Commonwealth.getInstance();
+  const communityOrganizerRole = new CommunityRole("Community Organizer", "Coordinates community events, outreach, and internal communications.", 800);
+  CommunicationsDomain.getInstance().addRole(communityOrganizerRole);
+  commonwealth.addDomain(CommunicationsDomain.getInstance());
   commonwealth.addDomain(HousingDomain.getInstance());
   commonwealth.addDomain(FoodDomain.getInstance());
   commonwealth.addDomain(HealthcareDomain.getInstance());
@@ -125,13 +130,16 @@ async function init(): Promise<void> {
     intervalMs: every.months(1),
     run: () => {
       if (CentralBank.getInstance().unrecoveredKin > 0)
-        CentralBank.getInstance().assessDemurrage(constitution.bankDemurrageRate);
+        CentralBank.getInstance().assessDemurrage(constitution.bankDemurrageRate, constitution.demurrageFloor);
     },
   });
   scheduler.register({
     name: "commons-levy",
     intervalMs: every.months(1),
-    run: () => Commonwealth.getInstance().assessDemurrage(Commonwealth.getInstance().computedLevyRate()),
+    run: () => {
+      const floor = constitution.demurrageFloor;
+      Commonwealth.getInstance().assessDemurrage(Commonwealth.getInstance().computedLevyRate(floor), floor);
+    },
   });
   scheduler.register({
     name: "payroll",

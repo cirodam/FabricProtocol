@@ -19,6 +19,12 @@
   let loading = $state(true);
   let error: string | null = $state(null);
 
+  interface BudgetLineItem { label: string; amount: number; }
+  let budgetLineItems = $state<BudgetLineItem[]>([]);
+  let budgetTotal = $state(0);
+
+  function fmtKin(n: number) { return n.toLocaleString(undefined, { maximumFractionDigits: 0 }); }
+
   interface KitchenDto { id: string; name: string; description: string; staffCount: number; }
   let kitchens = $state<KitchenDto[]>([]);
 
@@ -32,16 +38,18 @@
 
   async function load() {
     try {
-      const [reqRes, settingsRes, kitchensRes, millsRes] = await Promise.all([
+      const [reqRes, settingsRes, kitchensRes, millsRes, outflowsRes] = await Promise.all([
         fetch('/api/food/requirements'),
         fetch('/api/food/settings'),
         fetch('/api/food/kitchens'),
         fetch('/api/food/mills'),
+        fetch('/api/community/outflows'),
       ]);
       if (!reqRes.ok) throw new Error(`requirements: ${reqRes.status}`);
       if (!settingsRes.ok) throw new Error(`settings: ${settingsRes.status}`);
       if (!kitchensRes.ok) throw new Error(`kitchens: ${kitchensRes.status}`);
       if (!millsRes.ok) throw new Error(`mills: ${millsRes.status}`);
+      if (!outflowsRes.ok) throw new Error(`outflows: ${outflowsRes.status}`);
       totals = await reqRes.json();
       const settings = await settingsRes.json();
       monthlyAllowance = settings.monthlyFoodAllowance;
@@ -51,6 +59,10 @@
       kitchens = kd.kitchens;
       const md = await millsRes.json();
       mills = md.mills;
+      const outflows = await outflowsRes.json();
+      const foodDomain = outflows.payroll.domains.find((d: { handle: string }) => d.handle === 'food');
+      budgetLineItems = foodDomain?.lineItems ?? [];
+      budgetTotal = foodDomain?.total ?? 0;
     } catch (e) {
       error = (e as Error).message;
     } finally {
@@ -103,12 +115,29 @@
 <div class="page-header">
   <h1>Food</h1>
 </div>
+<p class="domain-desc">The Food domain is responsible for feeding every community member. It manages the universal monthly food allowance, community kitchens, mills, and other food production infrastructure. The community funds this domain so that no member ever goes hungry for lack of money.</p>
 
 {#if loading}
   <p class="muted">Loading…</p>
 {:else if error}
   <p class="error">{error}</p>
 {:else}
+  {#if budgetLineItems.length > 0}
+  <section class="section">
+    <h2>Budget</h2>
+    <table class="budget-table">
+      <thead><tr><th>Line item</th><th class="num">Kin / mo</th></tr></thead>
+      <tbody>
+        {#each budgetLineItems as item (item.label)}
+          <tr><td>{item.label}</td><td class="num">{fmtKin(item.amount)}</td></tr>
+        {/each}
+      </tbody>
+      <tfoot>
+        <tr class="total-row"><td>Total</td><td class="num">{fmtKin(budgetTotal)}</td></tr>
+      </tfoot>
+    </table>
+  </section>
+  {/if}
   <section class="section">
     <h2>Monthly Food Allowance</h2>
     <div class="allowance-row">
@@ -238,13 +267,40 @@
     display: flex;
     align-items: baseline;
     gap: 12px;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
   }
 
   h1 { margin: 0; font-size: 22px; font-weight: 600; }
 
+  .domain-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 28px;
+    max-width: 680px;
+  }
+
   .section { margin-bottom: 32px; }
   h2 { margin: 0 0 16px; font-size: 16px; font-weight: 600; }
+
+  .budget-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .budget-table th {
+    text-align: left;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+  .budget-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .budget-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .budget-table tfoot .total-row td { font-weight: 700; border-top: 2px solid var(--border); border-bottom: none; }
 
   .allowance-row {
     display: flex;

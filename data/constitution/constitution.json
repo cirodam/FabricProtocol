@@ -91,6 +91,15 @@
         "min": 0,
         "max": 0.1
       }
+    },
+    "demurrageFloor": {
+      "value": 1000,
+      "authority": "citizens-assembly",
+      "description": "Balance floor below which no demurrage is charged. Only the portion of an account balance above this threshold is subject to the levy or bank demurrage. Expressed in kin. Protects small balances — roughly one month of person-year income — from being eroded.",
+      "constraints": {
+        "min": 0,
+        "max": 5000
+      }
     }
   },
   "amendments": []

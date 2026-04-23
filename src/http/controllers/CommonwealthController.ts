@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Commonwealth } from "../../commons/Commonwealth.js";
 import { Bank } from "../../bank/Bank.js";
 import { Scheduler } from "../../scheduler/Scheduler.js";
+import { Constitution } from "../../commons/Constitution.js";
 
 const cw = () => Commonwealth.getInstance();
 
@@ -21,12 +22,14 @@ export function getDemurrage(_req: Request, res: Response): void {
     const scheduler = Scheduler.getInstance();
     const jobInfo = scheduler?.getJobInfo("commons-levy") ?? null;
 
-    const rate = commonwealth.computedLevyRate();
-    const taxableSupply = commonwealth.taxableSupply();
+    const floor = Constitution.getInstance().demurrageFloor;
+    const rate = commonwealth.computedLevyRate(floor);
+    const taxableSupply = commonwealth.taxableSupply(floor);
 
     res.json({
         rate,
         taxableSupply,
+        floor,
         projectedCollection: commonwealth.getOutflows().total,
         lastRun: jobInfo?.lastRun ?? null,
         nextRun: jobInfo?.nextRun ?? null,

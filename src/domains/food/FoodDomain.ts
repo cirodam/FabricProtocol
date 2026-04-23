@@ -1,4 +1,4 @@
-import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
+import { FunctionalDomain, DomainBudget } from "../../commons/domain/FunctionalDomain.js";
 import { Bank } from "../../bank/Bank.js";
 import { MemberService } from "../../member/MemberService.js";
 import { NutritionalProfile, DEFAULT_NUTRITIONAL_PROFILES, getMemberType } from "./NutritionalProfile.js";
@@ -131,6 +131,15 @@ export class FoodDomain extends FunctionalDomain {
         const amount = this.getMonthlyFoodAllowance();
         const memberCount = MemberService.getInstance().getAll().length;
         return amount * memberCount;
+    }
+
+    getBudget(): DomainBudget {
+        const base = super.getBudget();
+        const allowance = this.monthlyAllowanceTotal();
+        if (allowance > 0) {
+            base.lineItems.unshift({ label: 'Food allowance (all members)', amount: allowance });
+        }
+        return { lineItems: base.lineItems, total: base.total + allowance };
     }
 
     // Sum the daily nutritional requirements across all current community members.

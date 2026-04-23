@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { CentralBank } from "../../central_bank/CentralBank.js";
 import { Commonwealth } from "../../commons/Commonwealth.js";
+import { Constitution } from "../../commons/Constitution.js";
 import { MemberService } from "../../member/MemberService.js";
 import { Scheduler } from "../../scheduler/Scheduler.js";
 
@@ -34,10 +35,12 @@ export function getEndowments(_req: Request, res: Response): void {
 
 // GET /demurrage-schedule
 export function getDemurrageSchedule(_req: Request, res: Response): void {
-    const rate = Commonwealth.getInstance().computedLevyRate();
+    const floor = Constitution.getInstance().demurrageFloor;
+    const rate = Commonwealth.getInstance().computedLevyRate(floor);
     const info = Scheduler.getInstance()?.getJobInfo("commons-levy");
     res.json({
         rate,
+        floor,
         lastRun: info?.lastRun ?? null,
         nextRun: info?.nextRun ?? null,
         intervalMs: info?.intervalMs ?? null,

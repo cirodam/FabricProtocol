@@ -131,6 +131,13 @@ export const DEFAULT_CONSTITUTION: ConstitutionDocument = {
                 "Monthly rate at which the Central Bank applies demurrage to recover unanchored kin.",
             constraints: { min: 0, max: 0.10 },
         },
+        demurrageFloor: {
+            value: 1_000,
+            authority: "referendum",
+            description:
+                "Balance floor below which no demurrage is charged. Only the portion of an account balance above this threshold is subject to the levy or bank demurrage. Expressed in kin. Protects small balances — roughly one month of person-year income — from being eroded.",
+            constraints: { min: 0, max: 5_000 },
+        },
     },
     amendments: [],
     authorityMap: [
@@ -139,6 +146,7 @@ export const DEFAULT_CONSTITUTION: ConstitutionDocument = {
         { action: "exclude-member",           body: "referendum", description: "Permanently excluding a member" },
         { action: "change-levy-rate",         body: "referendum", description: "Changing the commons levy rate" },
         { action: "change-demurrage-rate",    body: "referendum", description: "Changing the bank demurrage rate" },
+        { action: "change-demurrage-floor",   body: "referendum", description: "Changing the demurrage-free balance floor" },
         { action: "amend-constitution",       body: "referendum", description: "Amending the constitution" },
         { action: "join-federation",          body: "referendum", description: "Joining a federation" },
         { action: "leave-federation",         body: "referendum", description: "Leaving a federation" },
@@ -247,6 +255,7 @@ export class Constitution {
 
     get deliberationPeriodDays(): number  { return this.get<number>("deliberationPeriodDays"); }
     get bankDemurrageRate(): number       { return this.get<number>("bankDemurrageRate"); }
+    get demurrageFloor(): number          { return this.get<number>("demurrageFloor"); }
     get kinPerPersonYear(): number        { return this.get<number>("kinPerPersonYear"); }
 
     /** Which governance body must authorize the given action. Returns null if not in the map. */

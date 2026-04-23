@@ -127,26 +127,28 @@ export class CentralBank implements IEconomicActor {
 
     /**
      * Calculate what demurrage would collect at the given rate without applying it.
+     * Only the portion of each balance above `floor` is taxable.
      * Returns the total amount that would be collected across all non-exempt accounts.
      */
-    calculateDemurrage(rate: number): number {
+    calculateDemurrage(rate: number, floor: number = 0): number {
         if (this.moneyInCirculation <= 0) return 0;
         let total = 0;
         for (const account of Bank.getInstance().getAllAccounts()) {
             if (account.exemptFromDemurrage || account.kin <= 0) continue;
-            total += Math.round(account.kin * rate * 100) / 100;
+            const taxable = Math.max(0, account.kin - floor);
+            total += Math.round(taxable * rate * 100) / 100;
         }
         return total;
     }
 
     /**
      * Collect demurrage from all non-exempt accounts and return it to the bank.
-     * Demurrage is assessed as a percentage of each account's current balance.
+     * Only the portion of each balance above `floor` is subject to demurrage.
      * Only runs when money is in circulation (i.e. the bank account is negative).
      * This is the mechanism by which the money supply gradually contracts after
      * member exits result in shortfalls.
      */
-    assessDemurrage(rate: number): void {
+    assessDemurrage(rate: number, floor: number = 0): void {
         if (this.moneyInCirculation <= 0) return;
 
         const bankInst = Bank.getInstance();
@@ -155,7 +157,8 @@ export class CentralBank implements IEconomicActor {
 
         for (const account of bankInst.getAllAccounts()) {
             if (account.exemptFromDemurrage || account.kin <= 0) continue;
-            const amount = Math.round(account.kin * rate * 100) / 100;
+            const taxable = Math.max(0, account.kin - floor);
+            const amount = Math.round(taxable * rate * 100) / 100;
             if (amount > 0) {
                 bankInst.transfer(account.id, bankAccount.id, "kin", amount, "demurrage: bank recovery");
             }

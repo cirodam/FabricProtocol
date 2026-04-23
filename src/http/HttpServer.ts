@@ -33,6 +33,7 @@ import applicationRoutes from "./routes/applicationRoutes.js";
 import calendarRoutes from "./routes/calendarRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import referendumRoutes from "./routes/referendumRoutes.js";
+import communicationsRoutes from "./routes/communicationsRoutes.js";
 import networkRoutes from "../network/networkRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import currencyBoardRoutes from "./routes/currencyBoardRoutes.js";
@@ -118,6 +119,7 @@ export class HttpServer {
         this.app.use("/api/constitution", constitutionRoutes);
         this.app.use("/api/provisioning", provisioningRoutes);
         this.app.use("/api/applications", applicationRoutes);
+        this.app.use("/api/communications", communicationsRoutes);
         this.app.use("/api/calendar", calendarRoutes);
         this.app.use("/api/messages", messageRoutes);
         this.app.use("/api/referenda", referendumRoutes);

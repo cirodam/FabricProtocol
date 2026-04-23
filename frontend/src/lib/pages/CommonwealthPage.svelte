@@ -9,14 +9,22 @@
   interface DemurrageInfo {
     rate: number;
     taxableSupply: number;
+    floor: number;
     projectedCollection: number;
     lastRun: string | null;
     nextRun: string | null;
   }
-  interface DomainPayroll { name: string; payroll: number; }
+  interface BudgetLineItem { label: string; amount: number; }
+  interface DomainBudget { lineItems: BudgetLineItem[]; total: number; }
   interface Outflows {
-    payroll: { foodAllowance: number; commons: number; domains: DomainPayroll[]; total: number };
+    payroll: {
+      commons: DomainBudget;
+      domains: ({ name: string; handle: string } & DomainBudget)[];
+      total: number;
+    };
   }
+
+  const DOMAIN_PAGES = new Set(['food', 'housing', 'healthcare', 'education', 'provisioning', 'communications']);
 
   let summary: Summary | null = $state(null);
   let demurrage: DemurrageInfo | null = $state(null);
@@ -78,7 +86,7 @@
       <!-- STAT CARDS -->
       <div class="stat-row">
         <div class="stat-card">
-          <div class="stat-label">Commons Balance</div>
+          <div class="stat-label">Community Balance</div>
           <div class="stat-value">{fmt(summary.kin)}</div>
           <div class="stat-sub">kin in community fund</div>
         </div>
@@ -90,12 +98,12 @@
         <div class="stat-card accent">
           <div class="stat-label">Dues Rate</div>
           <div class="stat-value">{demurrage.rate === 0 ? '0%' : fmtPct(demurrage.rate)}</div>
-          <div class="stat-sub">of all member balances, collected monthly</div>
+          <div class="stat-sub">of taxable balances, collected monthly</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Dues Base</div>
           <div class="stat-value">{fmt(demurrage.taxableSupply)}</div>
-          <div class="stat-sub">total kin subject to dues</div>
+          <div class="stat-sub">kin above {fmt(demurrage.floor)}-kin floor subject to dues</div>
         </div>
       </div>
 
@@ -104,53 +112,58 @@
           No budget is set. Community dues are <strong>0%</strong> — nothing will be collected this month.
         {:else}
           Dues are derived from the budget: <strong>{fmt(outflows.payroll.total)} kin</strong> needed
-          ÷ <strong>{fmt(demurrage.taxableSupply)} kin</strong> in member balances
-          = <strong>{fmtPct(demurrage.rate)}</strong> collected automatically from all member accounts each month.
+          ÷ <strong>{fmt(demurrage.taxableSupply)} kin</strong> taxable (balances above the {fmt(demurrage.floor)}-kin floor)
+          = <strong>{fmtPct(demurrage.rate)}</strong> collected automatically each month.
         {/if}
       </p>
 
       <!-- OUTFLOWS TABLE -->
       <section class="budget-section">
-        <h2>Payroll</h2>
-        <p class="section-desc">Monthly obligations the commons fund must meet. The dues rate adjusts automatically to cover these exactly.</p>
+        <h2>Monthly Outflows</h2>
+        <p class="section-desc">Monthly obligations the community fund must meet, organised by domain. The dues rate adjusts automatically to cover these exactly.</p>
 
-        <table class="outflows-table">
-          <thead>
-            <tr>
-              <th>Domain</th>
-              <th class="num">Monthly payroll (kin)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#if outflows.payroll.foodAllowance > 0}
-              <tr class="allowance-row">
-                <td>Food allowance <span class="muted-inline">(universal, all members)</span></td>
-                <td class="num">{fmt(outflows.payroll.foodAllowance)}</td>
-              </tr>
-            {/if}
-            {#if outflows.payroll.commons > 0}
+        {#if outflows.payroll.total === 0}
+          <p class="muted">No payroll roles assigned yet. The levy rate will be 0%.</p>
+        {:else}
+          <table class="domain-table">
+            <thead>
               <tr>
-                <td>Community (governance)</td>
-                <td class="num">{fmt(outflows.payroll.commons)}</td>
+                <th>Domain</th>
+                <th class="num">Kin / mo</th>
+                <th></th>
               </tr>
-            {/if}
-            {#each outflows.payroll.domains as d (d.name)}
-              <tr>
-                <td>{d.name}</td>
-                <td class="num">{#if d.payroll > 0}{fmt(d.payroll)}{:else}<span class="muted">—</span>{/if}</td>
+            </thead>
+            <tbody>
+              {#if outflows.payroll.commons.total > 0}
+                <tr>
+                  <td>Community (governance)</td>
+                  <td class="num">{fmt(outflows.payroll.commons.total)}</td>
+                  <td></td>
+                </tr>
+              {/if}
+              {#each outflows.payroll.domains as d (d.name)}
+                {#if d.total > 0}
+                  <tr>
+                    <td>{d.name}</td>
+                    <td class="num">{fmt(d.total)}</td>
+                    <td class="view-cell">
+                      {#if DOMAIN_PAGES.has(d.handle)}
+                        <button class="view-link" onclick={() => navigate(`/${d.handle}`)}>View →</button>
+                      {/if}
+                    </td>
+                  </tr>
+                {/if}
+              {/each}
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td>Total</td>
+                <td class="num">{fmt(outflows.payroll.total)}</td>
+                <td></td>
               </tr>
-            {/each}
-            {#if outflows.payroll.foodAllowance === 0 && outflows.payroll.domains.length === 0 && outflows.payroll.commons === 0}
-              <tr><td colspan="2" class="muted">No payroll roles assigned yet. The levy rate will be 0%.</td></tr>
-            {/if}
-          </tbody>
-          <tfoot>
-            <tr class="total-row">
-              <td>Total</td>
-              <td class="num">{fmt(outflows.payroll.total)}</td>
-            </tr>
-          </tfoot>
-        </table>
+            </tfoot>
+          </table>
+        {/if}
       </section>
 
     {/if}
@@ -218,17 +231,14 @@
   }
 
   .muted { color: var(--text-secondary); }
-  .muted-inline { font-size: 12px; color: var(--text-secondary); }
   .error { color: #ef5350; }
 
-  .allowance-row td { font-weight: 500; }
-
-  .outflows-table {
+  .domain-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
   }
-  .outflows-table th {
+  .domain-table th {
     text-align: left;
     padding: 6px 12px;
     font-size: 11px;
@@ -238,15 +248,25 @@
     color: var(--text-secondary);
     border-bottom: 1px solid var(--border);
   }
-  .outflows-table td {
-    padding: 8px 12px;
+  .domain-table td {
+    padding: 10px 12px;
     border-bottom: 1px solid var(--border);
   }
-  .outflows-table .num { text-align: right; font-variant-numeric: tabular-nums; }
-  .outflows-table tfoot .total-row td {
+  .domain-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .domain-table tfoot .total-row td {
     font-weight: 700;
     border-top: 2px solid var(--border);
     border-bottom: none;
   }
+  .view-cell { text-align: right; width: 80px; }
+  .view-link {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--accent, #2563eb);
+    padding: 0;
+  }
+  .view-link:hover { text-decoration: underline; }
 </style>
 

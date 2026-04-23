@@ -4,6 +4,16 @@ import { Bank } from "../../bank/Bank.js";
 import { FunctionalUnit } from "./FunctionalUnit.js";
 import { CommunityRole } from "../CommunityRole.js";
 
+export interface BudgetLineItem {
+    label: string;
+    amount: number;
+}
+
+export interface DomainBudget {
+    lineItems: BudgetLineItem[];
+    total: number;
+}
+
 // Base class for all functional domains (Food, Healthcare, Childcare, etc.).
 // Each domain has its own Bank account, funded by the Commons via fundDomain().
 // The domain is responsible for paying its own role-holders and those of its units.
@@ -32,6 +42,7 @@ export abstract class FunctionalDomain implements IEconomicActor {
 
     addRole(role: CommunityRole): void { this.roles.push(role); }
     removeRole(memberId: string): void { this.roles = this.roles.filter(r => r.memberId !== memberId); }
+    removeRoleById(id: string): void { this.roles = this.roles.filter(r => r.id !== id); }
     getRoles(): CommunityRole[] { return this.roles; }
 
     addUnit(unit: FunctionalUnit): void { this.units.push(unit); }
@@ -48,6 +59,20 @@ export abstract class FunctionalDomain implements IEconomicActor {
             .reduce((sum, r) => sum + r.kinPerMonth, 0);
         const unitsPayroll = this.units.reduce((sum, u) => sum + u.getPayroll(), 0);
         return domainPayroll + unitsPayroll;
+    }
+
+    // Budget breakdown for this domain. Override in subclasses to add domain-specific line items.
+    getBudget(): DomainBudget {
+        const lineItems: BudgetLineItem[] = [];
+        for (const role of this.roles.filter(r => r.isActive())) {
+            lineItems.push({ label: role.title, amount: role.kinPerMonth });
+        }
+        for (const unit of this.units) {
+            const payroll = unit.getPayroll();
+            if (payroll > 0) lineItems.push({ label: unit.getDisplayName(), amount: payroll });
+        }
+        const total = lineItems.reduce((sum, i) => sum + i.amount, 0);
+        return { lineItems, total };
     }
 
     // Pay domain-level roles, then delegate to each unit.
