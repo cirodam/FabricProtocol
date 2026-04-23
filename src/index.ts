@@ -153,8 +153,8 @@ async function init(): Promise<void> {
     name: "retirement-payouts",
     intervalMs: every.months(1),
     run: () => {
-      const retiredMembers = MemberService.getInstance().getAll().filter(m => m.retired);
-      SocialInsuranceBank.getInstance().issueMonthlyPayments(retiredMembers, constitution.retirementPayoutRate);
+      const eligible = MemberService.getInstance().getAll().filter(m => m.retired || m.disabled);
+      SocialInsuranceBank.getInstance().issueMonthlyPayments(eligible, constitution.retirementPayoutRate);
     },
   });
   scheduler.register({

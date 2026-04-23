@@ -97,9 +97,9 @@
           <div class="stat-sub">under {summary.retirementAge}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Retired</div>
+          <div class="stat-label">Drawing from Pool</div>
           <div class="stat-value">{summary.retiredMembers}</div>
-          <div class="stat-sub">drawing from pool</div>
+          <div class="stat-sub">retired or disabled</div>
         </div>
       </div>
 

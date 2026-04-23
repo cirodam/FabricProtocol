@@ -15,15 +15,15 @@ export function getSocialInsuranceSummary(_req: Request, res: Response): void {
 
     const workingMembers = allMembers.filter(m => {
         const age = (now - m.birthDate.getTime()) / MS_PER_YEAR;
-        return age < retirementAge;
+        return age < retirementAge && !m.disabled && !m.retired;
     });
-    const retiredMembers = allMembers.filter(m => m.retired);
+    const eligibleMembers = allMembers.filter(m => m.retired || m.disabled);
 
     const poolBalance = bank.poolBalance;
     const monthlyInflow = Math.round((allMembers.length * 10_000) / 12);
     const monthlyOutflow = Math.round(poolBalance * payoutRate);
-    const perRetireeMonthly = retiredMembers.length > 0
-        ? Math.floor(Math.floor(poolBalance * payoutRate) / retiredMembers.length)
+    const perRetireeMonthly = eligibleMembers.length > 0
+        ? Math.floor(Math.floor(poolBalance * payoutRate) / eligibleMembers.length)
         : 0;
 
     res.json({
@@ -32,7 +32,7 @@ export function getSocialInsuranceSummary(_req: Request, res: Response): void {
         payoutRate,
         totalMembers: allMembers.length,
         workingMembers: workingMembers.length,
-        retiredMembers: retiredMembers.length,
+        retiredMembers: eligibleMembers.length,
         monthlyInflow,
         monthlyOutflow,
         netMonthlyFlow: monthlyInflow - monthlyOutflow,
