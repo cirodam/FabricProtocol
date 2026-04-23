@@ -1,0 +1,11 @@
+{
+  "id": "af758c7e-4913-4172-a20c-3e1e3ff28673",
+  "fromAccountId": "523474bf-a284-4fcb-b03a-09964b1bcbcf",
+  "toAccountId": "9ad8d9ac-5cc6-4dfe-8111-a80fcc065491",
+  "currency": "kin",
+  "amount": 300000,
+  "memo": "retirement pool: contribution",
+  "timestamp": "2026-04-23T23:34:18.655Z",
+  "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "hash": "61d85f53e2d22f5854c2e9bd930d43bced26c8007f6d5b9ee4bd4925249887e7"
+}

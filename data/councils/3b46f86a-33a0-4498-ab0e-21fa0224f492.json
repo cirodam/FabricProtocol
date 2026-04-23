@@ -1,0 +1,13 @@
+{
+  "id": "3b46f86a-33a0-4498-ab0e-21fa0224f492",
+  "name": "Infrastructure Council",
+  "domainIds": [
+    "housing",
+    "energy",
+    "sanitation",
+    "transport"
+  ],
+  "targetSize": 5,
+  "poolId": null,
+  "seats": []
+}

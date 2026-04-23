@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, renameSync, unlinkSync } from "fs";
-import { join } from "path";
+import { join, resolve } from "path";
+import { DataManifest } from "./DataManifest.js";
 
 /**
  * Atomic JSON file store backed by the local filesystem.
@@ -18,22 +19,31 @@ export class FileStore {
   write<T>(id: string, data: T): void {
     const target = join(this.dir, `${id}.json`);
     const tmp = `${target}.tmp`;
-    writeFileSync(tmp, JSON.stringify(data, null, 2), "utf-8");
+    const content = JSON.stringify(data, null, 2);
+    writeFileSync(tmp, content, "utf-8");
     renameSync(tmp, target);
+    DataManifest.getInstance().record(resolve(target), content);
   }
 
   /** Read and parse {id}.json. Returns undefined if the file does not exist. */
   read<T>(id: string): T | undefined {
     const path = join(this.dir, `${id}.json`);
     if (!existsSync(path)) return undefined;
-    return JSON.parse(readFileSync(path, "utf-8")) as T;
+    const content = readFileSync(path, "utf-8");
+    DataManifest.getInstance().verify(resolve(path), content);
+    return JSON.parse(content) as T;
   }
 
   /** Read and parse all *.json files in the directory. */
   readAll<T>(): T[] {
     return readdirSync(this.dir)
       .filter(f => f.endsWith(".json"))
-      .map(f => JSON.parse(readFileSync(join(this.dir, f), "utf-8")) as T);
+      .map(f => {
+        const path = join(this.dir, f);
+        const content = readFileSync(path, "utf-8");
+        DataManifest.getInstance().verify(resolve(path), content);
+        return JSON.parse(content) as T;
+      });
   }
 
   /** Delete {id}.json. Returns true if the file existed. */
@@ -41,6 +51,7 @@ export class FileStore {
     const path = join(this.dir, `${id}.json`);
     if (!existsSync(path)) return false;
     unlinkSync(path);
+    DataManifest.getInstance().remove(resolve(path));
     return true;
   }
 

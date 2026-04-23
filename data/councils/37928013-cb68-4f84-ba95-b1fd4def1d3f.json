@@ -1,0 +1,12 @@
+{
+  "id": "37928013-cb68-4f84-ba95-b1fd4def1d3f",
+  "name": "Commons Council",
+  "domainIds": [
+    "education",
+    "enrichment",
+    "communications"
+  ],
+  "targetSize": 5,
+  "poolId": null,
+  "seats": []
+}

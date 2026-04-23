@@ -1,0 +1,11 @@
+{
+  "id": "a79d10f9-7bb2-4105-8521-80f53c21279b",
+  "fromAccountId": "523474bf-a284-4fcb-b03a-09964b1bcbcf",
+  "toAccountId": "eddf7a78-7acc-4f37-b280-c13506556bcd",
+  "currency": "kin",
+  "amount": 1000,
+  "memo": "community endowment: member share",
+  "timestamp": "2026-04-23T23:34:18.659Z",
+  "previousHash": "61d85f53e2d22f5854c2e9bd930d43bced26c8007f6d5b9ee4bd4925249887e7",
+  "hash": "1019bf62b1305e535a8b3ece429cf9e672685c081ef6ddc68751f4c496d3fef3"
+}

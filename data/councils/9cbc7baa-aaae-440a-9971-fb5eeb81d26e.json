@@ -1,0 +1,13 @@
+{
+  "id": "9cbc7baa-aaae-440a-9971-fb5eeb81d26e",
+  "name": "Care Council",
+  "domainIds": [
+    "healthcare",
+    "dependency-care",
+    "child-care",
+    "deathcare"
+  ],
+  "targetSize": 5,
+  "poolId": null,
+  "seats": []
+}

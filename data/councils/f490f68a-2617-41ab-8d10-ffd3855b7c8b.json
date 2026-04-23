@@ -1,0 +1,12 @@
+{
+  "id": "f490f68a-2617-41ab-8d10-ffd3855b7c8b",
+  "name": "Economy Council",
+  "domainIds": [
+    "marketplace",
+    "manufacturing",
+    "courier"
+  ],
+  "targetSize": 5,
+  "poolId": null,
+  "seats": []
+}

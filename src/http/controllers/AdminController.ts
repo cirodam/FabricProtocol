@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { readdirSync, unlinkSync, existsSync, statSync } from "fs";
-import { join } from "path";
+import { join, resolve } from "path";
 import { Commonwealth } from "../../commons/Commonwealth.js";
 import { DomainSettings } from "../../settings/DomainSettings.js";
+import { DataManifest } from "../../storage/DataManifest.js";
 
 // ── Per-domain data directories cleared when a domain is disabled ─────────────
 // Keyed by stable domain ID. Only domains with persisted data need entries.
@@ -58,6 +59,7 @@ function clearDir(dir: string): number {
             count += clearDir(full);
         } else if (entry.endsWith(".json")) {
             unlinkSync(full);
+            DataManifest.getInstance().remove(resolve(full));
             count++;
         }
     }

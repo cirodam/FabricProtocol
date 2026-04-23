@@ -1,6 +1,10 @@
-import { readdirSync, existsSync } from "fs";
+import { createHash } from "crypto";
+import { readdirSync, existsSync, readFileSync, writeFileSync } from "fs";
+import { join } from "path";
 import { BankTransaction, Currency } from "./BankTransaction.js";
 import { FileStore } from "../storage/FileStore.js";
+
+const GENESIS_HASH = "0".repeat(64);
 
 export interface TransactionQuery {
   accountId?: string;
@@ -15,6 +19,16 @@ interface TransactionRecord {
   amount: number;
   memo: string;
   timestamp: string;
+  /** SHA-256 of the previous transaction record (or GENESIS_HASH for the first). */
+  previousHash?: string;
+  /** SHA-256 of this record with the hash field omitted. */
+  hash?: string;
+}
+
+type RecordWithoutHash = Omit<TransactionRecord, "hash">;
+
+function computeHash(record: RecordWithoutHash): string {
+  return createHash("sha256").update(JSON.stringify(record), "utf-8").digest("hex");
 }
 
 /** Returns the YYYY-MM bucket string for a given date. */
@@ -25,15 +39,34 @@ function monthBucket(date: Date): string {
 
 export class TransactionLoader {
   private readonly baseDir: string;
+  private readonly chainFile: string;
 
   constructor(baseDir: string) {
     this.baseDir = baseDir;
+    this.chainFile = join(baseDir, ".chain.json");
   }
 
-  /** Append a transaction to the current month's bucket. */
+  /** Append a transaction to the current month's bucket with hash chain fields. */
   save(tx: BankTransaction): void {
+    const previousHash = this.readChainHead();
+    const base: RecordWithoutHash = { ...this.toBaseRecord(tx), previousHash };
+    const hash = computeHash(base);
     const store = new FileStore(`${this.baseDir}/${monthBucket(tx.timestamp)}`);
-    store.write(tx.id, this.toRecord(tx));
+    store.write(tx.id, { ...base, hash });
+    this.writeChainHead(hash);
+  }
+
+  private readChainHead(): string {
+    if (!existsSync(this.chainFile)) return GENESIS_HASH;
+    try {
+      return (JSON.parse(readFileSync(this.chainFile, "utf-8")) as { headHash: string }).headHash ?? GENESIS_HASH;
+    } catch {
+      return GENESIS_HASH;
+    }
+  }
+
+  private writeChainHead(hash: string): void {
+    writeFileSync(this.chainFile, JSON.stringify({ headHash: hash }), "utf-8");
   }
 
   /**
@@ -50,21 +83,55 @@ export class TransactionLoader {
 
     const buckets = options.month ? allBuckets.filter(b => b === options.month) : allBuckets;
 
-    const txs: BankTransaction[] = [];
+    const rawRecords: TransactionRecord[] = [];
     for (const bucket of buckets) {
       const store = new FileStore(`${this.baseDir}/${bucket}`);
-      for (const record of store.readAll<TransactionRecord>()) {
-        if (!options.accountId || record.fromAccountId === options.accountId || record.toAccountId === options.accountId) {
-          txs.push(this.fromRecord(record));
-        }
-      }
+      rawRecords.push(...store.readAll<TransactionRecord>());
     }
 
-    txs.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-    return txs;
+    rawRecords.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+    // Verify the hash chain when loading all months (full history).
+    if (!options.month) this.verifyChain(rawRecords);
+
+    return rawRecords
+      .filter(r => !options.accountId || r.fromAccountId === options.accountId || r.toAccountId === options.accountId)
+      .map(r => this.fromRecord(r));
   }
 
-  private toRecord(tx: BankTransaction): TransactionRecord {
+  /**
+   * Verify the SHA-256 hash chain across all chained records.
+   * Legacy records without hash fields are skipped; the chain is validated
+   * strictly from the first chained record onward.
+   */
+  private verifyChain(records: TransactionRecord[]): void {
+    let prevHash: string | null = null;
+
+    for (const record of records) {
+      if (!record.hash || record.previousHash === undefined) continue;
+
+      if (prevHash === null) {
+        // First chained record found — verify its own hash, accept its previousHash.
+        if (record.previousHash !== GENESIS_HASH) {
+          console.warn(`[chain] First chained transaction ${record.id} links to a legacy record. Chain verification starts here.`);
+        }
+      } else if (record.previousHash !== prevHash) {
+        throw new Error(
+          `[chain] Transaction chain is broken at ${record.id} — ` +
+          `a transaction may have been deleted or reordered.`
+        );
+      }
+
+      const { hash, ...rest } = record;
+      if (computeHash(rest) !== hash) {
+        throw new Error(`[chain] Transaction ${record.id} hash mismatch — the record may have been tampered with.`);
+      }
+
+      prevHash = record.hash;
+    }
+  }
+
+  private toBaseRecord(tx: BankTransaction): Omit<TransactionRecord, "previousHash" | "hash"> {
     return {
       id: tx.id,
       fromAccountId: tx.fromAccountId,

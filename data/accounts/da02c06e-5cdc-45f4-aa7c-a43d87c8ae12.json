@@ -1,0 +1,9 @@
+{
+  "id": "da02c06e-5cdc-45f4-aa7c-a43d87c8ae12",
+  "ownerId": "00000000-0000-0000-0000-000000000009",
+  "label": "primary",
+  "kin": 0,
+  "overdraftLimit": 0,
+  "exemptFromDemurrage": true,
+  "createdAt": "2026-04-23T23:33:56.256Z"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "3e837cbd-6a09-4f91-8c89-5f85260accec",
+  "fromAccountId": "523474bf-a284-4fcb-b03a-09964b1bcbcf",
+  "toAccountId": "f5f4ee61-10cc-42ec-ae66-07180e962d48",
+  "currency": "kin",
+  "amount": 49000,
+  "memo": "community endowment: commonwealth share",
+  "timestamp": "2026-04-23T23:34:18.660Z",
+  "previousHash": "1019bf62b1305e535a8b3ece429cf9e672685c081ef6ddc68751f4c496d3fef3",
+  "hash": "4317af225c750b2c14fc2180ae661a422f095da0134f7f63a1f6eb499a0615b3"
+}

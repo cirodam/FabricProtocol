@@ -67,10 +67,30 @@ import { WaterDomain } from "./domains/water/WaterDomain.js";
 import { CommunityRole } from "./commons/CommunityRole.js";
 import { SocialInsuranceBank } from "./social_insurance/SocialInsuranceBank.js";
 import { SocialInsuranceMemberLoader } from "./social_insurance/SocialInsuranceMemberLoader.js";
+import { DataManifest } from "./storage/DataManifest.js";
 
 
 async function init(): Promise<void> {
-  // ── Constitution (must be first — other services read parameters from it) ──
+  // ── Network + Data Integrity ─────────────────────────────────────────────────
+  // NodeService must initialise first so the Ed25519 signing key is available.
+  // DataManifest then loads and verifies the integrity manifest before any data
+  // files are read — any file modified outside the application will throw here.
+  await NodeService.getInstance().init({
+    type:    (process.env.NODE_TYPE ?? "community") as NodeType,
+    name:    process.env.NODE_NAME ?? Community.getInstance().name,
+    address: process.env.NODE_ADDRESS ?? "http://localhost:3000",
+    dataDir: "data/network",
+    seeds:   process.env.NODE_SEEDS
+                 ? process.env.NODE_SEEDS.split(",").map(s => s.trim()).filter(Boolean)
+                 : [],
+  });
+  const signer = NodeService.getInstance().getSigner();
+  DataManifest.getInstance().init(
+    (data) => signer.signBody(data),
+    signer.publicKeyHex
+  );
+
+  // ── Constitution (must be before other services — they read parameters from it) ──
   GovernanceService.getInstance().initConstitution(new ConstitutionLoader("data/constitution"));
   const constitution = Constitution.getInstance();
 
@@ -202,18 +222,6 @@ async function init(): Promise<void> {
   });
 
   await scheduler.start();
-
-  // ── Network ──────────────────────────────────────────────────────────────────
-  // Must complete before HTTP server starts — /node/* routes require NodeService.
-  await NodeService.getInstance().init({
-    type:    (process.env.NODE_TYPE ?? "community") as NodeType,
-    name:    process.env.NODE_NAME ?? Community.getInstance().name,
-    address: process.env.NODE_ADDRESS ?? "http://localhost:3000",
-    dataDir: "data/network",
-    seeds:   process.env.NODE_SEEDS
-                 ? process.env.NODE_SEEDS.split(",").map(s => s.trim()).filter(Boolean)
-                 : [],
-  });
 
   // ── HTTP ─────────────────────────────────────────────────────────────────────
   new HttpServer().start();

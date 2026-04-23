@@ -1,0 +1,11 @@
+{
+  "id": "59b59c3b-68d0-4769-beda-b51f9261a5d9",
+  "name": "Safety Council",
+  "domainIds": [
+    "fire",
+    "justice"
+  ],
+  "targetSize": 5,
+  "poolId": null,
+  "seats": []
+}
