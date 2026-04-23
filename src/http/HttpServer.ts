@@ -44,6 +44,7 @@ import networkRoutes from "../network/networkRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import currencyBoardRoutes from "./routes/currencyBoardRoutes.js";
 import socialInsuranceRoutes from "./routes/socialInsuranceRoutes.js";
+import unitRoutes from "./routes/unitRoutes.js";
 
 /**
  * HTTP REST API server.
@@ -115,6 +116,7 @@ export class HttpServer {
         this.app.use("/api/healthcare", healthcareRoutes);
         this.app.use("/api/education", educationRoutes);
         this.app.use("/api/admin", adminRoutes);
+        this.app.use("/api/domains/:domainId/units", unitRoutes);
         this.app.use("/api/locations", locationRoutes);
         this.app.use("/api/courier", courierRoutes);
         this.app.use("/api/dependency-care", dependencyCareRoutes);

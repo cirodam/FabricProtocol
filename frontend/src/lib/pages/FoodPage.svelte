@@ -209,7 +209,7 @@
   <section class="section">
     <div class="section-header">
       <h2>Community Kitchens</h2>
-      <button class="new-btn" onclick={() => navigate('/food/kitchens/new')}>+ New kitchen</button>
+      <button class="new-btn" onclick={() => navigate('/domains/00000000-0000-0000-0000-000000000003/units/new')}>+ New kitchen</button>
     </div>
     {#if kitchens.length === 0}
       <p class="muted">No kitchens yet.</p>
@@ -218,8 +218,8 @@
         {#each kitchens as k (k.id)}
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div class="kitchen-card" role="button" tabindex="0"
-            onclick={() => navigate(`/food/kitchens/${k.id}`)}
-            onkeydown={(e) => e.key === 'Enter' && navigate(`/food/kitchens/${k.id}`)}
+            onclick={() => navigate(`/domains/00000000-0000-0000-0000-000000000003/units/${k.id}`)}
+            onkeydown={(e) => e.key === 'Enter' && navigate(`/domains/00000000-0000-0000-0000-000000000003/units/${k.id}`)}
           >
             <div class="card-badge">Community Kitchen</div>
             <h3>{k.name}</h3>
@@ -236,7 +236,7 @@
   <section class="section">
     <div class="section-header">
       <h2>Grain Mills</h2>
-      <button class="new-btn" onclick={() => navigate('/food/mills/new')}>+ New mill</button>
+      <button class="new-btn" onclick={() => navigate('/domains/00000000-0000-0000-0000-000000000003/units/new')}>+ New mill</button>
     </div>
     {#if mills.length === 0}
       <p class="muted">No mills yet.</p>
@@ -245,8 +245,8 @@
         {#each mills as m (m.id)}
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div class="mill-card" role="button" tabindex="0"
-            onclick={() => navigate(`/food/mills/${m.id}`)}
-            onkeydown={(e) => e.key === 'Enter' && navigate(`/food/mills/${m.id}`)}
+            onclick={() => navigate(`/domains/00000000-0000-0000-0000-000000000003/units/${m.id}`)}
+            onkeydown={(e) => e.key === 'Enter' && navigate(`/domains/00000000-0000-0000-0000-000000000003/units/${m.id}`)}
           >
             <div class="mill-badge">Grain Mill</div>
             <h3>{m.name}</h3>

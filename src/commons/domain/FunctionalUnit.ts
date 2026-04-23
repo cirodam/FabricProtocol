@@ -12,18 +12,22 @@ import { CommunityRole } from "../CommunityRole.js";
  * (paid roles) and a member roster. Multiple units can exist within a single domain
  * as the community grows.
  */
-export abstract class FunctionalUnit implements IEconomicActor {
+export class FunctionalUnit implements IEconomicActor {
     readonly id: string;
     readonly name: string;
     readonly description: string;
+    readonly createdAt: Date;
+    private readonly _type: string;
 
     private roles: CommunityRole[] = [];
     private memberIds: Set<string> = new Set();
 
-    constructor(name: string, description: string = "") {
+    constructor(name: string, description: string = "", type: string = "unit") {
         this.id = randomUUID();
         this.name = name;
         this.description = description;
+        this._type = type;
+        this.createdAt = new Date();
         Bank.getInstance().openAccount(this, "primary", 0, false);
     }
 
@@ -32,11 +36,12 @@ export abstract class FunctionalUnit implements IEconomicActor {
     getHandle(): string { return this.name.toLowerCase().replace(/[^a-z0-9_]/g, "_"); }
 
     /** Stable type tag — used to filter units within a domain (e.g. "clinic", "dental-clinic"). */
-    abstract getType(): string;
+    getType(): string { return this._type; }
 
     addRole(role: CommunityRole): void { this.roles.push(role); }
     getRoles(): CommunityRole[] { return this.roles; }
     clearRoles(): void { this.roles = []; }
+    removeRoleById(id: string): void { this.roles = this.roles.filter(r => r.id !== id); }
 
     addMember(memberId: string): void { this.memberIds.add(memberId); }
     removeMember(memberId: string): void { this.memberIds.delete(memberId); }

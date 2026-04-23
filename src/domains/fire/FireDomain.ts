@@ -48,6 +48,10 @@ export class FireDomain extends FunctionalDomain {
         for (const c of loader.loadAll()) {
             this.addUnit(c);
         }
+        this.registerUnitType("fire-company",
+            u => this.companyLoader?.save(u as FireCompany),
+            id => { this.removeUnit(id); this.companyLoader?.delete(id); },
+        );
     }
 
     addCompany(company: FireCompany): void {

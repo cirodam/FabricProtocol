@@ -41,6 +41,10 @@ export class DependencyCareDomain extends FunctionalDomain {
         for (const h of loader.loadAll()) {
             this.addUnit(h);
         }
+        this.registerUnitType("shared-household",
+            u => this.householdLoader?.save(u as SharedHousehold),
+            id => { this.removeUnit(id); this.householdLoader?.delete(id); },
+        );
     }
 
     addHousehold(household: SharedHousehold): void {
@@ -72,6 +76,10 @@ export class DependencyCareDomain extends FunctionalDomain {
         for (const u of loader.loadAll()) {
             this.addUnit(u);
         }
+        this.registerUnitType("medical-care-unit",
+            u => this.medicalCareUnitLoader?.save(u as MedicalCareUnit),
+            id => { this.removeUnit(id); this.medicalCareUnitLoader?.delete(id); },
+        );
     }
 
     addMedicalCareUnit(unit: MedicalCareUnit): void {

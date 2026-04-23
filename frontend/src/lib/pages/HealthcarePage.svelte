@@ -136,7 +136,7 @@
     <section class="section">
       <div class="section-header">
         <h2>Primary Care Clinics</h2>
-        <button class="new-btn" onclick={() => navigate("/healthcare/clinics/new")}>+ New clinic</button>
+        <button class="new-btn" onclick={() => navigate("/domains/00000000-0000-0000-0000-000000000004/units/new")}>+ New clinic</button>
       </div>
       {#if clinics.length === 0}
         <p class="muted">No clinics yet.</p>
@@ -145,8 +145,8 @@
           {#each clinics as clinic (clinic.id)}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div class="unit-card" role="button" tabindex="0"
-              onclick={() => navigate(`/healthcare/clinics/${clinic.id}`)}
-              onkeydown={(e) => e.key === 'Enter' && navigate(`/healthcare/clinics/${clinic.id}`)}>
+              onclick={() => navigate(`/domains/00000000-0000-0000-0000-000000000004/units/${clinic.id}`)}
+              onkeydown={(e) => e.key === 'Enter' && navigate(`/domains/00000000-0000-0000-0000-000000000004/units/${clinic.id}`)}>
               <div class="badge badge-primary">Primary Care</div>
               <h3>{clinic.name}</h3>
               <p class="card-desc">{clinic.description}</p>
@@ -160,7 +160,7 @@
     <section class="section">
       <div class="section-header">
         <h2>Dental Clinics</h2>
-        <button class="new-btn" onclick={() => navigate("/healthcare/dental-clinics/new")}>+ New dental clinic</button>
+        <button class="new-btn" onclick={() => navigate("/domains/00000000-0000-0000-0000-000000000004/units/new")}>+ New dental clinic</button>
       </div>
       {#if dentalClinics.length === 0}
         <p class="muted">No dental clinics yet.</p>
@@ -169,8 +169,8 @@
           {#each dentalClinics as dc (dc.id)}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div class="unit-card" role="button" tabindex="0"
-              onclick={() => navigate(`/healthcare/dental-clinics/${dc.id}`)}
-              onkeydown={(e) => e.key === 'Enter' && navigate(`/healthcare/dental-clinics/${dc.id}`)}>
+              onclick={() => navigate(`/domains/00000000-0000-0000-0000-000000000004/units/${dc.id}`)}
+              onkeydown={(e) => e.key === 'Enter' && navigate(`/domains/00000000-0000-0000-0000-000000000004/units/${dc.id}`)}>
               <div class="badge badge-dental">Dental Clinic</div>
               <h3>{dc.name}</h3>
               <p class="card-desc">{dc.description}</p>

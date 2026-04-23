@@ -25,10 +25,6 @@
   import TransportPage from './lib/pages/TransportPage.svelte';
   import EnrichmentPage from './lib/pages/EnrichmentPage.svelte';
   import DependencyCarePage from './lib/pages/DependencyCarePage.svelte';
-  import SharedHouseholdPage from './lib/pages/SharedHouseholdPage.svelte';
-  import AddSharedHouseholdPage from './lib/pages/AddSharedHouseholdPage.svelte';
-  import MedicalCareUnitPage from './lib/pages/MedicalCareUnitPage.svelte';
-  import AddMedicalCareUnitPage from './lib/pages/AddMedicalCareUnitPage.svelte';
   import HomeCaregivingPage from './lib/pages/HomeCaregivingPage.svelte';
   import ChildCarePage from './lib/pages/ChildCarePage.svelte';
   import HomeChildcarePage from './lib/pages/HomeChildcarePage.svelte';
@@ -47,26 +43,14 @@
   import CreateReferendumPage from './lib/pages/CreateReferendumPage.svelte';
   import ReferendumDetailPage from './lib/pages/ReferendumDetailPage.svelte';
   import HealthcarePage from './lib/pages/HealthcarePage.svelte';
-  import ClinicPage from './lib/pages/ClinicPage.svelte';
-  import AddHealthcareClinicPage from './lib/pages/AddHealthcareClinicPage.svelte';
-  import DentalClinicPage from './lib/pages/DentalClinicPage.svelte';
-  import AddDentalClinicPage from './lib/pages/AddDentalClinicPage.svelte';
   import SettingsPage from './lib/pages/SettingsPage.svelte';
   import FirePage from './lib/pages/FirePage.svelte';
-  import FireCompanyPage from './lib/pages/FireCompanyPage.svelte';
-  import AddFireCompanyPage from './lib/pages/AddFireCompanyPage.svelte';
   import EducationPage from './lib/pages/EducationPage.svelte';
-  import SchoolPage from './lib/pages/SchoolPage.svelte';
-  import AddSchoolPage from './lib/pages/AddSchoolPage.svelte';
-  import LibraryPage from './lib/pages/LibraryPage.svelte';
-  import AddLibraryPage from './lib/pages/AddLibraryPage.svelte';
-  import CommunityKitchenPage from './lib/pages/CommunityKitchenPage.svelte';
-  import AddCommunityKitchenPage from './lib/pages/AddCommunityKitchenPage.svelte';
-  import MillPage from './lib/pages/MillPage.svelte';
-  import AddMillPage from './lib/pages/AddMillPage.svelte';
   import AdminPage from './lib/pages/AdminPage.svelte';
   import CreateAccountPage from './lib/pages/CreateAccountPage.svelte';
   import LoginPage from './lib/pages/LoginPage.svelte';
+  import FunctionalUnitPage from './lib/pages/FunctionalUnitPage.svelte';
+  import AddFunctionalUnitPage from './lib/pages/AddFunctionalUnitPage.svelte';
 
   function getPath() {
     return window.location.pathname;
@@ -183,14 +167,7 @@
     <SanitationPage {navigate} />
   {:else if path === '/water'}
     <WaterPage {navigate} />
-  {:else if path === '/food/kitchens/new'}
-    <AddCommunityKitchenPage {navigate} />
-  {:else if path.startsWith('/food/kitchens/')}
-    <CommunityKitchenPage id={path.slice('/food/kitchens/'.length)} {navigate} />
-  {:else if path === '/food/mills/new'}
-    <AddMillPage {navigate} />
-  {:else if path.startsWith('/food/mills/')}
-    <MillPage id={path.slice('/food/mills/'.length)} {navigate} />
+
   {:else if path === '/housing'}
     <HousingPage {navigate} />
   {:else if path === '/housing/new'}
@@ -207,14 +184,6 @@
     <EnrichmentPage {navigate} />
   {:else if path === '/dependency-care'}
     <DependencyCarePage {navigate} />
-  {:else if path === '/dependency-care/households/new'}
-    <AddSharedHouseholdPage {navigate} />
-  {:else if path.startsWith('/dependency-care/households/')}
-    <SharedHouseholdPage id={path.slice('/dependency-care/households/'.length)} {navigate} />
-  {:else if path === '/dependency-care/medical-care-units/new'}
-    <AddMedicalCareUnitPage {navigate} />
-  {:else if path.startsWith('/dependency-care/medical-care-units/')}
-    <MedicalCareUnitPage id={path.slice('/dependency-care/medical-care-units/'.length)} {navigate} />
   {:else if path === '/dependency-care/home-caregiving'}
     <HomeCaregivingPage {navigate} />
   {:else if path === '/child-care'}
@@ -223,22 +192,10 @@
     <HomeChildcarePage {navigate} />
   {:else if path === '/healthcare'}
     <HealthcarePage {navigate} />
-  {:else if path === '/healthcare/clinics/new'}
-    <AddHealthcareClinicPage {navigate} />
-  {:else if path.startsWith('/healthcare/clinics/')}
-    <ClinicPage id={path.slice('/healthcare/clinics/'.length)} {navigate} />
-  {:else if path === '/healthcare/dental-clinics/new'}
-    <AddDentalClinicPage {navigate} />
-  {:else if path.startsWith('/healthcare/dental-clinics/')}
-    <DentalClinicPage id={path.slice('/healthcare/dental-clinics/'.length)} {navigate} />
   {:else if path === '/settings'}
     <SettingsPage {navigate} />
   {:else if path === '/fire'}
     <FirePage {navigate} />
-  {:else if path === '/fire/companies/new'}
-    <AddFireCompanyPage {navigate} />
-  {:else if path.startsWith('/fire/companies/')}
-    <FireCompanyPage id={path.slice('/fire/companies/'.length)} {navigate} />
   {:else if path === '/guilds'}
     <GuildsPage {navigate} {path} />
   {:else if path === '/guilds/new'}
@@ -251,13 +208,9 @@
     <ConstitutionPage {navigate} {path} />
   {:else if path === '/education'}
     <EducationPage {navigate} />
-  {:else if path === '/education/schools/new'}
-    <AddSchoolPage {navigate} />
-  {:else if path.startsWith('/education/schools/')}
-    <SchoolPage id={path.slice('/education/schools/'.length)} {navigate} />
-  {:else if path === '/education/libraries/new'}
-    <AddLibraryPage {navigate} />
-  {:else if path.startsWith('/education/libraries/')}
-    <LibraryPage id={path.slice('/education/libraries/'.length)} {navigate} />
+  {:else if path.startsWith('/domains/') && path.endsWith('/units/new')}
+    <AddFunctionalUnitPage domainId={path.split('/')[2]} {navigate} />
+  {:else if path.startsWith('/domains/') && path.includes('/units/')}
+    <FunctionalUnitPage domainId={path.split('/')[2]} unitId={path.split('/')[4]} {navigate} />
   {/if}
 </main>

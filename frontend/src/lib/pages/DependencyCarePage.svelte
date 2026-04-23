@@ -143,7 +143,7 @@
   <section class="section">
     <div class="section-header">
       <h2>Shared Households <span class="count">{households.length}</span></h2>
-      <button class="new-btn" onclick={() => navigate('/dependency-care/households/new')}>+ New household</button>
+      <button class="new-btn" onclick={() => navigate('/domains/00000000-0000-0000-0000-000000000011/units/new')}>+ New household</button>
     </div>
     {#if households.length === 0}
       <p class="muted">No shared households yet.</p>
@@ -155,7 +155,7 @@
           </thead>
           <tbody>
             {#each households as h (h.id)}
-              <tr class="clickable" onclick={() => navigate(`/dependency-care/households/${h.id}`)}>
+              <tr class="clickable" onclick={() => navigate(`/domains/00000000-0000-0000-0000-000000000011/units/${h.id}`)}>
                 <td class="name">{h.name}</td>
                 <td class="muted">{h.description || '—'}</td>
                 <td class="num">{h.staffCount}</td>
@@ -171,7 +171,7 @@
   <section class="section">
     <div class="section-header">
       <h2>Medical Care Units <span class="count">{medicalUnits.length}</span></h2>
-      <button class="new-btn" onclick={() => navigate('/dependency-care/medical-care-units/new')}>+ New unit</button>
+      <button class="new-btn" onclick={() => navigate('/domains/00000000-0000-0000-0000-000000000011/units/new')}>+ New unit</button>
     </div>
     {#if medicalUnits.length === 0}
       <p class="muted">No medical care units yet.</p>
@@ -183,7 +183,8 @@
           </thead>
           <tbody>
             {#each medicalUnits as u (u.id)}
-              <tr class="clickable" onclick={() => navigate(`/dependency-care/medical-care-units/${u.id}`)}>
+              <tr class="clickable" onclick={() => navigate(`/domains/00000000-0000-0000-0000-000000000011/units/${u.id}`)}>
+
                 <td class="name">{u.name}</td>
                 <td class="muted">{u.description || '—'}</td>
                 <td class="num">{u.staffCount}</td>

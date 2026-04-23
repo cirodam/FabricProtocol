@@ -32,6 +32,10 @@ export class HealthcareDomain extends FunctionalDomain {
         for (const clinic of loader.loadAll()) {
             this.addUnit(clinic);
         }
+        this.registerUnitType("clinic",
+            u => this.loader?.save(u as Clinic),
+            id => { this.removeUnit(id); this.loader?.delete(id); },
+        );
     }
 
     addClinic(clinic: Clinic): void {
@@ -63,6 +67,10 @@ export class HealthcareDomain extends FunctionalDomain {
         for (const clinic of loader.loadAll()) {
             this.addUnit(clinic);
         }
+        this.registerUnitType("dental-clinic",
+            u => this.dentalLoader?.save(u as DentalClinic),
+            id => { this.removeUnit(id); this.dentalLoader?.delete(id); },
+        );
     }
 
     addDentalClinic(clinic: DentalClinic): void {

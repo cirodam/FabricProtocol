@@ -74,7 +74,7 @@
     <h1>Fire</h1>
     <p class="subtitle">Fire protection, emergency response, and first responder services</p>
   </div>
-  <button class="new-btn" onclick={() => navigate('/fire/companies/new')}>+ New company</button>
+  <button class="new-btn" onclick={() => navigate('/domains/00000000-0000-0000-0000-000000000013/units/new')}>+ New company</button>
 </div>
 
 {#if loading}
@@ -132,7 +132,7 @@
           </thead>
           <tbody>
             {#each companies as c (c.id)}
-              <tr class="clickable" onclick={() => navigate(`/fire/companies/${c.id}`)}>
+              <tr class="clickable" onclick={() => navigate(`/domains/00000000-0000-0000-0000-000000000013/units/${c.id}`)}>
                 <td class="name">{c.name}</td>
                 <td class="muted">{c.description || '—'}</td>
                 <td class="num">{c.staffCount}</td>

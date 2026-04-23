@@ -57,6 +57,10 @@ export class EducationDomain extends FunctionalDomain {
         for (const school of loader.loadAll()) {
             this.addUnit(school);
         }
+        this.registerUnitType("school",
+            u => this.schoolLoader?.save(u as School),
+            id => { this.removeUnit(id); this.schoolLoader?.delete(id); },
+        );
     }
 
     addSchool(school: School): void {
@@ -88,6 +92,10 @@ export class EducationDomain extends FunctionalDomain {
         for (const library of loader.loadAll()) {
             this.addUnit(library);
         }
+        this.registerUnitType("library",
+            u => this.libraryLoader?.save(u as Library),
+            id => { this.removeUnit(id); this.libraryLoader?.delete(id); },
+        );
     }
 
     addLibrary(library: Library): void {

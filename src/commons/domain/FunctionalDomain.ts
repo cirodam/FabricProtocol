@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { IEconomicActor } from "../../IEconomicActor.js";
 import { Bank } from "../../bank/Bank.js";
 import { FunctionalUnit } from "./FunctionalUnit.js";
+import { GenericUnitLoader } from "../../storage/GenericUnitLoader.js";
 import { CommunityRole } from "../CommunityRole.js";
 
 export interface BudgetLineItem {
@@ -26,6 +27,10 @@ export abstract class FunctionalDomain implements IEconomicActor {
 
     private roles: CommunityRole[] = [];
     private units: FunctionalUnit[] = [];
+    private genericLoader: GenericUnitLoader | null = null;
+    private unitSavers:   Map<string, (unit: FunctionalUnit) => void> = new Map();
+    private unitDeleters: Map<string, (id: string) => void> = new Map();
+
 
     constructor(name: string, description: string = "", id?: string) {
         this.id = id ?? randomUUID();
@@ -50,6 +55,61 @@ export abstract class FunctionalDomain implements IEconomicActor {
     getUnits(): FunctionalUnit[] { return this.units; }
     getUnitsByType<T extends FunctionalUnit>(type: string): T[] {
         return this.units.filter(u => u.getType() === type) as T[];
+    }
+
+    // ── Generic units (created through the standard UI) ──────────────────────
+
+    initGenericUnits(loader: GenericUnitLoader): void {
+        this.genericLoader = loader;
+        for (const { unit } of loader.loadAll()) {
+            this.addUnit(unit);
+        }
+    }
+
+    addGenericUnit(unit: FunctionalUnit): void {
+        this.addUnit(unit);
+        this.genericLoader?.save(unit, this.id);
+    }
+
+    saveGenericUnit(unit: FunctionalUnit): void {
+        this.genericLoader?.save(unit, this.id);
+    }
+
+    removeGenericUnit(id: string): void {
+        this.removeUnit(id);
+        this.genericLoader?.delete(id);
+    }
+
+    /**
+     * Register a typed saver/deleter so the generic API can persist changes
+     * to domain-specific loaders (e.g. ClinicLoader, SchoolLoader).
+     * Call this in each domain's initXxx() method.
+     */
+    protected registerUnitType(
+        type: string,
+        save: (unit: FunctionalUnit) => void,
+        del:  (id: string) => void,
+    ): void {
+        this.unitSavers.set(type, save);
+        this.unitDeleters.set(type, del);
+    }
+
+    /** Persist a unit via whichever loader owns its type. */
+    saveUnit(unit: FunctionalUnit): void {
+        const saver = this.unitSavers.get(unit.getType());
+        if (saver) { saver(unit); return; }
+        this.genericLoader?.save(unit, this.id);
+    }
+
+    /** Remove a unit from memory and its owning loader. */
+    deleteUnit(id: string): void {
+        const unit = this.units.find(u => u.id === id);
+        if (unit) {
+            const deleter = this.unitDeleters.get(unit.getType());
+            if (deleter) { deleter(id); this.removeUnit(id); return; }
+        }
+        this.removeUnit(id);
+        this.genericLoader?.delete(id);
     }
 
     // Monthly payroll: domain-level roles plus all units.

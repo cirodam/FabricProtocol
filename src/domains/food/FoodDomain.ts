@@ -36,6 +36,10 @@ export class FoodDomain extends FunctionalDomain {
         for (const kitchen of loader.loadAll()) {
             this.addUnit(kitchen);
         }
+        this.registerUnitType("community-kitchen",
+            u => this.kitchenLoader?.save(u as CommunityKitchen),
+            id => { this.removeUnit(id); this.kitchenLoader?.delete(id); },
+        );
     }
 
     addKitchen(kitchen: CommunityKitchen): void {
@@ -65,6 +69,10 @@ export class FoodDomain extends FunctionalDomain {
         for (const mill of loader.loadAll()) {
             this.addUnit(mill);
         }
+        this.registerUnitType("mill",
+            u => this.millLoader?.save(u as Mill),
+            id => { this.removeUnit(id); this.millLoader?.delete(id); },
+        );
     }
 
     addMill(mill: Mill): void {

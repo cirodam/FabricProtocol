@@ -134,7 +134,7 @@
     <section class="section">
       <div class="section-header">
         <h2>Schools</h2>
-        <button class="new-btn" onclick={() => navigate("/education/schools/new")}>+ New school</button>
+        <button class="new-btn" onclick={() => navigate("/domains/00000000-0000-0000-0000-000000000005/units/new")}>+ New school</button>
       </div>
       {#if schools.length === 0}
         <p class="muted">No schools yet.</p>
@@ -143,8 +143,8 @@
           {#each schools as school (school.id)}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div class="unit-card" role="button" tabindex="0"
-              onclick={() => navigate(`/education/schools/${school.id}`)}
-              onkeydown={(e) => e.key === 'Enter' && navigate(`/education/schools/${school.id}`)}>
+              onclick={() => navigate(`/domains/00000000-0000-0000-0000-000000000005/units/${school.id}`)}
+              onkeydown={(e) => e.key === 'Enter' && navigate(`/domains/00000000-0000-0000-0000-000000000005/units/${school.id}`)}>
               <div class="badge">School</div>
               <h3>{school.name}</h3>
               <p class="card-desc">{school.description}</p>
@@ -158,7 +158,7 @@
     <section class="section">
       <div class="section-header">
         <h2>Libraries</h2>
-        <button class="new-btn" onclick={() => navigate("/education/libraries/new")}>+ New library</button>
+        <button class="new-btn" onclick={() => navigate("/domains/00000000-0000-0000-0000-000000000005/units/new")}>+ New library</button>
       </div>
       {#if libraries.length === 0}
         <p class="muted">No libraries yet.</p>
@@ -167,8 +167,8 @@
           {#each libraries as library (library.id)}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div class="unit-card" role="button" tabindex="0"
-              onclick={() => navigate(`/education/libraries/${library.id}`)}
-              onkeydown={(e) => e.key === 'Enter' && navigate(`/education/libraries/${library.id}`)}
+              onclick={() => navigate(`/domains/00000000-0000-0000-0000-000000000005/units/${library.id}`)}
+              onkeydown={(e) => e.key === 'Enter' && navigate(`/domains/00000000-0000-0000-0000-000000000005/units/${library.id}`)}
             >
               <div class="badge badge-library">Library</div>
               <h3>{library.name}</h3>
