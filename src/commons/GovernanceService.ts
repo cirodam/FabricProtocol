@@ -1,7 +1,6 @@
 import { Proposal, ProposalStatus, VoteThreshold } from "./Proposal.js";
 import { Constitution } from "./Constitution.js";
 import { ConstitutionLoader } from "./ConstitutionLoader.js";
-import { Commonwealth } from "./Commonwealth.js";
 import { CommunityRole } from "./CommunityRole.js";
 import { MemberService } from "../member/MemberService.js";
 

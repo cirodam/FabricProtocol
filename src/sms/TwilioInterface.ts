@@ -1,6 +1,3 @@
-import { SmsHandler } from "./SmsHandler.js";
-import { IncomingMessage } from "./SmsMessage.js";
-
 /**
  * Development SMS interface via Twilio webhooks.
  * Twilio POSTs to /sms when a message arrives at your Twilio number.
@@ -15,13 +12,8 @@ import { IncomingMessage } from "./SmsMessage.js";
  * In development, expose localhost with: npx ngrok http 3000
  */
 export class TwilioInterface {
-  // TODO: replace with: import express, { Request, Response } from "express";
-  private app: unknown = null;
-  private readonly handler: SmsHandler;
-
-  constructor(private readonly port: number = 3000) {
-    this.handler = new SmsHandler();
-  }
+  // TODO: wire up Express + Twilio webhook (see commented body of start())
+  constructor(private readonly port: number = 3000) {}
 
   start(): void {
     // TODO:

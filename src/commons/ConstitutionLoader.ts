@@ -1,5 +1,5 @@
 import { FileStore } from "../storage/FileStore.js";
-import { Constitution, ConstitutionDocument, DEFAULT_CONSTITUTION } from "./Constitution.js";
+import { Constitution, ConstitutionDocument } from "./Constitution.js";
 
 const FILE_KEY = "constitution";
 

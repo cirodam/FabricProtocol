@@ -1,5 +1,4 @@
 import { Location, LocationType } from "./Location.js";
-import { Address } from "./Address.js";
 import { LocationLoader } from "./LocationLoader.js";
 
 export class LocationRegistry {

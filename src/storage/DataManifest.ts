@@ -38,7 +38,6 @@ export class DataManifest {
 
     private entries: Record<string, string> = {};
     private signerFn: ((data: string) => string) | null = null;
-    private pubKeyHex: string | null = null;
     private ready = false;
 
     private constructor() {}
@@ -63,7 +62,6 @@ export class DataManifest {
      */
     init(signerFn: (data: string) => string, pubKeyHex: string): void {
         this.signerFn = signerFn;
-        this.pubKeyHex = pubKeyHex;
 
         if (existsSync(MANIFEST_PATH)) {
             const raw = JSON.parse(readFileSync(MANIFEST_PATH, "utf-8")) as ManifestFile;
