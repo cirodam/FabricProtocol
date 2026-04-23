@@ -28,8 +28,8 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
 export class HomeChildcare extends FunctionalUnit {
     readonly createdAt: Date;
 
-    constructor() {
-        super("Home Childcare", "Provides paid positions for community members caring for young children at home.");
+    constructor(id?: string) {
+        super("Home Childcare", "Provides paid positions for community members caring for young children at home.", undefined, id);
         this.createdAt = new Date();
     }
 

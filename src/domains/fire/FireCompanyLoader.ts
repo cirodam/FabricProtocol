@@ -58,8 +58,7 @@ export class FireCompanyLoader {
     }
 
     private fromRecord(r: FireCompanyRecord): FireCompany {
-        const company = new FireCompany(r.name);
-        (company as unknown as Record<string, unknown>)["id"]          = r.id;
+        const company = new FireCompany(r.name, r.id);
         (company as unknown as Record<string, unknown>)["description"] = r.description;
         (company as unknown as Record<string, unknown>)["createdAt"]   = new Date(r.createdAt);
         for (const staffId of r.staffIds ?? []) {

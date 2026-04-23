@@ -58,8 +58,7 @@ export class LibraryLoader {
     }
 
     private fromRecord(r: LibraryRecord): Library {
-        const library = new Library(r.name, r.description);
-        (library as unknown as Record<string, unknown>)["id"]        = r.id;
+        const library = new Library(r.name, r.description, r.id);
         (library as unknown as Record<string, unknown>)["createdAt"] = new Date(r.createdAt);
         for (const staffId of r.staffIds ?? []) {
             library.addMember(staffId);

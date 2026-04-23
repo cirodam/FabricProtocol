@@ -29,8 +29,8 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
 export class HomeCaregiving extends FunctionalUnit {
     readonly createdAt: Date;
 
-    constructor() {
-        super("Home Caregiving", "Provides paid positions for community members caring for dependent relatives at home.");
+    constructor(id?: string) {
+        super("Home Caregiving", "Provides paid positions for community members caring for dependent relatives at home.", undefined, id);
         this.createdAt = new Date();
     }
 

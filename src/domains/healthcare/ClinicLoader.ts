@@ -58,8 +58,7 @@ export class ClinicLoader {
     }
 
     private fromRecord(r: ClinicRecord): Clinic {
-        const clinic = new Clinic(r.name, r.description);
-        (clinic as unknown as Record<string, unknown>)["id"] = r.id;
+        const clinic = new Clinic(r.name, r.description, r.id);
         (clinic as unknown as Record<string, unknown>)["createdAt"] = new Date(r.createdAt);
         for (const staffId of r.staffIds ?? []) {
             clinic.addMember(staffId);

@@ -53,9 +53,8 @@ export class GenericUnitLoader {
     loadAll(): { unit: FunctionalUnit; domainId: string }[] {
         const results: { unit: FunctionalUnit; domainId: string }[] = [];
         for (const raw of this.store.readAll<UnitRecord>()) {
-            const unit = new FunctionalUnit(raw.name, raw.description, raw.type);
-            // Restore id via Object.defineProperty (readonly field)
-            Object.defineProperty(unit, "id", { value: raw.id, writable: false });
+            const unit = new FunctionalUnit(raw.name, raw.description, raw.type, raw.id);
+            // Restore createdAt (readonly field — constructor sets current time)
             Object.defineProperty(unit, "createdAt", {
                 value: new Date(raw.createdAt), writable: false,
             });

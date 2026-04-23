@@ -58,8 +58,7 @@ export class MillLoader {
     }
 
     private fromRecord(r: MillRecord): Mill {
-        const mill = new Mill(r.name, r.description);
-        (mill as unknown as Record<string, unknown>)["id"]        = r.id;
+        const mill = new Mill(r.name, r.description, r.id);
         (mill as unknown as Record<string, unknown>)["createdAt"] = new Date(r.createdAt);
         for (const staffId of r.staffIds ?? []) {
             mill.addMember(staffId);

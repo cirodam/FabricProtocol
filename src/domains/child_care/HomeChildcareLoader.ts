@@ -50,8 +50,7 @@ export class HomeChildcareLoader {
     load(): HomeChildcare | undefined {
         const r = this.store.read<HomeChildcareRecord>(RECORD_KEY);
         if (!r) return undefined;
-        const unit = new HomeChildcare();
-        (unit as unknown as Record<string, unknown>)["id"]        = r.id;
+        const unit = new HomeChildcare(r.id);
         (unit as unknown as Record<string, unknown>)["createdAt"] = new Date(r.createdAt);
         for (const staffId of r.staffIds ?? []) {
             unit.addMember(staffId);

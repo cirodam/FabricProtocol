@@ -58,8 +58,7 @@ export class CommunityKitchenLoader {
     }
 
     private fromRecord(r: KitchenRecord): CommunityKitchen {
-        const kitchen = new CommunityKitchen(r.name, r.description);
-        (kitchen as unknown as Record<string, unknown>)["id"]        = r.id;
+        const kitchen = new CommunityKitchen(r.name, r.description, r.id);
         (kitchen as unknown as Record<string, unknown>)["createdAt"] = new Date(r.createdAt);
         for (const staffId of r.staffIds ?? []) {
             kitchen.addMember(staffId);

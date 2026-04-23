@@ -25,8 +25,8 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
 export class DentalClinic extends FunctionalUnit {
     readonly createdAt: Date;
 
-    constructor(name: string, description: string = "Provides preventive and restorative oral health care for community members.") {
-        super(name, description);
+    constructor(name: string, description: string = "Provides preventive and restorative oral health care for community members.", id?: string) {
+        super(name, description, undefined, id);
         this.createdAt = new Date();
     }
 

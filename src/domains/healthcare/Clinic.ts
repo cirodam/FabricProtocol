@@ -10,8 +10,8 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
 export class Clinic extends FunctionalUnit {
     readonly createdAt: Date;
 
-    constructor(name: string, description: string = "Provides primary care, preventive medicine, and chronic disease management.") {
-        super(name, description);
+    constructor(name: string, description: string = "Provides primary care, preventive medicine, and chronic disease management.", id?: string) {
+        super(name, description, undefined, id);
         this.createdAt = new Date();
     }
 

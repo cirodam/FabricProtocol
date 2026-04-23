@@ -26,8 +26,8 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
 export class FireCompany extends FunctionalUnit {
     readonly createdAt: Date;
 
-    constructor(name: string) {
-        super(name, "A fire station and crew providing fire suppression, rescue, and first-response services.");
+    constructor(name: string, id?: string) {
+        super(name, "A fire station and crew providing fire suppression, rescue, and first-response services.", undefined, id);
         this.createdAt = new Date();
     }
 

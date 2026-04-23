@@ -31,8 +31,8 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
 export class MedicalCareUnit extends FunctionalUnit {
     readonly createdAt: Date;
 
-    constructor(name: string = "Medical Care Unit") {
-        super(name, "Provides continuous clinical care for community members with complex or end-of-life needs.");
+    constructor(name: string = "Medical Care Unit", id?: string) {
+        super(name, "Provides continuous clinical care for community members with complex or end-of-life needs.", undefined, id);
         this.createdAt = new Date();
     }
 

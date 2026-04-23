@@ -15,8 +15,8 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
 export class CommunityKitchen extends FunctionalUnit {
     readonly createdAt: Date;
 
-    constructor(name: string, description: string = "Prepares and delivers meals for members who cannot cook for themselves, and for community institutions.") {
-        super(name, description);
+    constructor(name: string, description: string = "Prepares and delivers meals for members who cannot cook for themselves, and for community institutions.", id?: string) {
+        super(name, description, undefined, id);
         this.createdAt = new Date();
     }
 

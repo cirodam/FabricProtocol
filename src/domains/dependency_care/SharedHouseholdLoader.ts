@@ -58,8 +58,7 @@ export class SharedHouseholdLoader {
     }
 
     private fromRecord(r: SharedHouseholdRecord): SharedHousehold {
-        const unit = new SharedHousehold(r.name);
-        (unit as unknown as Record<string, unknown>)["id"]          = r.id;
+        const unit = new SharedHousehold(r.name, r.id);
         (unit as unknown as Record<string, unknown>)["description"] = r.description;
         (unit as unknown as Record<string, unknown>)["createdAt"]   = new Date(r.createdAt);
         for (const staffId of r.staffIds ?? []) {

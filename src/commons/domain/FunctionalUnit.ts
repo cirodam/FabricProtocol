@@ -22,13 +22,15 @@ export class FunctionalUnit implements IEconomicActor {
     private roles: CommunityRole[] = [];
     private memberIds: Set<string> = new Set();
 
-    constructor(name: string, description: string = "", type: string = "unit") {
-        this.id = randomUUID();
+    constructor(name: string, description: string = "", type: string = "unit", id?: string) {
+        this.id = id ?? randomUUID();
         this.name = name;
         this.description = description;
         this._type = type;
         this.createdAt = new Date();
-        Bank.getInstance().openAccount(this, "primary", 0, false);
+        if (!Bank.getInstance().getPrimaryAccount(this.id)) {
+            Bank.getInstance().openAccount(this, "primary", 0, false);
+        }
     }
 
     getId(): string { return this.id; }

@@ -58,8 +58,7 @@ export class SchoolLoader {
     }
 
     private fromRecord(r: SchoolRecord): School {
-        const school = new School(r.name, r.description);
-        (school as unknown as Record<string, unknown>)["id"]        = r.id;
+        const school = new School(r.name, r.description, r.id);
         (school as unknown as Record<string, unknown>)["createdAt"] = new Date(r.createdAt);
         for (const staffId of r.staffIds ?? []) {
             school.addMember(staffId);

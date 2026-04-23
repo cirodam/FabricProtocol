@@ -24,8 +24,8 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
 export class Library extends FunctionalUnit {
     readonly createdAt: Date;
 
-    constructor(name: string, description: string = "Maintains the community's knowledge commons, records, and reference collections.") {
-        super(name, description);
+    constructor(name: string, description: string = "Maintains the community's knowledge commons, records, and reference collections.", id?: string) {
+        super(name, description, undefined, id);
         this.createdAt = new Date();
     }
 

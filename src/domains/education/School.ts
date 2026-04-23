@@ -27,8 +27,8 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
 export class School extends FunctionalUnit {
     readonly createdAt: Date;
 
-    constructor(name: string, description: string = "Provides formal instruction for children, scaled to community capacity.") {
-        super(name, description);
+    constructor(name: string, description: string = "Provides formal instruction for children, scaled to community capacity.", id?: string) {
+        super(name, description, undefined, id);
         this.createdAt = new Date();
     }
 

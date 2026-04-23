@@ -29,8 +29,8 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
 export class SharedHousehold extends FunctionalUnit {
     readonly createdAt: Date;
 
-    constructor(name: string) {
-        super(name, "A small residential care home providing supported living for dependent community members.");
+    constructor(name: string, id?: string) {
+        super(name, "A small residential care home providing supported living for dependent community members.", undefined, id);
         this.createdAt = new Date();
     }
 

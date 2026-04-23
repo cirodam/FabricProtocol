@@ -19,8 +19,8 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
 export class Mill extends FunctionalUnit {
     readonly createdAt: Date;
 
-    constructor(name: string, description: string = "Processes whole grain into flour and meal for community consumption.") {
-        super(name, description);
+    constructor(name: string, description: string = "Processes whole grain into flour and meal for community consumption.", id?: string) {
+        super(name, description, undefined, id);
         this.createdAt = new Date();
     }
 
