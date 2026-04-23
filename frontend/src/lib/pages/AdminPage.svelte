@@ -12,7 +12,7 @@
 </script>
 
 <div class="domain-layout">
-  <CommunitySidebar {navigate} />
+  <CommunitySidebar {navigate} {path} />
 
   <div class="admin-content">
     {#if path === '/admin' || path === '/admin/members'}

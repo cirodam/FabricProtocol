@@ -97,7 +97,7 @@
               <td class="num">{fmt(acct.kin)}</td>
               <td class="flags">
                 {#if acct.allowNegativeKin}<span class="flag">overdraft</span>{/if}
-                {#if acct.exemptFromDemurrage}<span class="flag">exempt</span>{/if}
+                {#if acct.exemptFromDemurrage}<span class="flag">dues exempt</span>{/if}
               </td>
             </tr>
           {/each}

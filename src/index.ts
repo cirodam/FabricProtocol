@@ -71,7 +71,6 @@ async function init(): Promise<void> {
   );
   CentralBank.getInstance().init(new MemberEndowmentLoader("data/endowment-profiles"));
   CentralBank.getInstance().demurrageRate = constitution.bankDemurrageRate;
-  Commonwealth.getInstance().levyRate = constitution.commonsLevyRate;
   MemberService.getInstance().init(new MemberLoader("data/members"));
   ApplicationService.getInstance().init(new MemberApplicationLoader("data/members/applications"));
   CalendarService.getInstance().init(new CalendarEventLoader("data/calendar"));
@@ -132,7 +131,7 @@ async function init(): Promise<void> {
   scheduler.register({
     name: "commons-levy",
     intervalMs: every.months(1),
-    run: () => Commonwealth.getInstance().assessDemurrage(constitution.commonsLevyRate),
+    run: () => Commonwealth.getInstance().assessDemurrage(Commonwealth.getInstance().computedLevyRate()),
   });
   scheduler.register({
     name: "payroll",

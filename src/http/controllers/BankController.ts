@@ -78,15 +78,15 @@ export function createTransfer(req: Request, res: Response): void {
     }
 }
 
-function toAccountDto(a: { id: string; ownerId: string; label: string; kin: number; allowNegativeKin: boolean; exemptFromDemurrage: boolean; createdAt: Date }) {
+function toAccountDto(a: { id: string; ownerId: string; label: string; kin: number; overdraftLimit: number; exemptFromDemurrage: boolean; createdAt: Date }) {
     return {
-        id:                   a.id,
-        ownerId:              a.ownerId,
-        label:                a.label,
-        kin:              a.kin,
-        allowNegativeKin: a.allowNegativeKin,
-        exemptFromDemurrage:  a.exemptFromDemurrage,
-        createdAt:            a.createdAt,
+        id:                  a.id,
+        ownerId:             a.ownerId,
+        label:               a.label,
+        kin:                 a.kin,
+        overdraftLimit:      a.overdraftLimit,
+        exemptFromDemurrage: a.exemptFromDemurrage,
+        createdAt:           a.createdAt,
     };
 }
 

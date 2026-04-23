@@ -102,7 +102,7 @@
       }
     },
     "monthlyFoodAllowance": {
-      "value": 833,
+      "value": 200,
       "authority": "citizens-assembly",
       "description": "Kin paid to each member per month from the Food domain as an unconditional food allowance. This is a community policy decision — not a monetary definition. The community decides how much of the commons to distribute to members each month.",
       "constraints": {

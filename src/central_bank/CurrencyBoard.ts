@@ -1,10 +1,22 @@
 import { FileStore } from "../storage/FileStore.js";
 
+export interface SettlementRecord {
+    /** ISO timestamp of the settlement. */
+    at: string;
+    /** Positive = inbound (we received kithe). Negative = outbound (we sent kithe). */
+    kithe: number;
+    /** ID or name of the partner community. */
+    partnerId: string;
+    memo: string;
+}
+
 interface CurrencyBoardState {
     /** Kithe held in reserve, received from the federation as community endowment. */
     kitheReserve: number;
     /** Kin issued against the kithe reserve. Always equal to kitheReserve * KIN_PER_KITHE. */
     kinIssued: number;
+    /** Running log of inter-community kithe settlements. */
+    settlements: SettlementRecord[];
 }
 
 /**
@@ -38,6 +50,7 @@ export class CurrencyBoard {
         this.state = {
             kitheReserve: 0,
             kinIssued: 0,
+            settlements: [],
         };
     }
 
@@ -51,7 +64,10 @@ export class CurrencyBoard {
     init(store: FileStore): void {
         this.store = store;
         const saved = store.read<CurrencyBoardState>("currency-board");
-        if (saved) this.state = saved;
+        if (saved) {
+            this.state = saved;
+            this.state.settlements ??= [];
+        }
     }
 
     /** Kithe currently held in reserve. */
@@ -59,6 +75,9 @@ export class CurrencyBoard {
 
     /** Kin currently issued against the reserve. */
     get kinIssued(): number { return this.state.kinIssued; }
+
+    /** Full settlement history, newest first. */
+    get settlements(): SettlementRecord[] { return [...this.state.settlements].reverse(); }
 
     /**
      * Called when a new member joins or a member's annual endowment is issued.
@@ -102,9 +121,10 @@ export class CurrencyBoard {
      * Kithe flows out to the federation for payment to another community.
      * Returns false if reserves are insufficient.
      */
-    settleOutbound(kithe: number): boolean {
+    settleOutbound(kithe: number, partnerId: string, memo: string = ""): boolean {
         if (kithe > this.state.kitheReserve) return false;
         this.state.kitheReserve -= kithe;
+        this.state.settlements.push({ at: new Date().toISOString(), kithe: -kithe, partnerId, memo });
         this.persist();
         return true;
     }
@@ -113,8 +133,9 @@ export class CurrencyBoard {
      * Receive kithe from the federation as payment for goods delivered to
      * another community. Adds to the reserve without issuing new kin.
      */
-    settleInbound(kithe: number): void {
+    settleInbound(kithe: number, partnerId: string, memo: string = ""): void {
         this.state.kitheReserve += kithe;
+        this.state.settlements.push({ at: new Date().toISOString(), kithe, partnerId, memo });
         this.persist();
     }
 

@@ -112,31 +112,31 @@
       <span class="flag">overdraft allowed</span>
     {/if}
     {#if account.exemptFromDemurrage}
-      <span class="flag exempt">exempt from demurrage</span>
+      <span class="flag exempt">exempt from dues</span>
     {/if}
   </div>
 
   <section class="demurrage-section">
-    <h2>Demurrage</h2>
+    <h2>Community Dues</h2>
 
     {#if account.exemptFromDemurrage}
-      <p class="muted">This account is exempt from demurrage.</p>
+      <p class="muted">This account is exempt from community dues.</p>
     {:else if schedule}
       <div class="demurrage-grid">
         <div class="demurrage-row">
-          <span class="dl">Rate</span>
-          <span class="dv">{(schedule.rate * 100).toFixed(1)}% per cycle</span>
+          <span class="dl">Dues rate</span>
+          <span class="dv">{(schedule.rate * 100).toFixed(3)}% per month</span>
         </div>
         <div class="demurrage-row">
-          <span class="dl">Next run</span>
+          <span class="dl">Next collection</span>
           <span class="dv">{fmtDate(schedule.nextRun)}</span>
         </div>
         <div class="demurrage-row">
-          <span class="dl">Last run</span>
+          <span class="dl">Last collected</span>
           <span class="dv">{fmtDate(schedule.lastRun)}</span>
         </div>
         <div class="demurrage-row separator">
-          <span class="dl">Amount taken</span>
+          <span class="dl">Amount due</span>
           <span class="dv debit">− {fmt(demurrageAmount)} kin</span>
         </div>
         <div class="demurrage-row">
@@ -145,7 +145,7 @@
         </div>
       </div>
     {:else}
-      <p class="muted">Demurrage schedule unavailable.</p>
+      <p class="muted">Dues schedule unavailable.</p>
     {/if}
   </section>
 {/if}

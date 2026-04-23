@@ -34,7 +34,7 @@ export function getEndowments(_req: Request, res: Response): void {
 
 // GET /demurrage-schedule
 export function getDemurrageSchedule(_req: Request, res: Response): void {
-    const rate = Commonwealth.getInstance().levyRate;
+    const rate = Commonwealth.getInstance().computedLevyRate();
     const info = Scheduler.getInstance()?.getJobInfo("commons-levy");
     res.json({
         rate,

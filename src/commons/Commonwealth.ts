@@ -4,6 +4,7 @@ import { CommunityRole } from "./CommunityRole.js";
 import { FunctionalDomain } from "./domain/FunctionalDomain.js";
 import { LedgerService } from "../ledger/LedgerService.js";
 import { AssetLedger } from "../ledger/AssetLedger.js";
+import { FoodDomain } from "../domains/food/FoodDomain.js";
 
 // The Commons represents the community's collective investment in itself.
 // It holds pooled kin used to meet basic needs, provide care for dependents,
@@ -12,9 +13,6 @@ export class Commonwealth implements IEconomicActor {
     private static instance: Commonwealth;
 
     readonly id: string;
-
-    /** The commons levy rate applied monthly to all non-exempt accounts. Set at startup. */
-    levyRate: number = 0;
 
     private positions: CommunityRole[] = [];
     private domains: FunctionalDomain[] = [];
@@ -104,17 +102,19 @@ export class Commonwealth implements IEconomicActor {
     }
 
     /**
-     * Returns monthly payroll obligations broken down by domain, plus a commons-level
-     * line for positions held directly by the Commonwealth (governance staff, etc.).
+     * Returns monthly budget obligations broken down by category.
      *
      * Shape:
      *   {
-     *     commons:  number,          // positions held at the Commonwealth level
-     *     domains:  { name, payroll }[],
-     *     total:    number
+     *     foodAllowance: number,     // universal member food allowance (per member × count)
+     *     commons:       number,     // positions held at the Commonwealth level
+     *     domains:       { name, payroll }[],
+     *     total:         number
      *   }
      */
-    getOutflows(): { commons: number; domains: { name: string; payroll: number }[]; total: number } {
+    getOutflows(): { foodAllowance: number; commons: number; domains: { name: string; payroll: number }[]; total: number } {
+        const foodAllowance = FoodDomain.getInstance().monthlyAllowanceTotal();
+
         const commons = this.positions
             .filter(p => p.isActive())
             .reduce((sum, p) => sum + p.kinPerMonth, 0);
@@ -124,9 +124,9 @@ export class Commonwealth implements IEconomicActor {
             payroll: d.getPayroll(),
         }));
 
-        const total = commons + domains.reduce((sum, d) => sum + d.payroll, 0);
+        const total = foodAllowance + commons + domains.reduce((sum, d) => sum + d.payroll, 0);
 
-        return { commons, domains, total };
+        return { foodAllowance, commons, domains, total };
     }
 
     // Collect demurrage from all non-exempt accounts into the Commons primary account.
@@ -145,13 +145,25 @@ export class Commonwealth implements IEconomicActor {
         }
     }
 
-    // Calculate what the commons levy would collect at the given rate without applying it.
-    calculateDemurrage(rate: number): number {
+    /** Total kin held in non-exempt accounts — the base against which the levy is applied. */
+    taxableSupply(): number {
         let total = 0;
         for (const account of Bank.getInstance().getAllAccounts()) {
-            if (account.exemptFromDemurrage || account.kin <= 0) continue;
-            total += Math.round(account.kin * rate * 100) / 100;
+            if (!account.exemptFromDemurrage && account.kin > 0) total += account.kin;
         }
         return total;
+    }
+
+    /**
+     * Derives the levy rate needed to exactly cover monthly outflows.
+     * rate = totalOutflows / taxableSupply
+     * Returns 0 if there are no outflows or no taxable balances.
+     */
+    computedLevyRate(): number {
+        const outflows = this.getOutflows().total;
+        if (outflows === 0) return 0;
+        const supply = this.taxableSupply();
+        if (supply === 0) return 0;
+        return outflows / supply;
     }
 }

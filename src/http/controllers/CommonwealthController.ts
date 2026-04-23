@@ -2,14 +2,12 @@ import { Request, Response } from "express";
 import { Commonwealth } from "../../commons/Commonwealth.js";
 import { Bank } from "../../bank/Bank.js";
 import { Scheduler } from "../../scheduler/Scheduler.js";
-import { CentralBank } from "../../central_bank/CentralBank.js";
-import { Constitution } from "../../commons/Constitution.js";
 
-const COMMONS_DEMURRAGE_RATE = 0.02;
+const cw = () => Commonwealth.getInstance();
 
 // GET /commonwealth/summary
 export function getSummary(_req: Request, res: Response): void {
-    const commonwealth = Commonwealth.getInstance();
+    const commonwealth = cw();
     const account = Bank.getInstance().getPrimaryAccount(commonwealth.id);
 
     res.json({
@@ -17,33 +15,26 @@ export function getSummary(_req: Request, res: Response): void {
     });
 }
 
-// GET /commonwealth/demurrage
+// GET /community/demurrage
 export function getDemurrage(_req: Request, res: Response): void {
+    const commonwealth = cw();
     const scheduler = Scheduler.getInstance();
     const jobInfo = scheduler?.getJobInfo("commons-levy") ?? null;
 
-    const projectedCollection = Commonwealth.getInstance().calculateDemurrage(COMMONS_DEMURRAGE_RATE);
+    const rate = commonwealth.computedLevyRate();
+    const taxableSupply = commonwealth.taxableSupply();
 
     res.json({
-        rate:                COMMONS_DEMURRAGE_RATE,
-        lastRun:             jobInfo?.lastRun ?? null,
-        nextRun:             jobInfo?.nextRun ?? null,
-        projectedCollection,
+        rate,
+        taxableSupply,
+        projectedCollection: commonwealth.getOutflows().total,
+        lastRun: jobInfo?.lastRun ?? null,
+        nextRun: jobInfo?.nextRun ?? null,
     });
 }
 
-// GET /commonwealth/outflows
-// Returns monthly payroll obligations by domain, plus total outstanding member allowances.
+// GET /community/outflows
 export function getOutflows(_req: Request, res: Response): void {
-    const payroll = Commonwealth.getInstance().getOutflows();
-    const cb = CentralBank.getInstance();
-    const allowances = {
-        total:       cb.desiredMoneyInCirculation,
-        perMember:   Constitution.getInstance().monthlyFoodAllowance,
-    };
-    res.json({
-        payroll,
-        allowances,
-        monthlyTotal: payroll.total,
-    });
+    const payroll = cw().getOutflows();
+    res.json({ payroll });
 }

@@ -118,6 +118,13 @@ export class FoodDomain extends FunctionalDomain {
         }
     }
 
+    /** Total kin committed to food allowances each month (perMember × memberCount). */
+    monthlyAllowanceTotal(): number {
+        const amount = Constitution.getInstance().monthlyFoodAllowance;
+        const memberCount = MemberService.getInstance().getAll().length;
+        return amount * memberCount;
+    }
+
     // Sum the daily nutritional requirements across all current community members.
     getDailyRequirements(): NutritionalProfile {
         const totals: NutritionalProfile = { calories: 0, proteinG: 0, carbsG: 0, fatG: 0, fiberG: 0, waterL: 0 };

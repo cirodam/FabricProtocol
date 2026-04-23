@@ -1,9 +1,10 @@
 <script lang="ts">
-  const { navigate }: { navigate: (to: string) => void } = $props();
+  const { navigate, path = window.location.pathname }: { navigate: (to: string) => void; path?: string } = $props();
 
   const economyLinks = [
-    { label: 'Community', path: '/community' },
-    { label: 'Central Bank', path: '/community/central-bank' },
+    { label: 'Community Budget', path: '/community' },
+    { label: 'Central Bank',     path: '/community/central-bank' },
+    { label: 'Currency Board',   path: '/community/currency-board' },
   ];
 
   const governanceLinks = [
@@ -18,8 +19,11 @@
   ];
 
   function isActive(linkPath: string): boolean {
-    return window.location.pathname === linkPath ||
-      (linkPath !== '/' && window.location.pathname.startsWith(linkPath));
+    if (path === linkPath) return true;
+    // These paths are prefixes of sibling links, so require exact match only
+    const exactOnly = ['/community', '/referenda'];
+    if (exactOnly.includes(linkPath)) return false;
+    return path.startsWith(linkPath + '/');
   }
 </script>
 
