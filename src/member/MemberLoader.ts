@@ -11,6 +11,7 @@ interface MemberRecord {
   joinDate: string;
   handle: string;
   disabled: boolean;
+  retired: boolean;
   guardianId: string | null;
   phone: string | null;
   pinHash: string | null;
@@ -34,6 +35,7 @@ export class MemberLoader {
       joinDate: member.joinDate.toISOString(),
       handle: member.handle,
       disabled: member.disabled,
+      retired: member.retired,
       guardianId: member.guardianId,
       phone: member.phone,
       pinHash: member.pinHash,
@@ -63,6 +65,7 @@ export class MemberLoader {
     (m as unknown as Record<string, unknown>)["id"] = r.id;
     (m as unknown as Record<string, unknown>)["joinDate"] = new Date(r.joinDate);
     m.guardianId = r.guardianId;
+    m.retired = r.retired ?? false;
     m.phone = r.phone;
     m.pinHash = r.pinHash ?? null;
     m.passwordHash = r.passwordHash ?? null;

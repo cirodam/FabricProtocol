@@ -42,7 +42,7 @@
 <div class="page-header">
   <h1>Members</h1>
   <span class="count">{loading ? '…' : members.length}</span>
-  <button class="add-btn" onclick={() => navigate('/applications/new')}>+ New application</button>
+  <button class="add-btn" onclick={() => navigate('/admin/applications/new')}>+ New application</button>
 </div>
 
 {#if loading}
@@ -66,7 +66,7 @@
       <tbody>
         {#each members as m (m.id)}
           <tr>
-            <td><button class="link-btn" onclick={() => navigate(`/members/${m.id}`)}>{m.firstName} {m.lastName}</button></td>
+            <td><button class="link-btn" onclick={() => navigate(`/admin/members/${m.id}`)}>{m.firstName} {m.lastName}</button></td>
             <td class="muted">{age(m.birthDate)}</td>
             <td class="handle">@{m.handle}</td>
             <td class="muted">{formatDate(m.joinDate)}</td>

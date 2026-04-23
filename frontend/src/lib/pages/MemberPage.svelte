@@ -18,6 +18,7 @@
     trustScore: number; // kept for backwards compat — not rendered
     personYears: number;
     disabled: boolean;
+    retired: boolean;
     guardianId: string | null;
     phone: string | null;
     languages: LanguageProficiency[];
@@ -28,6 +29,23 @@
   let error: string | null = $state(null);
   let deleting = $state(false);
   let deleteError: string | null = $state(null);
+  let togglingRetired = $state(false);
+
+  async function toggleRetired() {
+    if (!member) return;
+    togglingRetired = true;
+    try {
+      const res = await fetch(`/api/members/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ retired: !member.retired }),
+      });
+      if (!res.ok) throw new Error(`${res.status}`);
+      member = await res.json();
+    } finally {
+      togglingRetired = false;
+    }
+  }
 
   async function load() {
     try {
@@ -78,7 +96,7 @@
 </script>
 
 <div class="page-header">
-  <button class="back-btn" onclick={() => navigate('/members')}>← Members</button>
+  <button class="back-btn" onclick={() => navigate('/admin/members')}>← Members</button>
   {#if member}
     <button class="danger-btn" onclick={deleteMember} disabled={deleting}>
       {deleting ? 'Removing…' : 'Remove member'}
@@ -143,6 +161,13 @@
         <dl>
           <dt>Disabled</dt>
           <dd>{member.disabled ? 'Yes' : 'No'}</dd>
+          <dt>Retired</dt>
+          <dd>
+            {member.retired ? 'Yes' : 'No'}
+            <button class="toggle-btn" onclick={toggleRetired} disabled={togglingRetired}>
+              {member.retired ? 'Unretire' : 'Retire'}
+            </button>
+          </dd>
         </dl>
       </div>
     </div>
@@ -239,7 +264,19 @@
 
   dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; align-items: baseline; }
   dt { color: var(--text-muted); font-size: 13px; white-space: nowrap; }
-  dd { margin: 0; font-size: 14px; }
+  dd { margin: 0; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+
+  .toggle-btn {
+    font-size: 12px;
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .toggle-btn:hover:not(:disabled) { background: var(--surface-hover, #f3f4f6); color: var(--text); }
+  .toggle-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 
   .lang-card { grid-column: 1 / -1; }

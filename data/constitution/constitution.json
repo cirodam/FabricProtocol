@@ -100,6 +100,24 @@
         "min": 0,
         "max": 5000
       }
+    },
+    "retirementAge": {
+      "value": 65,
+      "authority": "referendum",
+      "description": "Age at which a member becomes eligible for monthly retirement payments from the social insurance pool.",
+      "constraints": {
+        "min": 55,
+        "max": 75
+      }
+    },
+    "retirementPayoutRate": {
+      "value": 0.005,
+      "authority": "referendum",
+      "description": "Fraction of the retirement pool distributed each month across all current retirees. E.g. 0.005 = 0.5% of pool per month.",
+      "constraints": {
+        "min": 0.001,
+        "max": 0.02
+      }
     }
   },
   "amendments": []

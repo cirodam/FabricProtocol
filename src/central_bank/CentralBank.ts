@@ -25,6 +25,13 @@ export class CentralBank implements IEconomicActor {
     private endowments: Map<string, MemberEndowment> = new Map();
     private endowmentLoader: MemberEndowmentLoader | null = null;
 
+    /**
+     * Total kin minted into the retirement pool (net of burns).
+     * Included in desiredMoneyInCirculation so the demurrage safety-net
+     * correctly treats pool-backed kin as legitimately issued.
+     */
+    private poolIssued: number = 0;
+
     private constructor() {
         this.id = "00000000-0000-0000-0000-000000000001"; // stable singleton ID
         if (!Bank.getInstance().getPrimaryAccount(this.id)) {
@@ -61,16 +68,44 @@ export class CentralBank implements IEconomicActor {
         return Math.max(0, -(bankAccount?.kin ?? 0));
     }
 
-    /** What money in circulation should be — sum of all active member endowments. */
+    /** What money in circulation should be — sum of all active member endowments plus pool-backed kin. */
     get desiredMoneyInCirculation(): number {
         let total = 0;
         for (const e of this.endowments.values()) total += e.endowment;
-        return total;
+        return total + this.poolIssued;
     }
 
     /** Kin still floating from departed members we couldn't fully reclaim. */
     get unrecoveredKin(): number {
         return Math.max(0, this.moneyInCirculation - this.desiredMoneyInCirculation);
+    }
+
+    /**
+     * Mint kin into the retirement pool account.
+     * Called by SocialInsuranceBank for birthday and join contributions.
+     */
+    mintToPool(targetAccountId: string, amount: number, description: string): void {
+        const bankInst = Bank.getInstance();
+        const bankAccount = bankInst.getPrimaryAccount(this.id);
+        const poolAccount = bankInst.getAccount(targetAccountId);
+        if (!bankAccount) throw new Error("CentralBank has no primary account");
+        if (!poolAccount) throw new Error(`Pool account ${targetAccountId} not found`);
+        bankInst.transfer(bankAccount.id, poolAccount.id, "kin", amount, description);
+        this.poolIssued += amount;
+    }
+
+    /**
+     * Burn kin from the retirement pool back to the bank (contraction).
+     * Called by SocialInsuranceBank on member death to cancel their unspent entitlement.
+     */
+    burnFromPool(sourceAccountId: string, amount: number, description: string): void {
+        const bankInst = Bank.getInstance();
+        const bankAccount = bankInst.getPrimaryAccount(this.id);
+        const poolAccount = bankInst.getAccount(sourceAccountId);
+        if (!bankAccount) throw new Error("CentralBank has no primary account");
+        if (!poolAccount) throw new Error(`Pool account ${sourceAccountId} not found`);
+        bankInst.transfer(poolAccount.id, bankAccount.id, "kin", amount, description);
+        this.poolIssued = Math.max(0, this.poolIssued - amount);
     }
 
     /** Returns the endowment record for a given member, or undefined if none exists. */

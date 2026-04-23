@@ -2,8 +2,8 @@
   "id": "a9480eda-c446-4522-8353-6b17a473a6ae",
   "ownerId": "00000000-0000-0000-0000-000000000001",
   "label": "primary",
-  "kin": -3390000,
-  "allowNegativeKin": true,
+  "kin": -6780000,
+  "overdraftLimit": null,
   "exemptFromDemurrage": true,
   "createdAt": "2026-04-20T19:57:23.252Z"
 }

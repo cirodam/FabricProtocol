@@ -84,7 +84,7 @@ export function updateMember(req: Request, res: Response): void {
         return;
     }
 
-    const { firstName, lastName, phone, disabled, languages } = req.body ?? {};
+    const { firstName, lastName, phone, disabled, retired, languages } = req.body ?? {};
 
     if (firstName !== undefined) {
         if (typeof firstName !== "string" || !firstName.trim()) {
@@ -114,6 +114,13 @@ export function updateMember(req: Request, res: Response): void {
         }
         member.disabled = disabled;
     }
+    if (retired !== undefined) {
+        if (typeof retired !== "boolean") {
+            res.status(400).json({ error: "retired must be a boolean" });
+            return;
+        }
+        member.retired = retired;
+    }
 
     if (languages !== undefined) {
         if (!Array.isArray(languages)) {
@@ -139,6 +146,7 @@ function toDto(m: Member) {
         handle:             m.handle,
         personYears:        personYears(m.birthDate),
         disabled:           m.disabled,
+        retired:            m.retired,
         guardianId:         m.guardianId,
         phone:              m.phone,
         languages:          m.languages,

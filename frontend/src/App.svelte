@@ -10,6 +10,7 @@
   import PostPage from './lib/pages/PostPage.svelte';
   import CentralBankPage from './lib/pages/CentralBankPage.svelte';
   import CommonwealthPage from './lib/pages/CommonwealthPage.svelte';
+  import SocialInsurancePage from './lib/pages/SocialInsurancePage.svelte';
   import DemographicsPage from './lib/pages/DemographicsPage.svelte';
   import FoodPage from './lib/pages/FoodPage.svelte';
   import CommunicationsPage from './lib/pages/CommunicationsPage.svelte';
@@ -159,6 +160,8 @@
     <PostPage id={path.slice('/marketplace/'.length)} {navigate} />
   {:else if path.startsWith('/community')}
     <CommonwealthPage {navigate} {path} />
+  {:else if path === '/social-insurance'}
+    <SocialInsurancePage {navigate} {path} />
   {:else if path === '/provisioning'}
     <ProvisioningPage {navigate} />
   {:else if path === '/demographics'}

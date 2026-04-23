@@ -59,6 +59,8 @@ import { ReferendumService } from "./referendum/ReferendumService.js";
 import { ReferendumLoader } from "./referendum/ReferendumLoader.js";
 import { CommunicationsDomain } from "./domains/communications/CommunicationsDomain.js";
 import { CommunityRole } from "./commons/CommunityRole.js";
+import { SocialInsuranceBank } from "./social_insurance/SocialInsuranceBank.js";
+import { SocialInsuranceMemberLoader } from "./social_insurance/SocialInsuranceMemberLoader.js";
 
 
 async function init(): Promise<void> {
@@ -73,7 +75,13 @@ async function init(): Promise<void> {
   );
   CentralBank.getInstance().init(new MemberEndowmentLoader("data/endowment-profiles"));
   CentralBank.getInstance().demurrageRate = constitution.bankDemurrageRate;
+  SocialInsuranceBank.getInstance().init(new SocialInsuranceMemberLoader("data/social-insurance"));
   MemberService.getInstance().init(new MemberLoader("data/members"));
+  // Backfill pool contributions for members who predate the social insurance system.
+  SocialInsuranceBank.getInstance().backfillMembers(
+    MemberService.getInstance().getAll(),
+    constitution.kinPerPersonYear,
+  );
   ApplicationService.getInstance().init(new MemberApplicationLoader("data/members/applications"));
   CalendarService.getInstance().init(new CalendarEventLoader("data/calendar"));
   CalendarService.getInstance().seedDefaults();
@@ -139,6 +147,14 @@ async function init(): Promise<void> {
     run: () => {
       const floor = constitution.demurrageFloor;
       Commonwealth.getInstance().assessDemurrage(Commonwealth.getInstance().computedLevyRate(floor), floor);
+    },
+  });
+  scheduler.register({
+    name: "retirement-payouts",
+    intervalMs: every.months(1),
+    run: () => {
+      const retiredMembers = MemberService.getInstance().getAll().filter(m => m.retired);
+      SocialInsuranceBank.getInstance().issueMonthlyPayments(retiredMembers, constitution.retirementPayoutRate);
     },
   });
   scheduler.register({

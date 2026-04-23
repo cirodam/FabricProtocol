@@ -6,8 +6,10 @@
   "joinDate": "2026-04-20T20:05:52.653Z",
   "handle": "ifreeman",
   "disabled": false,
+  "retired": true,
   "guardianId": null,
   "phone": "84837489483",
   "pinHash": null,
+  "passwordHash": null,
   "languages": []
 }

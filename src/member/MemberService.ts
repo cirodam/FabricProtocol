@@ -6,6 +6,7 @@ import { Commonwealth } from "../commons/Commonwealth.js";
 import { Bank } from "../bank/Bank.js";
 import { Marketplace } from "../marketplace/Marketplace.js";
 import { Constitution } from "../commons/Constitution.js";
+import { SocialInsuranceBank } from "../social_insurance/SocialInsuranceBank.js";
 import { createHash } from "crypto";
 
 export class MemberService {
@@ -38,7 +39,9 @@ export class MemberService {
     this.members.set(member.id, member);
     Bank.getInstance().openAccount(member, "primary");
     const age = Math.floor((Date.now() - member.birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-    CentralBank.getInstance().issueEndowment(member, age * Constitution.getInstance().kinPerPersonYear);
+    // Back-debt goes to the retirement pool, not the member's primary account.
+    // This prevents a large immediate injection into the money supply.
+    SocialInsuranceBank.getInstance().depositContribution(member, age * Constitution.getInstance().kinPerPersonYear);
     this.loader?.save(member);
   }
 
@@ -97,9 +100,8 @@ export class MemberService {
     return member.pinHash === createHash("sha256").update(pin).digest("hex");
   }
 
-  // Call once per day. On each member's birthday, issues one person-year
-  // of kin via the CentralBank — a birthday endowment recognizing another
-  // year of the member's life.
+  // Call once per day. On each member's birthday, deposits one person-year
+  // of kin into the retirement pool on behalf of this member.
   checkAnniversaries(today: Date = new Date()): void {
     const mm = today.getMonth();
     const dd = today.getDate();
@@ -107,20 +109,22 @@ export class MemberService {
       const isBirthday =
         member.birthDate.getMonth() === mm && member.birthDate.getDate() === dd;
       if (isBirthday) {
-        CentralBank.getInstance().issueEndowment(member, Constitution.getInstance().kinPerPersonYear);
+        SocialInsuranceBank.getInstance().depositContribution(member, Constitution.getInstance().kinPerPersonYear);
       }
     }
   }
 
   /**
    * Discharge a member (departure or death).
-   * 1. CentralBank reclaims up to the endowment amount from the member's balance.
-   * 2. Any remaining balance is transferred to the Commons.
-   * 3. Member's accounts are closed.
-   * 4. Member record is deleted.
+   * 1. SocialInsuranceBank burns the member's unspent pool entitlement.
+   * 2. CentralBank reclaims any legacy endowment balance.
+   * 3. Any remaining balance is transferred to the Commons.
+   * 4. Member's accounts are closed.
+   * 5. Member record is deleted.
    */
   discharge(member: Member): void {
     Marketplace.getInstance().removePostsByPoster(member.getId());
+    SocialInsuranceBank.getInstance().settleDeath(member);
     CentralBank.getInstance().reclaimEndowment(member);
     Commonwealth.getInstance().collect(member);
 

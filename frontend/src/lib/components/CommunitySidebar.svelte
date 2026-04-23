@@ -2,9 +2,10 @@
   const { navigate, path = window.location.pathname }: { navigate: (to: string) => void; path?: string } = $props();
 
   const economyLinks = [
-    { label: 'Community Budget', path: '/community' },
-    { label: 'Central Bank',     path: '/community/central-bank' },
-    { label: 'Currency Board',   path: '/community/currency-board' },
+    { label: 'Community Budget',    path: '/community' },
+    { label: 'Central Bank',        path: '/community/central-bank' },
+    { label: 'Currency Board',      path: '/community/currency-board' },
+    { label: 'Social Insurance',    path: '/social-insurance' },
   ];
 
   const governanceLinks = [

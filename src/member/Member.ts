@@ -17,6 +17,7 @@ export class Member implements IEconomicActor {
     readonly joinDate: Date;
     handle: string;              // lowercase alphanumeric + underscores, unique in community
     disabled: boolean;            // community-determined; exempt from work expectations
+    retired: boolean;             // true once the member has reached retirement age and opted in
     guardianId: string | null;
     phone: string | null;        // E.164, e.g. "+15551234567". null if no phone.
     pinHash: string | null;      // SHA-256 hex of PIN. null until set.
@@ -36,6 +37,7 @@ export class Member implements IEconomicActor {
         this.joinDate = new Date();
         this.handle = handle.toLowerCase().replace(/[^a-z0-9_]/g, "");
         this.disabled = disabled;
+        this.retired = false;
         this.guardianId = null;
         this.phone = null;
         this.pinHash = null;

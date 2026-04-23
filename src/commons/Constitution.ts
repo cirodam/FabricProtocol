@@ -138,6 +138,22 @@ export const DEFAULT_CONSTITUTION: ConstitutionDocument = {
                 "Balance floor below which no demurrage is charged. Only the portion of an account balance above this threshold is subject to the levy or bank demurrage. Expressed in kin. Protects small balances — roughly one month of person-year income — from being eroded.",
             constraints: { min: 0, max: 5_000 },
         },
+
+        // ── Social insurance ─────────────────────────────────────────────────
+        retirementAge: {
+            value: 65,
+            authority: "referendum",
+            description:
+                "Age at which a member becomes eligible for monthly retirement payments from the social insurance pool.",
+            constraints: { min: 55, max: 75 },
+        },
+        retirementPayoutRate: {
+            value: 0.005,
+            authority: "referendum",
+            description:
+                "Fraction of the retirement pool distributed each month across all current retirees. E.g. 0.005 = 0.5% of pool per month.",
+            constraints: { min: 0.001, max: 0.02 },
+        },
     },
     amendments: [],
     authorityMap: [
@@ -257,6 +273,8 @@ export class Constitution {
     get bankDemurrageRate(): number       { return this.get<number>("bankDemurrageRate"); }
     get demurrageFloor(): number          { return this.get<number>("demurrageFloor"); }
     get kinPerPersonYear(): number        { return this.get<number>("kinPerPersonYear"); }
+    get retirementAge(): number           { return this.get<number>("retirementAge"); }
+    get retirementPayoutRate(): number    { return this.get<number>("retirementPayoutRate"); }
 
     /** Which governance body must authorize the given action. Returns null if not in the map. */
     getRequiredBody(action: string): GovernanceBody | null {
