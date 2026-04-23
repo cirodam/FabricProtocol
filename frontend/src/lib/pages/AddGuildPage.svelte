@@ -30,8 +30,8 @@
 </script>
 
 <div class="page">
-  <button class="back-link" onclick={() => navigate("/guilds")}>← Guilds</button>
-  <h1>New Guild</h1>
+  <button class="back-link" onclick={() => navigate("/guilds")}>← Specialists</button>
+  <h1>New Specialist Group</h1>
 
   <form onsubmit={submit} class="form">
     {#if error}<p class="error">{error}</p>{/if}
@@ -43,12 +43,12 @@
 
     <label>
       <span>Description</span>
-      <textarea bind:value={description} rows="3" placeholder="Who this guild represents, eligibility criteria, notes…" disabled={working}></textarea>
+      <textarea bind:value={description} rows="3" placeholder="Who this group represents, eligibility criteria, notes…" disabled={working}></textarea>
     </label>
 
     <div class="actions">
       <button type="button" onclick={() => navigate("/guilds")} disabled={working}>Cancel</button>
-      <button type="submit" class="primary" disabled={working || !name.trim()}>{working ? "Creating…" : "Create guild"}</button>
+      <button type="submit" class="primary" disabled={working || !name.trim()}>{working ? "Creating…" : "Create group"}</button>
     </div>
   </form>
 </div>

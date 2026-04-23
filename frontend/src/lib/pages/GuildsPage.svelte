@@ -1,5 +1,7 @@
 <script lang="ts">
-  const { navigate }: { navigate: (path: string) => void } = $props();
+  import CommunitySidebar from '../components/CommunitySidebar.svelte';
+
+  const { navigate, path }: { navigate: (path: string) => void; path: string } = $props();
 
   interface Guild {
     id: string;
@@ -29,9 +31,12 @@
   load();
 </script>
 
+<div class="domain-layout">
+<CommunitySidebar {navigate} {path} />
+<div class="domain-main">
 <div class="page-header">
-  <h1>Guilds</h1>
-  <p class="intro">Guilds are community-recognized groups organized around a shared domain or trade — farmers, healthcare workers, educators, firefighters, caregivers, and so on. Each guild's members are eligible to be drawn by sortition to fill seats on the domain's governing council.</p>
+  <h1>Specialists</h1>
+  <p class="intro">Specialist groups are members who want to lead the community in a particular area. Farmers work together to ensure the community has enough food. Healthcare workers coordinate to keep members healthy. Specialists are eligible to serve on the governing council for their group.</p>
 </div>
 
 {#if loading}
@@ -41,11 +46,11 @@
 {:else}
   <section class="section">
     <div class="section-header">
-      <h2>Guilds <span class="count">{guilds.length}</span></h2>
-      <button class="new-btn" onclick={() => navigate('/guilds/new')}>+ New guild</button>
+      <h2>Specialist Groups <span class="count">{guilds.length}</span></h2>
+      <button class="new-btn" onclick={() => navigate('/guilds/new')}>+ New group</button>
     </div>
     {#if guilds.length === 0}
-      <p class="muted">No guilds yet.</p>
+      <p class="muted">No specialist groups yet.</p>
     {:else}
       <div class="table-wrap">
         <table>
@@ -67,6 +72,8 @@
     {/if}
   </section>
 {/if}
+</div>
+</div>
 
 <style>
   h1 { margin: 0 0 8px; font-size: 22px; font-weight: 600; }

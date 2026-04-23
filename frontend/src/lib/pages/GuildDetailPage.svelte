@@ -1,5 +1,7 @@
 <script lang="ts">
-  const { id, navigate }: { id: string; navigate: (path: string) => void } = $props();
+  const { id, navigate, path }: { id: string; navigate: (path: string) => void; path: string } = $props();
+
+  import CommunitySidebar from '../components/CommunitySidebar.svelte';
 
   interface Member { id: string; firstName: string; lastName: string; handle: string; }
   interface Guild {
@@ -108,23 +110,26 @@
   load();
 </script>
 
+<div class="domain-layout">
+<CommunitySidebar {navigate} {path} />
+<div class="domain-main">
 <div class="page">
-  <button class="back-link" onclick={() => navigate("/guilds")}>← Guilds</button>
+  <button class="back-link" onclick={() => navigate("/guilds")}>← Specialists</button>
 
   {#if loading}
     <p class="muted">Loading…</p>
   {:else if error || !guild}
-    <p class="error">{error ?? "Guild not found"}</p>
+    <p class="error">{error ?? "Specialist group not found"}</p>
   {:else}
     <div class="header">
       <div>
-        <span class="badge">Guild</span>
+        <span class="badge">Specialist Group</span>
         <h1>{guild.name}</h1>
         {#if guild.description}<p class="desc">{guild.description}</p>{/if}
       </div>
       <div class="header-actions">
         {#if !confirmDelete}
-          <button class="danger-outline" onclick={() => confirmDelete = true}>Delete guild</button>
+          <button class="danger-outline" onclick={() => confirmDelete = true}>Delete group</button>
         {:else}
           <span class="confirm-text">Delete permanently?</span>
           <button class="danger" onclick={deleteGuild} disabled={deleteWorking}>
@@ -206,6 +211,8 @@
       </form>
     </section>
   {/if}
+</div>
+</div>
 </div>
 
 <style>

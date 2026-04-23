@@ -1,4 +1,8 @@
 <script lang="ts">
+  import CommunitySidebar from '../components/CommunitySidebar.svelte';
+
+  const { navigate, path } = $props<{ navigate: (to: string) => void; path: string }>();
+
   type Authority = 'immutable' | 'citizens-assembly' | 'council' | 'commonwealth';
 
   interface Parameter {
@@ -83,6 +87,9 @@
   }
 </script>
 
+<div class="domain-layout">
+<CommunitySidebar {navigate} {path} />
+<div class="domain-main">
 <div class="page-header">
   <div>
     <span class="badge">Governance</span>
@@ -202,6 +209,8 @@
   </section>
 
 {/if}
+</div>
+</div>
 
 <style>
   .page-header {

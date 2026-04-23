@@ -10,6 +10,7 @@
   const governanceLinks = [
     { label: 'Referenda',    path: '/referenda' },
     { label: 'Constitution', path: '/constitution' },
+    { label: 'Specialists',  path: '/guilds' },
   ];
 
   const adminLinks = [
@@ -22,7 +23,7 @@
   function isActive(linkPath: string): boolean {
     if (path === linkPath) return true;
     // These paths are prefixes of sibling links, so require exact match only
-    const exactOnly = ['/community', '/referenda'];
+    const exactOnly = ['/community', '/referenda', '/guilds'];
     if (exactOnly.includes(linkPath)) return false;
     return path.startsWith(linkPath + '/');
   }

@@ -213,15 +213,15 @@
   {:else if path.startsWith('/fire/companies/')}
     <FireCompanyPage id={path.slice('/fire/companies/'.length)} {navigate} />
   {:else if path === '/guilds'}
-    <GuildsPage {navigate} />
+    <GuildsPage {navigate} {path} />
   {:else if path === '/guilds/new'}
     <AddGuildPage {navigate} />
   {:else if path.startsWith('/guilds/')}
-    <GuildDetailPage id={path.slice('/guilds/'.length)} {navigate} />
+    <GuildDetailPage id={path.slice('/guilds/'.length)} {navigate} {path} />
   {:else if path === '/assembly'}
     <AssemblyPage />
   {:else if path === '/constitution'}
-    <ConstitutionPage />
+    <ConstitutionPage {navigate} {path} />
   {:else if path === '/education'}
     <EducationPage {navigate} />
   {:else if path === '/education/schools/new'}
