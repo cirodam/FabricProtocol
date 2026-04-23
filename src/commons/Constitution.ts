@@ -29,11 +29,12 @@ export interface ConstitutionAmendment {
 }
 
 export interface ConstitutionDocument {
-    version:      number;
-    adoptedAt:    string;
-    parameters:   Record<string, ConstitutionalParameter<number | boolean>>;
-    amendments:   ConstitutionAmendment[];
-    authorityMap: ActionAuthority[];
+    version:       number;
+    adoptedAt:     string;
+    communityName: string;
+    parameters:    Record<string, ConstitutionalParameter<number | boolean>>;
+    amendments:    ConstitutionAmendment[];
+    authorityMap:  ActionAuthority[];
 }
 
 // ── Defaults ─────────────────────────────────────────────────────────────────
@@ -41,6 +42,7 @@ export interface ConstitutionDocument {
 export const DEFAULT_CONSTITUTION: ConstitutionDocument = {
     version: 1,
     adoptedAt: new Date().toISOString(),
+    communityName: "My Community",
     parameters: {
         // ── Axioms — unit definitions, never changeable ──────────────────────
         kinPerPersonYear: {
@@ -220,6 +222,14 @@ export class Constitution {
 
     /** ISO timestamp of original adoption. */
     get adoptedAt(): string { return this.doc.adoptedAt; }
+
+    /** The community's display name. */
+    get communityName(): string { return this.doc.communityName ?? "Community"; }
+
+    /** Update the community name. Caller is responsible for persisting. */
+    setCommunityName(name: string): void {
+        this.doc = { ...this.doc, communityName: name };
+    }
 
     /** Full amendment history. */
     get amendments(): readonly ConstitutionAmendment[] { return this.doc.amendments; }

@@ -119,4 +119,12 @@ export class GovernanceService {
         Constitution.getInstance().amend(key, newValue, proposalId);
         this.constitutionLoader?.save();
     }
+
+    /** Update the community name and persist. No proposal required — admin-level action. */
+    setCommunityName(name: string): void {
+        const trimmed = name.trim();
+        if (!trimmed) throw new Error("Community name cannot be empty");
+        Constitution.getInstance().setCommunityName(trimmed);
+        this.constitutionLoader?.save();
+    }
 }

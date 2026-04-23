@@ -4,6 +4,7 @@ import { CommunityRole } from "./CommunityRole.js";
 import { FunctionalDomain, BudgetLineItem } from "./domain/FunctionalDomain.js";
 import { LedgerService } from "../ledger/LedgerService.js";
 import { AssetLedger } from "../ledger/AssetLedger.js";
+import { Constitution } from "./Constitution.js";
 
 // The Commons represents the community's collective investment in itself.
 // It holds pooled kin used to meet basic needs, provide care for dependents,
@@ -33,7 +34,7 @@ export class Commonwealth implements IEconomicActor {
     }
 
     getId(): string { return this.id; }
-    getDisplayName(): string { return "Community"; }
+    getDisplayName(): string { return Constitution.getInstance().communityName; }
     getHandle(): string { return "commons"; }
 
     addPosition(position: CommunityRole): void {

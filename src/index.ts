@@ -71,10 +71,16 @@ import { DataManifest } from "./storage/DataManifest.js";
 
 
 async function init(): Promise<void> {
+  // ── Constitution (must be first — NodeService reads communityName from it) ──
+  GovernanceService.getInstance().initConstitution(new ConstitutionLoader("data/constitution"));
+  const constitution = Constitution.getInstance();
+
   // ── Network + Data Integrity ─────────────────────────────────────────────────
-  // NodeService must initialise first so the Ed25519 signing key is available.
-  // DataManifest then loads and verifies the integrity manifest before any data
-  // files are read — any file modified outside the application will throw here.
+  // NodeService initialises next so the Ed25519 signing key is available.
+  // DataManifest then loads and verifies the integrity manifest before any further
+  // data files are read — any file modified outside the application will throw here.
+  // Note: the constitution read above is unverified on first boot (no manifest yet),
+  // but verifyAllOnDisk() covers it on every subsequent boot.
   await NodeService.getInstance().init({
     type:    (process.env.NODE_TYPE ?? "community") as NodeType,
     name:    process.env.NODE_NAME ?? Community.getInstance().name,
@@ -89,10 +95,6 @@ async function init(): Promise<void> {
     (data) => signer.signBody(data),
     signer.publicKeyHex
   );
-
-  // ── Constitution (must be before other services — they read parameters from it) ──
-  GovernanceService.getInstance().initConstitution(new ConstitutionLoader("data/constitution"));
-  const constitution = Constitution.getInstance();
 
   // ── Persistence ─────────────────────────────────────────────────────────────
   Bank.getInstance().init(

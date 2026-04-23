@@ -1,10 +1,11 @@
 import { randomUUID } from "crypto";
+import { Constitution } from "./commons/Constitution.js";
 
 export class Community {
   private static instance: Community;
 
   readonly id: string;
-  readonly name = "Community";
+  get name(): string { return Constitution.getInstance().communityName; }
   readonly currencyName = "Kin";
   readonly latitude: number = 0;
   readonly longitude: number = 0;
