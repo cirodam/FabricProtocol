@@ -1,20 +1,19 @@
 import { FunctionalDomain, DomainBudget } from "../../commons/domain/FunctionalDomain.js";
+import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
+import { FunctionalUnitLoader } from "../../commons/domain/FunctionalUnitLoader.js";
 import { Bank } from "../../bank/Bank.js";
 import { MemberService } from "../../member/MemberService.js";
 import { NutritionalProfile, DEFAULT_NUTRITIONAL_PROFILES, getMemberType } from "./NutritionalProfile.js";
 import { FoodDomainLoader } from "./FoodDomainLoader.js";
 import { CommunityKitchen } from "./CommunityKitchen.js";
-import { CommunityKitchenLoader } from "./CommunityKitchenLoader.js";
 import { Mill } from "./Mill.js";
-import { MillLoader } from "./MillLoader.js";
 
 export class FoodDomain extends FunctionalDomain {
     private static readonly DOMAIN_ID = "00000000-0000-0000-0000-000000000003";
     private static instance: FoodDomain;
 
     private loader: FoodDomainLoader | null = null;
-    private kitchenLoader: CommunityKitchenLoader | null = null;
-    private millLoader: MillLoader | null = null;
+
     private constructor() {
         super("Food", "Responsible for feeding all community members.", FoodDomain.DOMAIN_ID);
     }
@@ -28,74 +27,37 @@ export class FoodDomain extends FunctionalDomain {
 
     init(loader: FoodDomainLoader): void {
         this.loader = loader;
-        loader.load(); // load other domain settings if present
+        loader.load();
     }
 
-    initKitchens(loader: CommunityKitchenLoader): void {
-        this.kitchenLoader = loader;
-        for (const kitchen of loader.loadAll()) {
-            this.addUnit(kitchen);
+    initUnits(loader: FunctionalUnitLoader): void {
+        for (const unit of loader.loadAll()) {
+            this.addUnit(unit);
         }
-        this.registerUnitType("community-kitchen",
-            u => this.kitchenLoader?.save(u as CommunityKitchen),
-            id => { this.removeUnit(id); this.kitchenLoader?.delete(id); },
-        );
+        const save = (u: FunctionalUnit) => loader.save(u);
+        const del  = (id: string) => { this.removeUnit(id); loader.delete(id); };
+        for (const type of ["community-kitchen", "mill", "grain-elevator"]) {
+            this.registerUnitType(type, save, del);
+        }
     }
 
-    addKitchen(kitchen: CommunityKitchen): void {
-        this.addUnit(kitchen);
-        this.kitchenLoader?.save(kitchen);
-    }
+    // ── Typed convenience wrappers (used by FoodController) ──────────────────
 
-    saveKitchen(kitchen: CommunityKitchen): void {
-        this.kitchenLoader?.save(kitchen);
-    }
-
+    addKitchen(kitchen: CommunityKitchen): void { this.createUnit(kitchen); }
+    saveKitchen(kitchen: CommunityKitchen): void { this.saveUnit(kitchen); }
     getKitchen(id: string): CommunityKitchen | undefined {
-        return this.getUnits().find(u => u.id === id) as CommunityKitchen | undefined;
+        return this.getUnits().find(u => u.id === id && u.getType() === "community-kitchen") as CommunityKitchen | undefined;
     }
+    getAllKitchens(): CommunityKitchen[] { return this.getUnitsByType<CommunityKitchen>("community-kitchen"); }
+    removeKitchen(id: string): void { this.deleteUnit(id); }
 
-    getAllKitchens(): CommunityKitchen[] {
-        return this.getUnitsByType<CommunityKitchen>("community-kitchen");
-    }
-
-    removeKitchen(id: string): void {
-        this.removeUnit(id);
-        this.kitchenLoader?.delete(id);
-    }
-
-    initMills(loader: MillLoader): void {
-        this.millLoader = loader;
-        for (const mill of loader.loadAll()) {
-            this.addUnit(mill);
-        }
-        this.registerUnitType("mill",
-            u => this.millLoader?.save(u as Mill),
-            id => { this.removeUnit(id); this.millLoader?.delete(id); },
-        );
-    }
-
-    addMill(mill: Mill): void {
-        this.addUnit(mill);
-        this.millLoader?.save(mill);
-    }
-
-    saveMill(mill: Mill): void {
-        this.millLoader?.save(mill);
-    }
-
+    addMill(mill: Mill): void { this.createUnit(mill); }
+    saveMill(mill: Mill): void { this.saveUnit(mill); }
     getMill(id: string): Mill | undefined {
-        return this.getUnits().find(u => u.id === id) as Mill | undefined;
+        return this.getUnits().find(u => u.id === id && u.getType() === "mill") as Mill | undefined;
     }
-
-    getAllMills(): Mill[] {
-        return this.getUnitsByType<Mill>("mill");
-    }
-
-    removeMill(id: string): void {
-        this.removeUnit(id);
-        this.millLoader?.delete(id);
-    }
+    getAllMills(): Mill[] { return this.getUnitsByType<Mill>("mill"); }
+    removeMill(id: string): void { this.deleteUnit(id); }
 
     getMonthlyFoodAllowance(): number {
         return this.loader?.load().monthlyFoodAllowance ?? 0;
@@ -107,8 +69,6 @@ export class FoodDomain extends FunctionalDomain {
         this.loader?.save(settings);
     }
 
-    // Issue the monthly food allowance to every member from this domain's account.
-    // Kin flows from the Food domain's account — funded by the commons — to each member's primary account.
     issueMonthlyKin(): void {
         const amount = this.getMonthlyFoodAllowance();
         if (amount <= 0) return;
@@ -134,7 +94,6 @@ export class FoodDomain extends FunctionalDomain {
         }
     }
 
-    /** Total kin committed to food allowances each month (perMember × memberCount). */
     monthlyAllowanceTotal(): number {
         const amount = this.getMonthlyFoodAllowance();
         const memberCount = MemberService.getInstance().getAll().length;
@@ -150,7 +109,6 @@ export class FoodDomain extends FunctionalDomain {
         return { lineItems: base.lineItems, total: base.total + allowance };
     }
 
-    // Sum the daily nutritional requirements across all current community members.
     getDailyRequirements(): NutritionalProfile {
         const totals: NutritionalProfile = { calories: 0, proteinG: 0, carbsG: 0, fatG: 0, fiberG: 0, waterL: 0 };
         for (const member of MemberService.getInstance().getAll()) {
@@ -165,4 +123,5 @@ export class FoodDomain extends FunctionalDomain {
         return totals;
     }
 }
+
 

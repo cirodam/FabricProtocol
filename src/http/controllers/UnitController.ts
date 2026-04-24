@@ -4,6 +4,7 @@ import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
 import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
 import { MemberService } from "../../member/MemberService.js";
 import { CommunityRole } from "../../commons/CommunityRole.js";
+import { UnitTemplateRegistry } from "../../commons/domain/UnitTemplateRegistry.js";
 
 function getDomain(req: Request, res: Response): FunctionalDomain | null {
     const domain = Commonwealth.getInstance().getDomains()
@@ -34,6 +35,36 @@ function roleToDto(r: CommunityRole, memberName: string | null) {
         memberName,
         active:      r.isActive(),
     };
+}
+
+// GET /api/domains/:domainId/units/templates
+export function listTemplates(req: Request, res: Response): void {
+    const domain = getDomain(req, res);
+    if (!domain) return;
+    // Return templates whose types are registered for this domain
+    const registered = UnitTemplateRegistry.getAll().filter(t =>
+        domain.getUnits().length >= 0 // all registered types visible; domain filters by what it accepts
+    );
+    res.json(registered.map(t => ({ type: t.type, label: t.label, description: t.description })));
+}
+
+// POST /api/domains/:domainId/units  — body: { type }
+export function createUnit(req: Request, res: Response): void {
+    const domain = getDomain(req, res);
+    if (!domain) return;
+
+    const { type } = req.body ?? {};
+    if (typeof type !== "string" || !type.trim()) {
+        res.status(400).json({ error: "type is required" }); return;
+    }
+
+    const unit = UnitTemplateRegistry.create(type.trim());
+    if (!unit) {
+        res.status(400).json({ error: `Unknown unit type: ${type}` }); return;
+    }
+
+    domain.createUnit(unit);
+    res.status(201).json(unitToDto(unit));
 }
 
 // GET /api/domains/:domainId/units

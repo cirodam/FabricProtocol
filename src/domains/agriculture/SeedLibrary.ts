@@ -22,10 +22,14 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
  * FarmOperations (as the source of planting stock each season).
  */
 export class SeedLibrary extends FunctionalUnit {
-    constructor() {
-        super("Seed Library", "Maintains community seed supply, genetic diversity, and seed sovereignty.");
+    constructor(name: string = "Seed Library", id?: string) {
+        super(
+            name,
+            "Maintains community seed supply, genetic diversity, and seed sovereignty.",
+            "seed-library",
+            id,
+        );
     }
 
     getType(): string { return "seed-library"; }
-
 }

@@ -23,10 +23,9 @@ import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
  * so that private production decisions, in aggregate, meet community needs.
  */
 export class FarmCoordinator extends FunctionalUnit {
-    constructor() {
-        super("Farm Coordinator", "Coordinates with private farms to ensure community food needs are met.");
+    constructor(name: string = "Farm Coordinator", id?: string) {
+        super(name, "Coordinates with private farms to ensure community food needs are met.", "farm-coordinator", id);
     }
 
     getType(): string { return "farm-coordinator"; }
-
 }

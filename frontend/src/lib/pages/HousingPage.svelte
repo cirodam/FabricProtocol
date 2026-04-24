@@ -1,5 +1,6 @@
 <script lang="ts">
   import CommunitySidebar from '../components/CommunitySidebar.svelte';
+  import DomainPoolPanel from '../components/DomainPoolPanel.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
   interface HousingUnit {
@@ -161,6 +162,9 @@
     <h2>Units</h2>
     <span class="unit-count muted">{total} unit{total === 1 ? '' : 's'}</span>
   </div>
+
+
+  <DomainPoolPanel domainId="00000000-0000-0000-0000-000000000001" {navigate} />
 
 {#if loading}
   <p class="muted">Loading…</p>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import CommunitySidebar from '../components/CommunitySidebar.svelte';
+  import DomainPoolPanel from '../components/DomainPoolPanel.svelte';
   const { navigate, path }: { navigate: (p: string) => void; path: string } = $props();
 
   interface RoleDto { id: string; title: string; description: string; kinPerMonth: number; memberId: string | null; memberName: string | null; active: boolean; }
@@ -125,6 +126,9 @@
     </div>
     <p class="domain-desc">The Communications domain maintains the community's shared communications infrastructure: radio stations, internet access points, postal hubs, and similar facilities. Roles in this domain are funded by the community.</p>
 
+
+    <DomainPoolPanel domainId="00000000-0000-0000-0000-000000000006" {navigate} />
+
     {#if loading}
       <p class="muted">Loading…</p>
     {:else if error}
@@ -223,7 +227,7 @@
       </section>
 
     {/if}
-  </div>
+</div>
 </div>
 
 <style>

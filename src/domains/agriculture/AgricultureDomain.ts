@@ -1,4 +1,6 @@
 import { FunctionalDomain } from "../../commons/domain/FunctionalDomain.js";
+import { FunctionalUnit } from "../../commons/domain/FunctionalUnit.js";
+import { FunctionalUnitLoader } from "../../commons/domain/FunctionalUnitLoader.js";
 import { CommunityRole } from "../../commons/CommunityRole.js";
 
 /**
@@ -30,11 +32,6 @@ export class AgricultureDomain extends FunctionalDomain {
             "Coordinates relationships with local farmers and producers, tracks seasonal growing plans, and connects agricultural output to the food domain.",
             700,
         ));
-        this.addRole(new CommunityRole(
-            "Agriculture Coordinator",
-            "Coordinates relationships with local farmers and producers, tracks seasonal growing plans, and connects agricultural output to the food domain.",
-            700,
-        ));
     }
 
     static getInstance(): AgricultureDomain {
@@ -42,5 +39,16 @@ export class AgricultureDomain extends FunctionalDomain {
             AgricultureDomain.instance = new AgricultureDomain();
         }
         return AgricultureDomain.instance;
+    }
+
+    initUnits(loader: FunctionalUnitLoader): void {
+        for (const u of loader.loadAll()) {
+            this.addUnit(u);
+        }
+        const save = (u: FunctionalUnit) => loader.save(u);
+        const del  = (id: string) => { this.removeUnit(id); loader.delete(id); };
+        for (const type of ["seed-library", "supply-relations-office", "farm-coordinator"]) {
+            this.registerUnitType(type, save, del);
+        }
     }
 }

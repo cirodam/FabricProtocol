@@ -1,5 +1,6 @@
 <script lang="ts">
   import CommunitySidebar from '../components/CommunitySidebar.svelte';
+  import DomainPoolPanel from '../components/DomainPoolPanel.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
   interface ClinicDto {
@@ -89,6 +90,9 @@
       <p class="subtitle">Community clinics and health services</p>
     </div>
   </div>
+
+
+  <DomainPoolPanel domainId="00000000-0000-0000-0000-000000000004" {navigate} />
 
   {#if loading}
     <p class="muted">Loading…</p>

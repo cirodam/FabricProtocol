@@ -1,5 +1,7 @@
 <script lang="ts">
   import CommunitySidebar from '../components/CommunitySidebar.svelte';
+  import DomainPoolPanel from '../components/DomainPoolPanel.svelte';
+  import FunctionalUnitsSection from '../components/FunctionalUnitsSection.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
   interface Totals {
@@ -24,12 +26,6 @@
 
   function fmtKin(n: number) { return n.toLocaleString(undefined, { maximumFractionDigits: 0 }); }
 
-  interface KitchenDto { id: string; name: string; description: string; staffCount: number; }
-  let kitchens = $state<KitchenDto[]>([]);
-
-  interface MillDto { id: string; name: string; description: string; staffCount: number; }
-  let mills = $state<MillDto[]>([]);
-
   let editingAllowance = $state(false);
   let allowanceInput: number = $state(0);
   let saving = $state(false);
@@ -37,27 +33,19 @@
 
   async function load() {
     try {
-      const [reqRes, settingsRes, kitchensRes, millsRes, outflowsRes] = await Promise.all([
+      const [reqRes, settingsRes, outflowsRes] = await Promise.all([
         fetch('/api/food/requirements'),
         fetch('/api/food/settings'),
-        fetch('/api/food/kitchens'),
-        fetch('/api/food/mills'),
         fetch('/api/community/outflows'),
       ]);
       if (!reqRes.ok) throw new Error(`requirements: ${reqRes.status}`);
       if (!settingsRes.ok) throw new Error(`settings: ${settingsRes.status}`);
-      if (!kitchensRes.ok) throw new Error(`kitchens: ${kitchensRes.status}`);
-      if (!millsRes.ok) throw new Error(`mills: ${millsRes.status}`);
       if (!outflowsRes.ok) throw new Error(`outflows: ${outflowsRes.status}`);
       totals = await reqRes.json();
       const settings = await settingsRes.json();
       monthlyAllowance = settings.monthlyFoodAllowance;
       monthlyOutflow = settings.monthlyOutflow;
       memberCount = settings.memberCount;
-      const kd = await kitchensRes.json();
-      kitchens = kd.kitchens;
-      const md = await millsRes.json();
-      mills = md.mills;
       const outflows = await outflowsRes.json();
       const foodDomain = outflows.payroll.domains.find((d: { handle: string }) => d.handle === 'food');
       budgetLineItems = foodDomain?.lineItems ?? [];
@@ -115,6 +103,9 @@
   <h1>Food</h1>
 </div>
 <p class="domain-desc">The Food domain is responsible for feeding every community member. It manages the universal monthly food allowance, community kitchens, mills, and other food production infrastructure. The community funds this domain so that no member ever goes hungry for lack of money.</p>
+
+
+  <DomainPoolPanel domainId="00000000-0000-0000-0000-000000000003" {navigate} />
 
 {#if loading}
   <p class="muted">Loading…</p>
@@ -205,58 +196,8 @@
     </section>
   {/if}
 
-  <section class="section">
-    <div class="section-header">
-      <h2>Community Kitchens</h2>
-      <button class="new-btn" onclick={() => navigate('/domains/00000000-0000-0000-0000-000000000003/units/new')}>+ New kitchen</button>
-    </div>
-    {#if kitchens.length === 0}
-      <p class="muted">No kitchens yet.</p>
-    {:else}
-      <div class="kitchen-grid">
-        {#each kitchens as k (k.id)}
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <div class="kitchen-card" role="button" tabindex="0"
-            onclick={() => navigate(`/domains/00000000-0000-0000-0000-000000000003/units/${k.id}`)}
-            onkeydown={(e) => e.key === 'Enter' && navigate(`/domains/00000000-0000-0000-0000-000000000003/units/${k.id}`)}
-          >
-            <div class="card-badge">Community Kitchen</div>
-            <h3>{k.name}</h3>
-            <p class="card-desc">{k.description}</p>
-            <div class="card-meta">{k.staffCount} staff member{k.staffCount === 1 ? '' : 's'}</div>
-          </div>
-        {/each}
-      </div>
+      <FunctionalUnitsSection domainId="00000000-0000-0000-0000-000000000003" {navigate} />
     {/if}
-  </section>
-{/if}
-
-{#if !loading && !error}
-  <section class="section">
-    <div class="section-header">
-      <h2>Grain Mills</h2>
-      <button class="new-btn" onclick={() => navigate('/domains/00000000-0000-0000-0000-000000000003/units/new')}>+ New mill</button>
-    </div>
-    {#if mills.length === 0}
-      <p class="muted">No mills yet.</p>
-    {:else}
-      <div class="mill-grid">
-        {#each mills as m (m.id)}
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <div class="mill-card" role="button" tabindex="0"
-            onclick={() => navigate(`/domains/00000000-0000-0000-0000-000000000003/units/${m.id}`)}
-            onkeydown={(e) => e.key === 'Enter' && navigate(`/domains/00000000-0000-0000-0000-000000000003/units/${m.id}`)}
-          >
-            <div class="mill-badge">Grain Mill</div>
-            <h3>{m.name}</h3>
-            <p class="card-desc">{m.description}</p>
-            <div class="card-meta">{m.staffCount} staff member{m.staffCount === 1 ? '' : 's'}</div>
-          </div>
-        {/each}
-      </div>
-    {/if}
-  </section>
-{/if}
 </div>
 </div>
 
@@ -422,53 +363,4 @@
 
   .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
   .section-header h2 { margin: 0; }
-
-  .new-btn { padding: 0.4rem 0.9rem; background: var(--accent, #2563eb); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 600; }
-  .new-btn:hover { opacity: 0.9; }
-
-  .kitchen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
-
-  .mill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
-
-  .mill-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius, 8px);
-    padding: 1.25rem;
-    cursor: pointer;
-    transition: box-shadow 0.15s;
-  }
-  .mill-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-
-  .mill-badge {
-    display: inline-block;
-    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em;
-    padding: 0.15rem 0.5rem; border-radius: 999px;
-    background: #fce7f3; color: #9d174d;
-    margin-bottom: 0.5rem;
-  }
-
-  .mill-card h3 { margin: 0 0 0.35rem; font-size: 1rem; }
-
-  .kitchen-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius, 8px);
-    padding: 1.25rem;
-    cursor: pointer;
-    transition: box-shadow 0.15s;
-  }
-  .kitchen-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-
-  .card-badge {
-    display: inline-block;
-    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em;
-    padding: 0.15rem 0.5rem; border-radius: 999px;
-    background: #fef9c3; color: #92400e;
-    margin-bottom: 0.5rem;
-  }
-
-  .kitchen-card h3 { margin: 0 0 0.35rem; font-size: 1rem; }
-  .card-desc { margin: 0 0 0.75rem; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; }
-  .card-meta { font-size: 0.8rem; color: var(--text-secondary); }
 </style>

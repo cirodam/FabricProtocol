@@ -28,6 +28,7 @@ import deathcareRoutes from "./routes/deathcareRoutes.js";
 import transportRoutes from "./routes/transportRoutes.js";
 import enrichmentRoutes from "./routes/enrichmentRoutes.js";
 import leaderPoolRoutes from "./routes/leaderPoolRoutes.js";
+import domainRoutes from "./routes/domainRoutes.js";
 import assemblyRoutes from "./routes/assemblyRoutes.js";
 import constitutionRoutes from "./routes/constitutionRoutes.js";
 import provisioningRoutes from "./routes/provisioningRoutes.js";
@@ -128,6 +129,7 @@ export class HttpServer {
         this.app.use("/api/transport", transportRoutes);
         this.app.use("/api/enrichment", enrichmentRoutes);
         this.app.use("/api/leader-pools", leaderPoolRoutes);
+        this.app.use("/api/domains", domainRoutes);
         this.app.use("/api/assembly", assemblyRoutes);
         this.app.use("/api/constitution", constitutionRoutes);
         this.app.use("/api/provisioning", provisioningRoutes);

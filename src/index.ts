@@ -15,8 +15,9 @@ import { HousingDomain } from "./domains/housing/HousingDomain.js";
 import { HousingUnitLoader } from "./domains/housing/HousingUnitLoader.js";
 import { FoodDomain } from "./domains/food/FoodDomain.js";
 import { FoodDomainLoader } from "./domains/food/FoodDomainLoader.js";
-import { CommunityKitchenLoader } from "./domains/food/CommunityKitchenLoader.js";
-import { MillLoader } from "./domains/food/MillLoader.js";
+import { CommunityKitchen } from "./domains/food/CommunityKitchen.js";
+import { Mill } from "./domains/food/Mill.js";
+import { GrainElevator } from "./domains/food/GrainElevator.js";
 import { HealthcareDomain } from "./domains/healthcare/HealthcareDomain.js";
 import { ClinicLoader } from "./domains/healthcare/ClinicLoader.js";
 import { DentalClinicLoader } from "./domains/healthcare/DentalClinicLoader.js";
@@ -47,6 +48,8 @@ import { ApplicationService } from "./member/ApplicationService.js";
 import { MemberApplicationLoader } from "./member/MemberApplicationLoader.js";
 import { LeaderPoolService } from "./commons/sortition/LeaderPoolService.js";
 import { LeaderPoolLoader } from "./commons/sortition/LeaderPoolLoader.js";
+import { DomainPoolAssignmentLoader } from "./commons/domain/DomainPoolAssignmentLoader.js";
+import { initDomainAssignmentLoader } from "./http/controllers/DomainController.js";
 import { AssemblyService } from "./commons/assembly/AssemblyService.js";
 import { CitizensAssemblyLoader } from "./commons/assembly/CitizensAssemblyLoader.js";
 import { GovernanceService } from "./commons/GovernanceService.js";
@@ -60,6 +63,11 @@ import { ReferendumService } from "./referendum/ReferendumService.js";
 import { ReferendumLoader } from "./referendum/ReferendumLoader.js";
 import { CommunicationsDomain } from "./domains/communications/CommunicationsDomain.js";
 import { AgricultureDomain } from "./domains/agriculture/AgricultureDomain.js";
+import { SeedLibrary } from "./domains/agriculture/SeedLibrary.js";
+import { SupplyRelationsOffice } from "./domains/agriculture/SupplyRelationsOffice.js";
+import { FarmCoordinator } from "./domains/agriculture/FarmCoordinator.js";
+import { FunctionalUnitLoader } from "./commons/domain/FunctionalUnitLoader.js";
+import { UnitTemplateRegistry } from "./commons/domain/UnitTemplateRegistry.js";
 import { SanitationDomain } from "./domains/sanitation/SanitationDomain.js";
 import { WaterDomain } from "./domains/water/WaterDomain.js";
 import { CommunityRole } from "./commons/CommunityRole.js";
@@ -126,8 +134,7 @@ async function init(): Promise<void> {
   GroupService.getInstance().init(new GroupLoader("data/groups"));
   HousingDomain.getInstance().init(new HousingUnitLoader("data/housing"));
   FoodDomain.getInstance().init(new FoodDomainLoader("data/food"));
-  FoodDomain.getInstance().initKitchens(new CommunityKitchenLoader("data/food/kitchens"));
-  FoodDomain.getInstance().initMills(new MillLoader("data/food/mills"));
+  FoodDomain.getInstance().initUnits(new FunctionalUnitLoader("data/food/units"));
   HealthcareDomain.getInstance().init(new ClinicLoader("data/healthcare/clinics"));
   HealthcareDomain.getInstance().initDentalClinics(new DentalClinicLoader("data/healthcare/dental-clinics"));
   EducationDomain.getInstance().initSchools(new SchoolLoader("data/education/schools"));
@@ -139,6 +146,45 @@ async function init(): Promise<void> {
   DependencyCareDomain.getInstance().initHomeCaregiving(new HomeCaregivingLoader("data/dependency-care/home-caregiving"));
   ChildcareDomain.getInstance().initHomeChildcare(new HomeChildcareLoader("data/child-care/home-childcare"));
   FireDomain.getInstance().initCompanies(new FireCompanyLoader("data/fire/companies"));
+  AgricultureDomain.getInstance().initUnits(new FunctionalUnitLoader("data/agriculture/units"));
+
+  // ── Unit template registry ─────────────────────────────────────────────────
+  UnitTemplateRegistry.register({
+    type: "community-kitchen",
+    label: "Community Kitchen",
+    description: "Prepares and delivers meals for members who cannot cook for themselves, and for community institutions.",
+    factory: () => new CommunityKitchen("Community Kitchen"),
+  });
+  UnitTemplateRegistry.register({
+    type: "mill",
+    label: "Grain Mill",
+    description: "Processes whole grain into flour and meal for community consumption.",
+    factory: () => new Mill("Grain Mill"),
+  });
+  UnitTemplateRegistry.register({
+    type: "grain-elevator",
+    label: "Grain Elevator",
+    description: "Stores bulk grain for long-term community food security and emergency stockpile management.",
+    factory: () => new GrainElevator(),
+  });
+  UnitTemplateRegistry.register({
+    type: "seed-library",
+    label: "Seed Library",
+    description: "Maintains open-pollinated seed stock, coordinates seed saving, and loans seeds to community growers each season.",
+    factory: () => new SeedLibrary(),
+  });
+  UnitTemplateRegistry.register({
+    type: "supply-relations-office",
+    label: "Supply Relations Office",
+    description: "Manages external food supply relationships, inter-community trade agreements, and the community's staple crop map.",
+    factory: () => new SupplyRelationsOffice(),
+  });
+  UnitTemplateRegistry.register({
+    type: "farm-coordinator",
+    label: "Farm Coordinator",
+    description: "Coordinates with private farms to ensure community food needs are met.",
+    factory: () => new FarmCoordinator(),
+  });
   LeaderPoolService.getInstance().init(new LeaderPoolLoader("data/sortition/pools"));
   AssemblyService.getInstance().init(new CitizensAssemblyLoader("data/assembly"));
   AssemblyService.getInstance().getOrCreate();
@@ -162,6 +208,16 @@ async function init(): Promise<void> {
   commonwealth.addDomain(DeathcareDomain.getInstance());
   commonwealth.addDomain(TransportDomain.getInstance());
   commonwealth.addDomain(EnrichmentDomain.getInstance());
+
+  // Load domain→pool assignments and apply to all registered domains.
+  {
+    const domainLoader = new DomainPoolAssignmentLoader("data/domains");
+    initDomainAssignmentLoader(domainLoader);
+    const assignments = domainLoader.load();
+    for (const domain of commonwealth.getDomains()) {
+      if (assignments[domain.id]) domain.poolId = assignments[domain.id] ?? null;
+    }
+  }
 
   // ── Scheduler ────────────────────────────────────────────────────────────────
   const scheduler = new Scheduler("data/scheduler");

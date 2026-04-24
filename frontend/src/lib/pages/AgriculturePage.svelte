@@ -1,5 +1,7 @@
 <script lang="ts">
   import CommunitySidebar from '../components/CommunitySidebar.svelte';
+  import DomainPoolPanel from '../components/DomainPoolPanel.svelte';
+  import FunctionalUnitsSection from '../components/FunctionalUnitsSection.svelte';
   const { navigate, path }: { navigate: (p: string) => void; path: string } = $props();
 
   interface RoleDto { id: string; title: string; description: string; kinPerMonth: number; memberId: string | null; memberName: string | null; active: boolean; }
@@ -21,6 +23,8 @@
   let assignMemberId = $state('');
   let assignWorking = $state(false);
   let assignError: string | null = $state(null);
+
+  const DOMAIN_ID = '00000000-0000-0000-0000-000000000007';
 
   async function load() {
     try {
@@ -121,6 +125,9 @@
     </div>
     <p class="domain-desc">The Agriculture domain coordinates food production for the community — working with local farmers, tracking growing plans, and connecting agricultural output to the food domain. The long-term goal is local caloric sovereignty: the community produces enough of its own food that outside supply chains are a supplement, not a lifeline.</p>
 
+
+    <DomainPoolPanel domainId="00000000-0000-0000-0000-000000000007" {navigate} />
+
     {#if loading}
       <p class="muted">Loading…</p>
     {:else if error}
@@ -133,6 +140,8 @@
         <p class="budget-summary">Total committed: <strong>{budgetTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })} kin / mo</strong></p>
       </section>
       {/if}
+
+      <FunctionalUnitsSection domainId={DOMAIN_ID} {navigate} />
 
       <section class="section">
         <h2>Roles</h2>
@@ -216,7 +225,7 @@
       </section>
 
     {/if}
-  </div>
+</div>
 </div>
 
 <style>
@@ -259,4 +268,5 @@
 
   .domain-layout { display: flex; min-height: 100vh; }
   .domain-main { flex: 1; padding: 32px 40px; max-width: 860px; }
+
 </style>

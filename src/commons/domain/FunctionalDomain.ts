@@ -29,6 +29,9 @@ export abstract class FunctionalDomain implements IEconomicActor {
     private unitSavers:   Map<string, (unit: FunctionalUnit) => void> = new Map();
     private unitDeleters: Map<string, (id: string) => void> = new Map();
 
+    /** The leader pool that governs this domain (if any). */
+    poolId: string | null = null;
+
 
     constructor(name: string, description: string = "", id?: string) {
         this.id = id ?? randomUUID();
@@ -75,6 +78,12 @@ export abstract class FunctionalDomain implements IEconomicActor {
     saveUnit(unit: FunctionalUnit): void {
         const saver = this.unitSavers.get(unit.getType());
         if (saver) { saver(unit); return; }
+    }
+
+    /** Add a new unit to memory and persist it immediately. */
+    createUnit(unit: FunctionalUnit): void {
+        this.addUnit(unit);
+        this.saveUnit(unit);
     }
 
     /** Remove a unit from memory and its owning loader. */
