@@ -335,9 +335,7 @@
   .toggle input:checked + .slider { background: #2563eb; }
   .toggle input:checked + .slider::before { transform: translateX(16px); }
 
-  .badge { font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 10px; font-weight: 500; }
-  .badge.enabled { background: #e6f4ea; color: #1a7a34; }
-  .badge.disabled { background: #f1f1f1; color: #888; }
+
 
   .btn {
     padding: 0.4rem 0.85rem;

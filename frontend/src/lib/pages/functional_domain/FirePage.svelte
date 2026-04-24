@@ -1,6 +1,6 @@
 <script lang="ts">
-  import DomainPage from '../components/DomainPage.svelte';
-  import DomainRolesTable from '../components/DomainRolesTable.svelte';
+  import DomainPage from '../../components/DomainPage.svelte';
+  import DomainRolesTable from '../../components/DomainRolesTable.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
   interface FireCompany { id: string; name: string; description: string; staffCount: number; createdAt: string; }

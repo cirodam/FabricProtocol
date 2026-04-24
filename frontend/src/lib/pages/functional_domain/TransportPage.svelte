@@ -1,6 +1,6 @@
 <script lang="ts">
-  import DomainPage from '../components/DomainPage.svelte';
-  import DomainRolesTable from '../components/DomainRolesTable.svelte';
+  import DomainPage from '../../components/DomainPage.svelte';
+  import DomainRolesTable from '../../components/DomainRolesTable.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
   interface RoleDto { id: string; title: string; description: string; kinPerMonth: number; memberId: string | null; memberName: string | null; active: boolean; }

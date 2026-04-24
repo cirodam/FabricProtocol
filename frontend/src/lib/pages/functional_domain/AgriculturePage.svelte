@@ -1,6 +1,6 @@
 <script lang="ts">
-  import DomainPage from '../components/DomainPage.svelte';
-  import FunctionalUnitsSection from '../components/FunctionalUnitsSection.svelte';
+  import DomainPage from '../../components/DomainPage.svelte';
+  import FunctionalUnitsSection from '../../components/FunctionalUnitsSection.svelte';
   const { navigate, path }: { navigate: (p: string) => void; path: string } = $props();
 
   interface RoleDto { id: string; title: string; description: string; kinPerMonth: number; memberId: string | null; memberName: string | null; active: boolean; }

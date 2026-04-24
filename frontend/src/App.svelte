@@ -12,28 +12,27 @@
   import CommonwealthPage from './lib/pages/CommonwealthPage.svelte';
   import SocialInsurancePage from './lib/pages/SocialInsurancePage.svelte';
   import DemographicsPage from './lib/pages/DemographicsPage.svelte';
-  import FoodPage from './lib/pages/FoodPage.svelte';
-  import CommunicationsPage from './lib/pages/CommunicationsPage.svelte';
-  import AgriculturePage from './lib/pages/AgriculturePage.svelte';
-  import SanitationPage from './lib/pages/SanitationPage.svelte';
-  import WaterPage from './lib/pages/WaterPage.svelte';
-  import HousingPage from './lib/pages/HousingPage.svelte';
-  import HousingUnitPage from './lib/pages/HousingUnitPage.svelte';
-  import AddHousingUnitPage from './lib/pages/AddHousingUnitPage.svelte';
-  import CourierPage from './lib/pages/CourierPage.svelte';
-  import DeathcarePage from './lib/pages/DeathcarePage.svelte';
-  import TransportPage from './lib/pages/TransportPage.svelte';
-  import EnrichmentPage from './lib/pages/EnrichmentPage.svelte';
-  import DependencyCarePage from './lib/pages/DependencyCarePage.svelte';
-  import HomeCaregivingPage from './lib/pages/HomeCaregivingPage.svelte';
-  import ChildCarePage from './lib/pages/ChildCarePage.svelte';
-  import HomeChildcarePage from './lib/pages/HomeChildcarePage.svelte';
+  import FoodPage from './lib/pages/functional_domain/FoodPage.svelte';
+  import CommunicationsPage from './lib/pages/functional_domain/CommunicationsPage.svelte';
+  import AgriculturePage from './lib/pages/functional_domain/AgriculturePage.svelte';
+  import SanitationPage from './lib/pages/functional_domain/SanitationPage.svelte';
+  import WaterPage from './lib/pages/functional_domain/WaterPage.svelte';
+  import HousingPage from './lib/pages/functional_domain/HousingPage.svelte';
+  import HousingUnitPage from './lib/pages/functional_domain/HousingUnitPage.svelte';
+  import AddHousingUnitPage from './lib/pages/functional_domain/AddHousingUnitPage.svelte';
+  import CourierPage from './lib/pages/functional_domain/CourierPage.svelte';
+  import DeathcarePage from './lib/pages/functional_domain/DeathcarePage.svelte';
+  import TransportPage from './lib/pages/functional_domain/TransportPage.svelte';
+  import EnrichmentPage from './lib/pages/functional_domain/EnrichmentPage.svelte';
+  import DependencyCarePage from './lib/pages/functional_domain/DependencyCarePage.svelte';
+  import HomeCaregivingPage from './lib/pages/functional_domain/HomeCaregivingPage.svelte';
+  import ChildCarePage from './lib/pages/functional_domain/ChildCarePage.svelte';
+  import HomeChildcarePage from './lib/pages/functional_domain/HomeChildcarePage.svelte';
   import LeaderPoolsPage from './lib/pages/LeaderPoolsPage.svelte';
   import LeaderPoolDetailPage from './lib/pages/LeaderPoolDetailPage.svelte';
   import AddLeaderPoolPage from './lib/pages/AddLeaderPoolPage.svelte';
   import AssemblyPage from './lib/pages/AssemblyPage.svelte';
   import ConstitutionPage from './lib/pages/ConstitutionPage.svelte';
-  import ProvisioningPage from './lib/pages/ProvisioningPage.svelte';
   import ApplicationsPage from './lib/pages/ApplicationsPage.svelte';
   import CalendarPage from './lib/pages/CalendarPage.svelte';
   import AddEventPage from './lib/pages/AddEventPage.svelte';
@@ -42,10 +41,10 @@
   import ReferendaPage from './lib/pages/ReferendaPage.svelte';
   import CreateReferendumPage from './lib/pages/CreateReferendumPage.svelte';
   import ReferendumDetailPage from './lib/pages/ReferendumDetailPage.svelte';
-  import HealthcarePage from './lib/pages/HealthcarePage.svelte';
+  import HealthcarePage from './lib/pages/functional_domain/HealthcarePage.svelte';
   import SettingsPage from './lib/pages/SettingsPage.svelte';
-  import FirePage from './lib/pages/FirePage.svelte';
-  import EducationPage from './lib/pages/EducationPage.svelte';
+  import FirePage from './lib/pages/functional_domain/FirePage.svelte';
+  import EducationPage from './lib/pages/functional_domain/EducationPage.svelte';
   import AdminPage from './lib/pages/AdminPage.svelte';
   import CreateAccountPage from './lib/pages/CreateAccountPage.svelte';
   import LoginPage from './lib/pages/LoginPage.svelte';
@@ -177,8 +176,6 @@
     <CommonwealthPage {navigate} {path} />
   {:else if path === '/social-insurance'}
     <SocialInsurancePage {navigate} {path} />
-  {:else if path === '/provisioning'}
-    <ProvisioningPage {navigate} />
   {:else if path === '/demographics'}
     <DemographicsPage />
   {:else if path === '/food'}

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import CommunitySidebar from '../components/CommunitySidebar.svelte';
-  import DomainPoolPanel from '../components/DomainPoolPanel.svelte';
+  import CommunitySidebar from '../../components/CommunitySidebar.svelte';
+  import DomainPoolPanel from '../../components/DomainPoolPanel.svelte';
   const { navigate, path }: { navigate: (p: string) => void; path: string } = $props();
 
   interface RoleDto { id: string; title: string; description: string; kinPerMonth: number; memberId: string | null; memberName: string | null; active: boolean; }

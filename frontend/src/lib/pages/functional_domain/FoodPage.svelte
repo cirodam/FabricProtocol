@@ -1,6 +1,6 @@
 <script lang="ts">
-  import DomainPage from '../components/DomainPage.svelte';
-  import FunctionalUnitsSection from '../components/FunctionalUnitsSection.svelte';
+  import DomainPage from '../../components/DomainPage.svelte';
+  import FunctionalUnitsSection from '../../components/FunctionalUnitsSection.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
   interface Totals {
