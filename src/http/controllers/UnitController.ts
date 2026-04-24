@@ -59,22 +59,6 @@ export function getUnit(req: Request, res: Response): void {
     res.json({ ...unitToDto(unit), roles });
 }
 
-// POST /api/domains/:domainId/units   body: { name, type, description? }
-export function createUnit(req: Request, res: Response): void {
-    const domain = getDomain(req, res);
-    if (!domain) return;
-    const { name, type, description } = req.body ?? {};
-    if (typeof name !== "string" || !name.trim()) {
-        res.status(400).json({ error: "name is required" }); return;
-    }
-    if (typeof type !== "string" || !type.trim()) {
-        res.status(400).json({ error: "type is required" }); return;
-    }
-    const unit = new FunctionalUnit(name.trim(), description?.trim() ?? "", type.trim());
-    domain.addGenericUnit(unit);
-    res.status(201).json(unitToDto(unit));
-}
-
 // DELETE /api/domains/:domainId/units/:unitId
 export function deleteUnit(req: Request, res: Response): void {
     const domain = getDomain(req, res);

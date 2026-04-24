@@ -2,8 +2,6 @@ import { IEconomicActor } from "../IEconomicActor.js";
 import { Bank } from "../bank/Bank.js";
 import { CommunityRole } from "./CommunityRole.js";
 import { FunctionalDomain, BudgetLineItem } from "./domain/FunctionalDomain.js";
-import { LedgerService } from "../ledger/LedgerService.js";
-import { AssetLedger } from "../ledger/AssetLedger.js";
 import { Constitution } from "./Constitution.js";
 
 // The Commons represents the community's collective investment in itself.
@@ -16,14 +14,12 @@ export class Commonwealth implements IEconomicActor {
 
     private positions: CommunityRole[] = [];
     private domains: FunctionalDomain[] = [];
-    readonly ledger: AssetLedger;
 
     private constructor() {
         this.id = "00000000-0000-0000-0000-000000000002"; // stable singleton ID
         if (!Bank.getInstance().getPrimaryAccount(this.id)) {
             Bank.getInstance().openAccount(this, "primary", 0, true);
         }
-        this.ledger = LedgerService.getInstance().openLedger(this, "primary");
     }
 
     static getInstance(): Commonwealth {

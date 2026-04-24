@@ -16,6 +16,8 @@ interface MemberRecord {
   phone: string | null;
   pinHash: string | null;
   passwordHash: string | null;
+  privateKeyDer: string;
+  publicKeyHex: string;
   languages: LanguageProficiency[];
 }
 
@@ -28,6 +30,7 @@ export class MemberLoader {
 
   save(member: Member): void {
     const { pinHash, passwordHash } = member.getCredentialsForPersistence();
+    const { privateKeyDer, publicKeyHex } = member.getKeypairForPersistence();
     const record: MemberRecord = {
       id: member.id,
       firstName: member.firstName,
@@ -41,6 +44,8 @@ export class MemberLoader {
       phone: member.phone,
       pinHash,
       passwordHash,
+      privateKeyDer,
+      publicKeyHex,
       languages: member.languages,
     };
     this.store.write(member.id, record);
@@ -68,6 +73,8 @@ export class MemberLoader {
       phone: r.phone,
       pinHash: r.pinHash ?? null,
       passwordHash: r.passwordHash ?? null,
+      privateKeyDer: r.privateKeyDer ?? null,
+      publicKeyHex: r.publicKeyHex ?? null,
       languages: r.languages ?? [],
     });
   }

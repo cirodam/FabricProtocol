@@ -1,4 +1,11 @@
-import { randomUUID } from "crypto";
+import {
+    randomUUID,
+    generateKeyPairSync,
+    sign as signEd25519,
+    createPrivateKey,
+    createHash,
+    type KeyObject,
+} from "crypto";
 import { IEconomicActor } from "../IEconomicActor.js";
 
 export interface LanguageProficiency {
@@ -26,6 +33,11 @@ export class Member implements IEconomicActor {
     private _pinHash: string | null = null;
     private _passwordHash: string | null = null;
 
+    private _privateKey: KeyObject;
+    private _privateKeyDer: string;
+    private _publicKeyHex: string;
+    private _nullifier: string;
+
     constructor(
         firstName: string,
         lastName: string,
@@ -47,6 +59,12 @@ export class Member implements IEconomicActor {
         this.guardianId = guardianId;
         this.phone = phone;
         this.languages = languages;
+
+        const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+        this._privateKey = privateKey;
+        this._privateKeyDer = privateKey.export({ type: "pkcs8", format: "der" }).toString("hex");
+        this._publicKeyHex = publicKey.export({ type: "spki", format: "der" }).toString("hex");
+        this._nullifier = createHash("sha256").update(this._privateKeyDer).digest("hex");
     }
 
     /**
@@ -66,6 +84,8 @@ export class Member implements IEconomicActor {
         phone: string | null;
         pinHash: string | null;
         passwordHash: string | null;
+        privateKeyDer: string | null;
+        publicKeyHex: string | null;
         languages: LanguageProficiency[];
     }): Member {
         const m = new Member(
@@ -83,12 +103,55 @@ export class Member implements IEconomicActor {
         m.retired = record.retired;
         m._pinHash = record.pinHash;
         m._passwordHash = record.passwordHash;
+        if (record.privateKeyDer && record.publicKeyHex) {
+            m._privateKey = createPrivateKey({
+                key: Buffer.from(record.privateKeyDer, "hex"),
+                format: "der",
+                type: "pkcs8",
+            });
+            m._privateKeyDer = record.privateKeyDer;
+            m._publicKeyHex = record.publicKeyHex;
+            m._nullifier = createHash("sha256").update(record.privateKeyDer).digest("hex");
+        }
         return m;
     }
 
     getId(): string { return this.id; }
     getDisplayName(): string { return `${this.firstName} ${this.lastName}`; }
     getHandle(): string { return this.handle; }
+
+    // ── Identity (Ed25519 keypair) ─────────────────────────────────────────────
+    // The community holds this keypair in custody on behalf of the member.
+    // The member can request their private key at any time (custody handoff).
+
+    /** Hex-encoded SPKI DER public key. Safe to share with the federation. */
+    get publicKeyHex(): string { return this._publicKeyHex; }
+
+    /**
+     * Nullifier: SHA-256(privateKeyDer).
+     * Submitted to a federation registry to detect double-membership without
+     * revealing the member's identity.
+     */
+    get nullifier(): string { return this._nullifier; }
+
+    /**
+     * Export the private key on explicit member request (custody handoff).
+     * Returns hex-encoded PKCS8 DER.
+     */
+    exportPrivateKey(): string { return this._privateKeyDer; }
+
+    /**
+     * Sign an arbitrary message on behalf of the member.
+     * Returns a hex-encoded Ed25519 signature.
+     */
+    sign(message: string): string {
+        return signEd25519(null, Buffer.from(message, "utf-8"), this._privateKey).toString("hex");
+    }
+
+    /** @internal Only for use by MemberLoader. */
+    getKeypairForPersistence(): { privateKeyDer: string; publicKeyHex: string } {
+        return { privateKeyDer: this._privateKeyDer, publicKeyHex: this._publicKeyHex };
+    }
 
     // ── Credential management ─────────────────────────────────────────────────
     // Hash values are never exposed. MemberService owns all pin/password logic.
@@ -140,6 +203,8 @@ export class Member implements IEconomicActor {
             guardianId: this.guardianId,
             phone: this.phone,
             languages: this.languages,
+            publicKeyHex: this._publicKeyHex,
+            nullifier: this._nullifier,
         };
     }
 }

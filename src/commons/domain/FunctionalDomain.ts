@@ -2,7 +2,6 @@ import { randomUUID } from "crypto";
 import { IEconomicActor } from "../../IEconomicActor.js";
 import { Bank } from "../../bank/Bank.js";
 import { FunctionalUnit } from "./FunctionalUnit.js";
-import { GenericUnitLoader } from "../../storage/GenericUnitLoader.js";
 import { CommunityRole } from "../CommunityRole.js";
 
 export interface BudgetLineItem {
@@ -27,7 +26,6 @@ export abstract class FunctionalDomain implements IEconomicActor {
 
     private roles: CommunityRole[] = [];
     private units: FunctionalUnit[] = [];
-    private genericLoader: GenericUnitLoader | null = null;
     private unitSavers:   Map<string, (unit: FunctionalUnit) => void> = new Map();
     private unitDeleters: Map<string, (id: string) => void> = new Map();
 
@@ -59,27 +57,6 @@ export abstract class FunctionalDomain implements IEconomicActor {
 
     // ── Generic units (created through the standard UI) ──────────────────────
 
-    initGenericUnits(loader: GenericUnitLoader): void {
-        this.genericLoader = loader;
-        for (const { unit } of loader.loadAll()) {
-            this.addUnit(unit);
-        }
-    }
-
-    addGenericUnit(unit: FunctionalUnit): void {
-        this.addUnit(unit);
-        this.genericLoader?.save(unit, this.id);
-    }
-
-    saveGenericUnit(unit: FunctionalUnit): void {
-        this.genericLoader?.save(unit, this.id);
-    }
-
-    removeGenericUnit(id: string): void {
-        this.removeUnit(id);
-        this.genericLoader?.delete(id);
-    }
-
     /**
      * Register a typed saver/deleter so the generic API can persist changes
      * to domain-specific loaders (e.g. ClinicLoader, SchoolLoader).
@@ -98,7 +75,6 @@ export abstract class FunctionalDomain implements IEconomicActor {
     saveUnit(unit: FunctionalUnit): void {
         const saver = this.unitSavers.get(unit.getType());
         if (saver) { saver(unit); return; }
-        this.genericLoader?.save(unit, this.id);
     }
 
     /** Remove a unit from memory and its owning loader. */
@@ -109,7 +85,6 @@ export abstract class FunctionalDomain implements IEconomicActor {
             if (deleter) { deleter(id); this.removeUnit(id); return; }
         }
         this.removeUnit(id);
-        this.genericLoader?.delete(id);
     }
 
     // Monthly payroll: domain-level roles plus all units.
