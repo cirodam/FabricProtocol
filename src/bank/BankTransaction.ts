@@ -26,4 +26,24 @@ export class BankTransaction {
         this.memo = memo;
         this.timestamp = new Date();
     }
+
+    /**
+     * Restore a persisted transaction without generating a new UUID or timestamp.
+     * For use by TransactionLoader only.
+     */
+    static restore(
+        id: string,
+        fromAccountId: string,
+        toAccountId: string,
+        currency: Currency,
+        amount: number,
+        memo: string,
+        timestamp: Date
+    ): BankTransaction {
+        const tx = new BankTransaction(fromAccountId, toAccountId, currency, amount, memo);
+        const t = tx as unknown as Record<string, unknown>;
+        t["id"] = id;
+        t["timestamp"] = timestamp;
+        return tx;
+    }
 }

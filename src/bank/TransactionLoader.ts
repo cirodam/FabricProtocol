@@ -1,8 +1,9 @@
 import { createHash } from "crypto";
 import { readdirSync, existsSync, readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+import { join, resolve } from "path";
 import { BankTransaction, Currency } from "./BankTransaction.js";
 import { FileStore } from "../storage/FileStore.js";
+import { DataManifest } from "../storage/DataManifest.js";
 
 const GENESIS_HASH = "0".repeat(64);
 
@@ -59,14 +60,18 @@ export class TransactionLoader {
   private readChainHead(): string {
     if (!existsSync(this.chainFile)) return GENESIS_HASH;
     try {
-      return (JSON.parse(readFileSync(this.chainFile, "utf-8")) as { headHash: string }).headHash ?? GENESIS_HASH;
+      const content = readFileSync(this.chainFile, "utf-8");
+      DataManifest.getInstance().verify(resolve(this.chainFile), content);
+      return (JSON.parse(content) as { headHash: string }).headHash ?? GENESIS_HASH;
     } catch {
       return GENESIS_HASH;
     }
   }
 
   private writeChainHead(hash: string): void {
-    writeFileSync(this.chainFile, JSON.stringify({ headHash: hash }), "utf-8");
+    const content = JSON.stringify({ headHash: hash });
+    writeFileSync(this.chainFile, content, "utf-8");
+    DataManifest.getInstance().record(resolve(this.chainFile), content);
   }
 
   /**
@@ -144,10 +149,14 @@ export class TransactionLoader {
   }
 
   private fromRecord(r: TransactionRecord): BankTransaction {
-    const tx = new BankTransaction(r.fromAccountId, r.toAccountId, r.currency, r.amount, r.memo);
-    const t = tx as unknown as Record<string, unknown>;
-    t["id"] = r.id;
-    t["timestamp"] = new Date(r.timestamp);
-    return tx;
+    return BankTransaction.restore(
+      r.id,
+      r.fromAccountId,
+      r.toAccountId,
+      r.currency,
+      r.amount,
+      r.memo,
+      new Date(r.timestamp)
+    );
   }
 }
