@@ -1,5 +1,4 @@
 <script lang="ts">
-  import CouncilPanel from '../components/CouncilPanel.svelte';
   import CommunitySidebar from '../components/CommunitySidebar.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
@@ -199,7 +198,6 @@
     {/if}
   </section>
 
-  <CouncilPanel domainId="00000000-0000-0000-0000-000000000014" {navigate} />
 
 {/if}
 </div>

@@ -4,18 +4,23 @@
   import CommunitySidebar from '../components/CommunitySidebar.svelte';
 
   interface Member { id: string; firstName: string; lastName: string; handle: string; }
-  interface Guild {
-    id: string; name: string; description: string;
+  interface CouncilSeat { memberId: string; seatedAt: string; firstName: string; lastName: string; handle: string; }
+  interface LeaderPool {
+    id: string; poolName: string;
     memberCount: number; createdAt: string; members: Member[];
+    isActive: boolean;
+    councilSize: number; activationThreshold: number;
+    councilSeatCount: number; councilVacancies: number;
+    councilSeats: CouncilSeat[];
   }
 
-  let guild: Guild | null      = $state(null);
-  let allMembers: Member[]    = $state([]);
+  let pool: LeaderPool | null  = $state(null);
+  let allMembers: Member[]     = $state([]);
   let loading = $state(true);
-  let error: string | null    = $state(null);
+  let error: string | null     = $state(null);
 
   let availableMembers = $derived(
-    allMembers.filter(m => !guild?.members.some(gm => gm.id === m.id))
+    allMembers.filter(m => !pool?.members.some(pm => pm.id === m.id))
   );
 
   // add form
@@ -29,19 +34,23 @@
   let drawError   = $state("");
   let drawWorking = $state(false);
 
+  // council
+  let councilDrawWorking = $state(false);
+  let councilDrawError   = $state("");
+
   // delete confirm
   let confirmDelete = $state(false);
   let deleteWorking = $state(false);
 
   async function load() {
     try {
-      const [guildRes, membersRes] = await Promise.all([
-        fetch(`/api/guilds/${id}`),
+      const [poolRes, membersRes] = await Promise.all([
+        fetch(`/api/leader-pools/${id}`),
         fetch("/api/members"),
       ]);
-      if (!guildRes.ok) throw new Error(`${guildRes.status}`);
+      if (!poolRes.ok) throw new Error(`${poolRes.status}`);
       if (!membersRes.ok) throw new Error(`${membersRes.status}`);
-      guild      = await guildRes.json();
+      pool       = await poolRes.json();
       allMembers = await membersRes.json();
     } catch (e) {
       error = (e as Error).message;
@@ -55,7 +64,7 @@
     if (!addMemberId) { addError = "Please select a member"; return; }
     addWorking = true; addError = "";
     try {
-      const res = await fetch(`/api/guilds/${id}/members`, {
+      const res = await fetch(`/api/leader-pools/${id}/members`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ memberId: addMemberId.trim() }),
@@ -75,7 +84,7 @@
   }
 
   async function removeMember(memberId: string) {
-    const res = await fetch(`/api/guilds/${id}/members/${memberId}`, { method: "DELETE" });
+    const res = await fetch(`/api/leader-pools/${id}/members/${memberId}`, { method: "DELETE" });
     if (res.ok) { drawn = drawn.filter(d => d.id !== memberId); await load(); }
   }
 
@@ -83,7 +92,7 @@
     e.preventDefault();
     drawWorking = true; drawError = ""; drawn = [];
     try {
-      const res = await fetch(`/api/guilds/${id}/draw`, {
+      const res = await fetch(`/api/leader-pools/${id}/draw`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ count: drawCount }),
@@ -101,10 +110,31 @@
     }
   }
 
-  async function deleteGuild() {
+  async function drawCouncilSeats() {
+    councilDrawWorking = true; councilDrawError = "";
+    try {
+      const res = await fetch(`/api/leader-pools/${id}/council/draw`, { method: "POST" });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error ?? `HTTP ${res.status}`);
+      }
+      await load();
+    } catch (e: unknown) {
+      councilDrawError = e instanceof Error ? e.message : "Draw failed";
+    } finally {
+      councilDrawWorking = false;
+    }
+  }
+
+  async function vacateCouncilSeat(memberId: string) {
+    const res = await fetch(`/api/leader-pools/${id}/council/seats/${memberId}`, { method: "DELETE" });
+    if (res.ok) await load();
+  }
+
+  async function deletePool() {
     deleteWorking = true;
-    const res = await fetch(`/api/guilds/${id}`, { method: "DELETE" });
-    if (res.ok) { navigate("/guilds"); } else { deleteWorking = false; }
+    const res = await fetch(`/api/leader-pools/${id}`, { method: "DELETE" });
+    if (res.ok) { navigate("/leader-pools"); } else { deleteWorking = false; }
   }
 
   load();
@@ -114,31 +144,71 @@
 <CommunitySidebar {navigate} {path} />
 <div class="domain-main">
 <div class="page">
-  <button class="back-link" onclick={() => navigate("/guilds")}>← Specialists</button>
+  <button class="back-link" onclick={() => navigate("/leader-pools")}>← Leader Pools</button>
 
   {#if loading}
     <p class="muted">Loading…</p>
-  {:else if error || !guild}
-    <p class="error">{error ?? "Specialist group not found"}</p>
+  {:else if error || !pool}
+    <p class="error">{error ?? "Leader pool not found"}</p>
   {:else}
     <div class="header">
       <div>
-        <span class="badge">Specialist Group</span>
-        <h1>{guild.name}</h1>
-        {#if guild.description}<p class="desc">{guild.description}</p>{/if}
+        <span class="badge">Leader Pool</span>
+        <h1>{pool.poolName}</h1>
       </div>
       <div class="header-actions">
         {#if !confirmDelete}
-          <button class="danger-outline" onclick={() => confirmDelete = true}>Delete group</button>
+          <button class="danger-outline" onclick={() => confirmDelete = true}>Delete pool</button>
         {:else}
           <span class="confirm-text">Delete permanently?</span>
-          <button class="danger" onclick={deleteGuild} disabled={deleteWorking}>
+          <button class="danger" onclick={deletePool} disabled={deleteWorking}>
             {deleteWorking ? "Deleting…" : "Yes, delete"}
           </button>
           <button onclick={() => confirmDelete = false}>Cancel</button>
         {/if}
       </div>
     </div>
+
+    <!-- Council section -->
+    <section class="section">
+      <h2>Council</h2>
+      {#if !pool.isActive}
+        <p class="dormant-notice">
+          This pool's council is <strong>dormant</strong>.
+          It activates when the pool exceeds {pool.activationThreshold} members
+          ({pool.memberCount} / {pool.activationThreshold + 1} needed).
+        </p>
+      {:else}
+        <p class="meta">{pool.councilSeatCount} / {pool.councilSize} seats filled &middot; {pool.councilVacancies} vacant</p>
+        {#if councilDrawError}<p class="error">{councilDrawError}</p>{/if}
+        {#if pool.councilVacancies > 0}
+          <button class="primary council-draw-btn" onclick={drawCouncilSeats} disabled={councilDrawWorking}>
+            {councilDrawWorking ? "Drawing…" : `Draw ${pool.councilVacancies} seat${pool.councilVacancies === 1 ? '' : 's'}`}
+          </button>
+        {/if}
+        {#if pool.councilSeats.length === 0}
+          <p class="muted">No seats filled yet. Draw to seat members.</p>
+        {:else}
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Member</th><th>Handle</th><th>Seated</th><th></th></tr></thead>
+              <tbody>
+                {#each pool.councilSeats as s (s.memberId)}
+                  <tr>
+                    <td>{s.firstName} {s.lastName}</td>
+                    <td class="muted">{s.handle || '—'}</td>
+                    <td class="muted">{new Date(s.seatedAt).toLocaleDateString()}</td>
+                    <td class="actions-cell">
+                      <button class="remove-btn" onclick={() => vacateCouncilSeat(s.memberId)}>Vacate</button>
+                    </td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
+        {/if}
+      {/if}
+    </section>
 
     <!-- Draw section -->
     <section class="section">
@@ -148,9 +218,9 @@
         <div class="draw-row">
           <label>
             Count
-            <input type="number" bind:value={drawCount} min="1" max={guild.memberCount || 1} disabled={drawWorking} />
+            <input type="number" bind:value={drawCount} min="1" max={pool.memberCount || 1} disabled={drawWorking} />
           </label>
-          <button type="submit" class="primary" disabled={drawWorking || guild.memberCount === 0}>
+          <button type="submit" class="primary" disabled={drawWorking || pool.memberCount === 0}>
             {drawWorking ? "Drawing…" : "Draw"}
           </button>
         </div>
@@ -170,17 +240,17 @@
     <!-- Members section -->
     <section class="section">
       <div class="section-header">
-        <h2>Members <span class="count">{guild.memberCount}</span></h2>
+        <h2>Members <span class="count">{pool.memberCount}</span></h2>
       </div>
 
-      {#if guild.members.length === 0}
+      {#if pool.members.length === 0}
         <p class="muted">No members yet.</p>
       {:else}
         <div class="table-wrap">
           <table>
             <thead><tr><th>Name</th><th>Handle</th><th></th></tr></thead>
             <tbody>
-              {#each guild.members as m (m.id)}
+              {#each pool.members as m (m.id)}
                 <tr>
                   <td>{m.firstName} {m.lastName}</td>
                   <td class="muted">{m.handle || '—'}</td>
@@ -199,7 +269,7 @@
         {#if addError}<p class="error">{addError}</p>{/if}
         <div class="add-row">
           <select bind:value={addMemberId} disabled={addWorking || availableMembers.length === 0}>
-            <option value="">{availableMembers.length === 0 ? 'All members already in guild' : 'Select a member…'}</option>
+            <option value="">{availableMembers.length === 0 ? 'All members already in pool' : 'Select a member…'}</option>
             {#each availableMembers as m (m.id)}
               <option value={m.id}>{m.firstName} {m.lastName}{m.handle ? ` (${m.handle})` : ''}</option>
             {/each}
@@ -222,7 +292,6 @@
   .header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
   .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; background: #ede9fe; color: #5b21b6; margin-bottom: 0.5rem; }
   h1 { margin: 0 0 0.25rem; font-size: 1.4rem; font-weight: 600; }
-  .desc { margin: 0; color: var(--text-secondary); font-size: 0.9rem; }
 
   .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
   .confirm-text { font-size: 0.85rem; }
@@ -261,4 +330,7 @@
   .danger { background: var(--color-danger, #dc2626); color: #fff; border-color: transparent; }
   .danger-outline { color: var(--color-danger, #dc2626); border-color: var(--color-danger, #dc2626); }
   .error { color: var(--color-danger, #dc2626); font-size: 0.875rem; margin: 0 0 0.5rem; }
+  .dormant-notice { background: #fef9c3; border: 1px solid #fde047; border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.9rem; color: #713f12; margin: 0; }
+  .meta { font-size: 0.85rem; color: var(--color-muted, #666); margin: 0 0 0.75rem; }
+  .council-draw-btn { margin-bottom: 0.75rem; }
 </style>

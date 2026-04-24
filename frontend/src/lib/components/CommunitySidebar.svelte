@@ -9,9 +9,9 @@
   ];
 
   const governanceLinks = [
-    { label: 'Referenda',    path: '/referenda' },
-    { label: 'Constitution', path: '/constitution' },
-    { label: 'Specialists',  path: '/guilds' },
+    { label: 'Referenda',     path: '/referenda' },
+    { label: 'Constitution',  path: '/constitution' },
+    { label: 'Leader Pools',  path: '/leader-pools' },
   ];
 
   const adminLinks = [
@@ -60,7 +60,7 @@
   function isActive(linkPath: string): boolean {
     if (path === linkPath) return true;
     // These paths are prefixes of sibling links, so require exact match only
-    const exactOnly = ['/community', '/referenda', '/guilds'];
+    const exactOnly = ['/community', '/referenda', '/leader-pools'];
     if (exactOnly.includes(linkPath)) return false;
     return path.startsWith(linkPath + '/');
   }

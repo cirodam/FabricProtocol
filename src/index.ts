@@ -45,10 +45,8 @@ import { EnrichmentDomain } from "./domains/enrichment/EnrichmentDomain.js";
 import { ProvisioningDomain } from "./domains/provisioning/ProvisioningDomain.js";
 import { ApplicationService } from "./member/ApplicationService.js";
 import { MemberApplicationLoader } from "./member/MemberApplicationLoader.js";
-import { GuildService } from "./commons/sortition/GuildService.js";
-import { GuildLoader } from "./commons/sortition/GuildLoader.js";
-import { CouncilService } from "./commons/council/CouncilService.js";
-import { DomainCouncilLoader } from "./commons/council/DomainCouncilLoader.js";
+import { LeaderPoolService } from "./commons/sortition/LeaderPoolService.js";
+import { LeaderPoolLoader } from "./commons/sortition/LeaderPoolLoader.js";
 import { AssemblyService } from "./commons/assembly/AssemblyService.js";
 import { CitizensAssemblyLoader } from "./commons/assembly/CitizensAssemblyLoader.js";
 import { GovernanceService } from "./commons/GovernanceService.js";
@@ -141,9 +139,7 @@ async function init(): Promise<void> {
   DependencyCareDomain.getInstance().initHomeCaregiving(new HomeCaregivingLoader("data/dependency-care/home-caregiving"));
   ChildcareDomain.getInstance().initHomeChildcare(new HomeChildcareLoader("data/child-care/home-childcare"));
   FireDomain.getInstance().initCompanies(new FireCompanyLoader("data/fire/companies"));
-  GuildService.getInstance().init(new GuildLoader("data/sortition/pools"));
-  CouncilService.getInstance().init(new DomainCouncilLoader("data/councils"));
-  CouncilService.getInstance().seedDefaults();
+  LeaderPoolService.getInstance().init(new LeaderPoolLoader("data/sortition/pools"));
   AssemblyService.getInstance().init(new CitizensAssemblyLoader("data/assembly"));
   AssemblyService.getInstance().getOrCreate();
 

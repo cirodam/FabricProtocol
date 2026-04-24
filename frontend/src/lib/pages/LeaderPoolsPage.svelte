@@ -3,24 +3,23 @@
 
   const { navigate, path }: { navigate: (path: string) => void; path: string } = $props();
 
-  interface Guild {
+  interface LeaderPool {
     id: string;
-    name: string;
-    description: string;
+    poolName: string;
     memberCount: number;
     createdAt: string;
   }
 
-  let guilds: Guild[] = $state([]);
+  let pools: LeaderPool[] = $state([]);
   let loading = $state(true);
   let error: string | null = $state(null);
 
   async function load() {
     try {
-      const res = await fetch('/api/guilds');
+      const res = await fetch('/api/leader-pools');
       if (!res.ok) throw new Error(`${res.status}`);
       const data = await res.json();
-      guilds = data.guilds;
+      pools = data.pools;
     } catch (e) {
       error = (e as Error).message;
     } finally {
@@ -35,8 +34,8 @@
 <CommunitySidebar {navigate} {path} />
 <div class="domain-main">
 <div class="page-header">
-  <h1>Specialists</h1>
-  <p class="intro">Specialist groups are members who want to lead the community in a particular area. Farmers work together to ensure the community has enough food. Healthcare workers coordinate to keep members healthy. Specialists are eligible to serve on the governing council for their group.</p>
+  <h1>Leader Pools</h1>
+  <p class="intro">Leader pools are groups of members eligible to be drawn by sortition to fill seats on a domain's governing council. Each pool is named for the domain it serves — Farmers, Medical Workers, Fire Department, and so on.</p>
 </div>
 
 {#if loading}
@@ -46,24 +45,23 @@
 {:else}
   <section class="section">
     <div class="section-header">
-      <h2>Specialist Groups <span class="count">{guilds.length}</span></h2>
-      <button class="new-btn" onclick={() => navigate('/guilds/new')}>+ New group</button>
+      <h2>Leader Pools <span class="count">{pools.length}</span></h2>
+      <button class="new-btn" onclick={() => navigate('/leader-pools/new')}>+ New pool</button>
     </div>
-    {#if guilds.length === 0}
-      <p class="muted">No specialist groups yet.</p>
+    {#if pools.length === 0}
+      <p class="muted">No leader pools yet.</p>
     {:else}
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Name</th><th>Description</th><th class="num">Members</th><th>Created</th></tr>
+            <tr><th>Pool Name</th><th class="num">Members</th><th>Created</th></tr>
           </thead>
           <tbody>
-            {#each guilds as g (g.id)}
-              <tr class="clickable" onclick={() => navigate(`/guilds/${g.id}`)}>
-                <td class="name">{g.name}</td>
-                <td class="muted">{g.description || '—'}</td>
-                <td class="num">{g.memberCount}</td>
-                <td class="muted">{new Date(g.createdAt).toLocaleDateString()}</td>
+            {#each pools as p (p.id)}
+              <tr class="clickable" onclick={() => navigate(`/leader-pools/${p.id}`)}>
+                <td class="name">{p.poolName}</td>
+                <td class="num">{p.memberCount}</td>
+                <td class="muted">{new Date(p.createdAt).toLocaleDateString()}</td>
               </tr>
             {/each}
           </tbody>

@@ -28,9 +28,9 @@
   import HomeCaregivingPage from './lib/pages/HomeCaregivingPage.svelte';
   import ChildCarePage from './lib/pages/ChildCarePage.svelte';
   import HomeChildcarePage from './lib/pages/HomeChildcarePage.svelte';
-  import GuildsPage from './lib/pages/GuildsPage.svelte';
-  import GuildDetailPage from './lib/pages/GuildDetailPage.svelte';
-  import AddGuildPage from './lib/pages/AddGuildPage.svelte';
+  import LeaderPoolsPage from './lib/pages/LeaderPoolsPage.svelte';
+  import LeaderPoolDetailPage from './lib/pages/LeaderPoolDetailPage.svelte';
+  import AddLeaderPoolPage from './lib/pages/AddLeaderPoolPage.svelte';
   import AssemblyPage from './lib/pages/AssemblyPage.svelte';
   import ConstitutionPage from './lib/pages/ConstitutionPage.svelte';
   import ProvisioningPage from './lib/pages/ProvisioningPage.svelte';
@@ -220,12 +220,12 @@
     <SettingsPage {navigate} />
   {:else if path === '/fire'}
     <FirePage {navigate} />
-  {:else if path === '/guilds'}
-    <GuildsPage {navigate} {path} />
-  {:else if path === '/guilds/new'}
-    <AddGuildPage {navigate} />
-  {:else if path.startsWith('/guilds/')}
-    <GuildDetailPage id={path.slice('/guilds/'.length)} {navigate} {path} />
+  {:else if path === '/leader-pools'}
+    <LeaderPoolsPage {navigate} {path} />
+  {:else if path === '/leader-pools/new'}
+    <AddLeaderPoolPage {navigate} />
+  {:else if path.startsWith('/leader-pools/')}
+    <LeaderPoolDetailPage id={path.slice('/leader-pools/'.length)} {navigate} {path} />
   {:else if path === '/assembly'}
     <AssemblyPage />
   {:else if path === '/constitution'}

@@ -1,54 +1,48 @@
 <script lang="ts">
   const { navigate }: { navigate: (path: string) => void } = $props();
 
-  let name        = $state("");
-  let description = $state("");
-  let error       = $state("");
-  let working     = $state(false);
+  let poolName = $state("");
+  let error    = $state("");
+  let working  = $state(false);
 
   async function submit(e: Event) {
     e.preventDefault();
-    if (!name.trim()) { error = "Name is required"; return; }
+    if (!poolName.trim()) { error = "Pool name is required"; return; }
     working = true; error = "";
     try {
-      const res = await fetch("/api/guilds", {
+      const res = await fetch("/api/leader-pools", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), description: description.trim() }),
+        body: JSON.stringify({ poolName: poolName.trim() }),
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
         throw new Error(d.error ?? `HTTP ${res.status}`);
       }
       const data = await res.json();
-      navigate(`/guilds/${data.id}`);
+      navigate(`/leader-pools/${data.id}`);
     } catch (e: unknown) {
-      error = e instanceof Error ? e.message : "Failed to create guild";
+      error = e instanceof Error ? e.message : "Failed to create pool";
       working = false;
     }
   }
 </script>
 
 <div class="page">
-  <button class="back-link" onclick={() => navigate("/guilds")}>← Specialists</button>
-  <h1>New Specialist Group</h1>
+  <button class="back-link" onclick={() => navigate("/leader-pools")}>← Leader Pools</button>
+  <h1>New Leader Pool</h1>
 
   <form onsubmit={submit} class="form">
     {#if error}<p class="error">{error}</p>{/if}
 
     <label>
-      <span>Name <span class="req">*</span></span>
-      <input type="text" bind:value={name} placeholder="e.g. Farmers, Medical Workers, Fire Department" disabled={working} />
-    </label>
-
-    <label>
-      <span>Description</span>
-      <textarea bind:value={description} rows="3" placeholder="Who this group represents, eligibility criteria, notes…" disabled={working}></textarea>
+      <span>Pool Name <span class="req">*</span></span>
+      <input type="text" bind:value={poolName} placeholder="e.g. Farmers, Medical Workers, Fire Department" disabled={working} />
     </label>
 
     <div class="actions">
-      <button type="button" onclick={() => navigate("/guilds")} disabled={working}>Cancel</button>
-      <button type="submit" class="primary" disabled={working || !name.trim()}>{working ? "Creating…" : "Create group"}</button>
+      <button type="button" onclick={() => navigate("/leader-pools")} disabled={working}>Cancel</button>
+      <button type="submit" class="primary" disabled={working || !poolName.trim()}>{working ? "Creating…" : "Create pool"}</button>
     </div>
   </form>
 </div>
@@ -61,8 +55,8 @@
   .form { display: flex; flex-direction: column; gap: 1.1rem; }
   label { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.9rem; font-weight: 500; }
   .req { color: var(--color-danger, #dc2626); }
-  input, textarea { padding: 0.5rem 0.75rem; border: 1px solid var(--color-border, #e2e8f0); border-radius: 6px; font-size: 0.9rem; font-family: inherit; resize: vertical; }
-  input:disabled, textarea:disabled { opacity: 0.6; }
+  input { padding: 0.5rem 0.75rem; border: 1px solid var(--color-border, #e2e8f0); border-radius: 6px; font-size: 0.9rem; font-family: inherit; }
+  input:disabled { opacity: 0.6; }
 
   .actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 0.5rem; }
   .actions button { padding: 0.5rem 1.25rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; border: 1px solid var(--color-border, #e2e8f0); background: none; }
