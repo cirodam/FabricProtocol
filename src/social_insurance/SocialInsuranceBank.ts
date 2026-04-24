@@ -1,6 +1,5 @@
 import { IEconomicActor } from "../IEconomicActor.js";
 import { Bank } from "../bank/Bank.js";
-import { CentralBank } from "../central_bank/CentralBank.js";
 import { Member } from "../member/Member.js";
 import { SocialInsuranceMember } from "./SocialInsuranceMember.js";
 import { SocialInsuranceMemberLoader } from "./SocialInsuranceMemberLoader.js";
@@ -21,6 +20,11 @@ import { SocialInsuranceMemberLoader } from "./SocialInsuranceMemberLoader.js";
  *
  * The pool account is exempt from demurrage — it is a deferred liability,
  * not circulating kin.
+ *
+ * SocialInsuranceBank is responsible for pool accounting and payout mechanics.
+ * All minting and burning decisions are owned by CentralBank, which calls
+ * {@link recordContribution} and {@link clearMemberRecord} after each monetary
+ * action to keep the records in sync.
  */
 export class SocialInsuranceBank implements IEconomicActor {
     private static instance: SocialInsuranceBank;
@@ -63,34 +67,6 @@ export class SocialInsuranceBank implements IEconomicActor {
         return total;
     }
 
-    /**
-     * Backfill pool contributions for members who joined before the social
-     * insurance system existed. Calculates each member's expected contribution
-     * (age × kinPerPersonYear) and mints the deficit into the pool.
-     * Safe to call on every startup — no-ops for members already fully contributed.
-     */
-    backfillMembers(members: Member[], kinPerPersonYear: number, circulationFraction: number = 0): void {
-        const now = Date.now();
-        const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;
-        for (const member of members) {
-            const age = Math.floor((now - member.birthDate.getTime()) / MS_PER_YEAR);
-            const expected = age * kinPerPersonYear;
-            const r = this.records.get(member.getId()) ?? new SocialInsuranceMember(member.getId());
-            const deficit = expected - r.poolContributed;
-            if (deficit > 0) {
-                const directAmount = Math.round(deficit * circulationFraction);
-                const poolAmount = deficit - directAmount;
-                r.poolContributed += poolAmount;
-                if (!this.records.has(member.getId())) this.records.set(r.memberId, r);
-                if (poolAmount > 0)
-                    CentralBank.getInstance().mintToPool(this.poolAccountId, poolAmount, "retirement pool: backfill");
-                if (directAmount > 0)
-                    CentralBank.getInstance().issueEndowment(member, directAmount);
-                this.loader?.save(r);
-            }
-        }
-    }
-
     /** Current balance of the retirement pool. */
     get poolBalance(): number {
         return Bank.getInstance().getPrimaryAccount(this.id)?.kin ?? 0;
@@ -104,25 +80,17 @@ export class SocialInsuranceBank implements IEconomicActor {
     }
 
     /**
-     * Mint kin on behalf of a member (join back-debt or birthday).
-     * A fraction (birthdayCirculationFraction) goes directly to the member's
-     * primary account as circulating kin; the remainder goes to the pool.
+     * Record that `poolAmount` kin has been minted into the pool on behalf of
+     * this member. Called by CentralBank after each mint operation.
+     * Creates the member record if it does not yet exist.
      */
-    depositContribution(member: Member, amount: number, circulationFraction: number = 0): void {
-        let r = this.records.get(member.getId());
+    recordContribution(memberId: string, poolAmount: number): void {
+        let r = this.records.get(memberId);
         if (!r) {
-            r = new SocialInsuranceMember(member.getId());
-            this.records.set(r.memberId, r);
+            r = new SocialInsuranceMember(memberId);
+            this.records.set(memberId, r);
         }
-        const directAmount = Math.round(amount * circulationFraction);
-        const poolAmount = amount - directAmount;
-        if (poolAmount > 0) {
-            r.poolContributed += poolAmount;
-            CentralBank.getInstance().mintToPool(this.poolAccountId, poolAmount, "retirement pool: contribution");
-        }
-        if (directAmount > 0) {
-            CentralBank.getInstance().issueEndowment(member, directAmount);
-        }
+        r.poolContributed += poolAmount;
         this.loader?.save(r);
     }
 
@@ -160,25 +128,21 @@ export class SocialInsuranceBank implements IEconomicActor {
     }
 
     /**
-     * On member death: burn their unspent entitlement from the pool.
-     * burn = max(0, contributed − received)
-     * This contracts the money supply by exactly the amount owed to this person
-     * that was never spent, preserving the invariant that total supply ∝ living
-     * population.
+     * Returns the unspent entitlement for a member: `max(0, contributed − received)`.
+     * Called by CentralBank to determine how much to burn on member departure.
      */
-    settleDeath(member: Member): void {
-        const r = this.records.get(member.getId());
-        if (!r) return;
+    getUnspentEntitlement(memberId: string): number {
+        const r = this.records.get(memberId);
+        if (!r) return 0;
+        return Math.max(0, r.poolContributed - r.poolReceived);
+    }
 
-        const burn = Math.max(0, r.poolContributed - r.poolReceived);
-        if (burn > 0) {
-            const available = Math.min(burn, this.poolBalance);
-            if (available > 0) {
-                CentralBank.getInstance().burnFromPool(this.poolAccountId, available, "retirement pool: death settlement");
-            }
-        }
-
-        this.records.delete(member.getId());
-        this.loader?.delete(member.getId());
+    /**
+     * Remove a member's pool record after CentralBank has burned their entitlement.
+     * Called by CentralBank as part of the discharge flow.
+     */
+    clearMemberRecord(memberId: string): void {
+        this.records.delete(memberId);
+        this.loader?.delete(memberId);
     }
 }

@@ -46,6 +46,7 @@ import currencyBoardRoutes from "./routes/currencyBoardRoutes.js";
 import socialInsuranceRoutes from "./routes/socialInsuranceRoutes.js";
 import unitRoutes from "./routes/unitRoutes.js";
 import setupRoutes from "./routes/setupRoutes.js";
+import projectionRoutes from "./routes/projectionRoutes.js";
 
 /**
  * HTTP REST API server.
@@ -144,6 +145,7 @@ export class HttpServer {
         this.app.use("/api/auth", authRoutes);
         this.app.use("/api/currency-board", currencyBoardRoutes);
         this.app.use("/api/social-insurance", socialInsuranceRoutes);
+        this.app.use("/api/projection", projectionRoutes);
 
         // Serve the Svelte frontend (production build)
         const frontendDist = join(__dirname, "../../frontend/dist");

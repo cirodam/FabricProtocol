@@ -107,12 +107,6 @@ async function init(): Promise<void> {
   // Restore poolIssued from persisted records so desiredMoneyInCirculation is correct on startup.
   CentralBank.getInstance().restorePoolIssued(SocialInsuranceBank.getInstance().getTotalPoolContributed());
   MemberService.getInstance().init(new MemberLoader("data/members"));
-  // Backfill pool contributions for members who predate the social insurance system.
-  SocialInsuranceBank.getInstance().backfillMembers(
-    MemberService.getInstance().getAll(),
-    constitution.kinPerPersonYear,
-    constitution.birthdayCirculationFraction,
-  );
   // Backfill community endowment for pre-existing members (idempotent via communityEndowmentTotal check).
   {
     const endowment = constitution.communityEndowment;
@@ -127,6 +121,15 @@ async function init(): Promise<void> {
       }
     }
   }
+  // Wire monetary policy event callbacks.
+  // CentralBank is the sole decision-maker for all minting and burning.
+  {
+    const ms = MemberService.getInstance();
+    ms.onMemberJoined(m => CentralBank.getInstance().handleMemberJoined(m));
+    ms.onMemberDischarged(m => CentralBank.getInstance().handleMemberDischarged(m));
+    ms.onMemberAnniversary(m => CentralBank.getInstance().handleMemberAnniversary(m));
+  }
+
   ApplicationService.getInstance().init(new MemberApplicationLoader("data/members/applications"));
   CalendarService.getInstance().init(new CalendarEventLoader("data/calendar"));
   CalendarService.getInstance().seedDefaults();

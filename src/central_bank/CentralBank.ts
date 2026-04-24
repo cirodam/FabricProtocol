@@ -2,6 +2,10 @@ import { IEconomicActor } from "../IEconomicActor.js";
 import { Bank } from "../bank/Bank.js";
 import { MemberEndowment } from "./MemberEndowment.js";
 import { MemberEndowmentLoader } from "./MemberEndowmentLoader.js";
+import { Constitution } from "../commons/Constitution.js";
+import { Commonwealth } from "../commons/Commonwealth.js";
+import { Member } from "../member/Member.js";
+import { SocialInsuranceBank } from "../social_insurance/SocialInsuranceBank.js";
 
 /**
  * The CentralBank is the sole issuer of currency in the community.
@@ -292,5 +296,72 @@ export class CentralBank implements IEconomicActor {
                 bankInst.transfer(account.id, bankAccount.id, "kin", amount, "demurrage: bank recovery");
             }
         }
+    }
+
+    // ── Event handlers ──────────────────────────────────────────────────────────
+    // Registered in index.ts via MemberService.on* callbacks.
+    // CentralBank is the sole authority on all minting and burning decisions.
+    // It reads Constitution directly so callers pass only the Member.
+
+    private static readonly MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;
+
+    /**
+     * Monetary response to a new member joining.
+     * 1. Mints the member's back-debt (age × kinPerPersonYear) into the pool
+     *    (and optionally a fraction directly to the member).
+     * 2. Issues the community endowment if configured.
+     */
+    handleMemberJoined(member: Member): void {
+        const constitution = Constitution.getInstance();
+        const age = Math.floor((Date.now() - member.birthDate.getTime()) / CentralBank.MS_PER_YEAR);
+        this._mintContribution(member, age * constitution.kinPerPersonYear, constitution.birthdayCirculationFraction, "retirement pool: join back-debt");
+        const endowment = constitution.communityEndowment;
+        if (endowment > 0)
+            this.issueCommunityEndowment(member, Commonwealth.getInstance(), endowment, constitution.demurrageFloor);
+    }
+
+    /**
+     * Monetary response to a member's annual birthday.
+     * Mints one person-year of kin into the pool (and optionally a fraction
+     * directly to the member's primary account).
+     */
+    handleMemberAnniversary(member: Member): void {
+        const constitution = Constitution.getInstance();
+        this._mintContribution(member, constitution.kinPerPersonYear, constitution.birthdayCirculationFraction, "retirement pool: annual contribution");
+    }
+
+    /**
+     * Monetary response to a member departing (departure or death).
+     * 1. Burns the member's unspent pool entitlement, then clears their SIB record.
+     * 2. Reclaims personal and community endowments.
+     */
+    handleMemberDischarged(member: Member): void {
+        const sib = SocialInsuranceBank.getInstance();
+        const burn = sib.getUnspentEntitlement(member.getId());
+        const available = Math.min(burn, sib.poolBalance);
+        if (available > 0)
+            this.burnFromPool(sib.poolAccountId, available, "retirement pool: death settlement");
+        sib.clearMemberRecord(member.getId());
+        this.reclaimEndowment(member);
+        const constitution = Constitution.getInstance();
+        const endowment = constitution.communityEndowment;
+        if (endowment > 0)
+            this.reclaimCommunityEndowment(member, Commonwealth.getInstance(), endowment, constitution.demurrageFloor);
+    }
+
+    /**
+     * Shared minting logic: splits `amount` between the retirement pool and
+     * the member's primary account, then records the pool portion in SIB.
+     */
+    private _mintContribution(member: Member, amount: number, circulationFraction: number, poolMemo: string): void {
+        const sib = SocialInsuranceBank.getInstance();
+        const directAmount = Math.round(amount * circulationFraction);
+        const poolAmount = amount - directAmount;
+        if (poolAmount > 0) {
+            this.mintToPool(sib.poolAccountId, poolAmount, poolMemo);
+            sib.recordContribution(member.getId(), poolAmount);
+        }
+        if (directAmount > 0)
+            this.issueEndowment(member, directAmount);
     }
 }

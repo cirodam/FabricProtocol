@@ -1,12 +1,9 @@
 import { Member } from "./Member.js";
 import { MemberLoader } from "./MemberLoader.js";
 import { DEFAULT_NUTRITIONAL_PROFILES, getMemberType, NutritionalProfile } from "../domains/food/NutritionalProfile.js";
-import { CentralBank } from "../central_bank/CentralBank.js";
 import { Commonwealth } from "../commons/Commonwealth.js";
 import { Bank } from "../bank/Bank.js";
 import { Marketplace } from "../marketplace/Marketplace.js";
-import { Constitution } from "../commons/Constitution.js";
-import { SocialInsuranceBank } from "../social_insurance/SocialInsuranceBank.js";
 import { createHash } from "crypto";
 
 export class MemberService {
@@ -14,6 +11,10 @@ export class MemberService {
 
   private members: Map<string, Member> = new Map();
   private loader: MemberLoader | null = null;
+
+  private joinHandlers: ((member: Member) => void)[] = [];
+  private dischargeHandlers: ((member: Member) => void)[] = [];
+  private anniversaryHandlers: ((member: Member) => void)[] = [];
 
   private constructor() {}
 
@@ -35,20 +36,25 @@ export class MemberService {
     return MemberService.instance;
   }
 
+  /** Register a handler to be called whenever a new member is added. */
+  onMemberJoined(handler: (member: Member) => void): void {
+    this.joinHandlers.push(handler);
+  }
+
+  /** Register a handler to be called when a member is discharged (departure or death). */
+  onMemberDischarged(handler: (member: Member) => void): void {
+    this.dischargeHandlers.push(handler);
+  }
+
+  /** Register a handler to be called on a member's annual birthday. */
+  onMemberAnniversary(handler: (member: Member) => void): void {
+    this.anniversaryHandlers.push(handler);
+  }
+
   add(member: Member): void {
     this.members.set(member.id, member);
     Bank.getInstance().openAccount(member, "primary");
-    const age = Math.floor((Date.now() - member.birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-    const fraction = Constitution.getInstance().birthdayCirculationFraction;
-    SocialInsuranceBank.getInstance().depositContribution(member, age * Constitution.getInstance().kinPerPersonYear, fraction);
-    const endowment = Constitution.getInstance().communityEndowment;
-    if (endowment > 0)
-      CentralBank.getInstance().issueCommunityEndowment(
-        member,
-        Commonwealth.getInstance(),
-        endowment,
-        Constitution.getInstance().demurrageFloor,
-      );
+    this.joinHandlers.forEach(h => h(member));
     this.loader?.save(member);
   }
 
@@ -107,8 +113,7 @@ export class MemberService {
     return member.pinHash === createHash("sha256").update(pin).digest("hex");
   }
 
-  // Call once per day. On each member's birthday, deposits one person-year
-  // of kin into the retirement pool on behalf of this member.
+  /** Call once per day. Fires anniversary handlers for every member whose birthday matches today. */
   checkAnniversaries(today: Date = new Date()): void {
     const mm = today.getMonth();
     const dd = today.getDate();
@@ -116,34 +121,22 @@ export class MemberService {
       const isBirthday =
         member.birthDate.getMonth() === mm && member.birthDate.getDate() === dd;
       if (isBirthday) {
-        const fraction = Constitution.getInstance().birthdayCirculationFraction;
-        SocialInsuranceBank.getInstance().depositContribution(member, Constitution.getInstance().kinPerPersonYear, fraction);
+        this.anniversaryHandlers.forEach(h => h(member));
       }
     }
   }
 
   /**
    * Discharge a member (departure or death).
-   * 1. SocialInsuranceBank burns the member's unspent pool entitlement.
-   * 2. CentralBank reclaims any legacy endowment balance.
-   * 3. Any remaining balance is transferred to the Commons.
-   * 4. Member's accounts are closed.
-   * 5. Member record is deleted.
+   * 1. Discharge handlers fire in registration order (pool settlement, endowment reclaim, etc.).
+   * 2. Any remaining balance is swept to the Commons.
+   * 3. Member's accounts are closed (must be zero-balance at this point).
+   * 4. Member record is deleted.
    */
   discharge(member: Member): void {
     Marketplace.getInstance().removePostsByPoster(member.getId());
-    SocialInsuranceBank.getInstance().settleDeath(member);
-    CentralBank.getInstance().reclaimEndowment(member);
-    const endowment = Constitution.getInstance().communityEndowment;
-    if (endowment > 0)
-      CentralBank.getInstance().reclaimCommunityEndowment(
-        member,
-        Commonwealth.getInstance(),
-        endowment,
-        Constitution.getInstance().demurrageFloor,
-      );
+    this.dischargeHandlers.forEach(h => h(member));
     Commonwealth.getInstance().collect(member);
-
     Bank.getInstance().closeAccounts(member.getId());
     this.loader?.delete(member.getId());
     this.members.delete(member.getId());
