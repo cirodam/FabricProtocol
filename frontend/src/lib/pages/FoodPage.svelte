@@ -1,6 +1,5 @@
 <script lang="ts">
-  import CommunitySidebar from '../components/CommunitySidebar.svelte';
-  import DomainPoolPanel from '../components/DomainPoolPanel.svelte';
+  import DomainPage from '../components/DomainPage.svelte';
   import FunctionalUnitsSection from '../components/FunctionalUnitsSection.svelte';
   const { navigate }: { navigate: (path: string) => void } = $props();
 
@@ -96,22 +95,14 @@
   load();
 </script>
 
-<div class="domain-layout">
-<CommunitySidebar {navigate} />
-<div class="domain-main">
-<div class="page-header">
-  <h1>Food</h1>
-</div>
-<p class="domain-desc">The Food domain is responsible for feeding every community member. It manages the universal monthly food allowance, community kitchens, mills, and other food production infrastructure. The community funds this domain so that no member ever goes hungry for lack of money.</p>
-
-
-  <DomainPoolPanel domainId="00000000-0000-0000-0000-000000000003" {navigate} />
-
-{#if loading}
-  <p class="muted">Loading…</p>
-{:else if error}
-  <p class="error">{error}</p>
-{:else}
+<DomainPage
+  {navigate}
+  title="Food"
+  description="The Food domain is responsible for feeding every community member. It manages the universal monthly food allowance, community kitchens, mills, and other food production infrastructure. The community funds this domain so that no member ever goes hungry for lack of money."
+  domainId="00000000-0000-0000-0000-000000000003"
+  {loading}
+  {error}
+>
   {#if budgetLineItems.length > 0}
   <section class="section">
     <h2>Budget</h2>
@@ -197,28 +188,9 @@
   {/if}
 
       <FunctionalUnitsSection domainId="00000000-0000-0000-0000-000000000003" {navigate} />
-    {/if}
-</div>
-</div>
+</DomainPage>
 
 <style>
-  .page-header {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-
-  h1 { margin: 0; font-size: 22px; font-weight: 600; }
-
-  .domain-desc {
-    font-size: 14px;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin: 0 0 28px;
-    max-width: 680px;
-  }
-
   .section { margin-bottom: 32px; }
   h2 { margin: 0 0 16px; font-size: 16px; font-weight: 600; }
 
@@ -357,9 +329,6 @@
   }
   .cancel-btn:disabled { opacity: 0.5; cursor: default; }
   .cancel-btn:hover:not(:disabled) { color: var(--text); border-color: var(--text-secondary); }
-
-  .muted { color: var(--text-secondary); }
-  .error { color: #ef5350; }
 
   .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
   .section-header h2 { margin: 0; }

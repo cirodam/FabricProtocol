@@ -1,6 +1,5 @@
 <script lang="ts">
-  import CommunitySidebar from '../components/CommunitySidebar.svelte';
-  import DomainPoolPanel from '../components/DomainPoolPanel.svelte';
+  import DomainPage from '../components/DomainPage.svelte';
   import FunctionalUnitsSection from '../components/FunctionalUnitsSection.svelte';
   const { navigate, path }: { navigate: (p: string) => void; path: string } = $props();
 
@@ -117,22 +116,15 @@
   load();
 </script>
 
-<div class="domain-layout">
-  <CommunitySidebar {navigate} {path} />
-  <div class="domain-main">
-    <div class="page-header">
-      <h1>Agriculture</h1>
-    </div>
-    <p class="domain-desc">The Agriculture domain coordinates food production for the community — working with local farmers, tracking growing plans, and connecting agricultural output to the food domain. The long-term goal is local caloric sovereignty: the community produces enough of its own food that outside supply chains are a supplement, not a lifeline.</p>
-
-
-    <DomainPoolPanel domainId="00000000-0000-0000-0000-000000000007" {navigate} />
-
-    {#if loading}
-      <p class="muted">Loading…</p>
-    {:else if error}
-      <p class="error">{error}</p>
-    {:else}
+<DomainPage
+  {navigate}
+  {path}
+  title="Agriculture"
+  description="The Agriculture domain coordinates food production for the community — working with local farmers, tracking growing plans, and connecting agricultural output to the food domain. The long-term goal is local caloric sovereignty: the community produces enough of its own food that outside supply chains are a supplement, not a lifeline."
+  domainId={DOMAIN_ID}
+  {loading}
+  {error}
+>
 
       {#if budgetTotal > 0}
       <section class="section">
@@ -224,18 +216,11 @@
         </details>
       </section>
 
-    {/if}
-</div>
-</div>
+</DomainPage>
 
 <style>
-  .page-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
-  h1 { margin: 0; font-size: 22px; font-weight: 600; }
-  .domain-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 28px; max-width: 680px; }
   h2 { margin: 0 0 12px; font-size: 16px; font-weight: 600; }
   .section { margin-bottom: 36px; }
-  .muted { color: var(--text-secondary); }
-  .error { color: #ef5350; }
   .error-inline { font-size: 12px; color: #ef5350; }
   .budget-summary { margin: 0; font-size: 14px; color: var(--text-secondary); }
   .budget-summary strong { color: var(--text-primary, #111); font-weight: 700; }
@@ -265,8 +250,4 @@
   .form-grid .full { grid-column: 1 / -1; }
   .form-grid label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 500; }
   .form-grid input { padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; }
-
-  .domain-layout { display: flex; min-height: 100vh; }
-  .domain-main { flex: 1; padding: 32px 40px; max-width: 860px; }
-
 </style>
