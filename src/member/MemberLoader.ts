@@ -27,6 +27,7 @@ export class MemberLoader {
   }
 
   save(member: Member): void {
+    const { pinHash, passwordHash } = member.getCredentialsForPersistence();
     const record: MemberRecord = {
       id: member.id,
       firstName: member.firstName,
@@ -38,8 +39,8 @@ export class MemberLoader {
       retired: member.retired,
       guardianId: member.guardianId,
       phone: member.phone,
-      pinHash: member.pinHash,
-      passwordHash: member.passwordHash,
+      pinHash,
+      passwordHash,
       languages: member.languages,
     };
     this.store.write(member.id, record);
@@ -54,22 +55,20 @@ export class MemberLoader {
   }
 
   private fromRecord(r: MemberRecord): Member {
-    const m = new Member(
-      r.firstName,
-      r.lastName,
-      new Date(r.birthDate),
-      r.handle,
-      r.disabled ?? false,
-    );
-    // Restore persisted identity fields — bypass readonly via cast
-    (m as unknown as Record<string, unknown>)["id"] = r.id;
-    (m as unknown as Record<string, unknown>)["joinDate"] = new Date(r.joinDate);
-    m.guardianId = r.guardianId;
-    m.retired = r.retired ?? false;
-    m.phone = r.phone;
-    m.pinHash = r.pinHash ?? null;
-    m.passwordHash = r.passwordHash ?? null;
-    m.languages = r.languages ?? [];
-    return m;
+    return Member.restore({
+      id: r.id,
+      firstName: r.firstName,
+      lastName: r.lastName,
+      birthDate: new Date(r.birthDate),
+      joinDate: new Date(r.joinDate),
+      handle: r.handle,
+      disabled: r.disabled ?? false,
+      retired: r.retired ?? false,
+      guardianId: r.guardianId,
+      phone: r.phone,
+      pinHash: r.pinHash ?? null,
+      passwordHash: r.passwordHash ?? null,
+      languages: r.languages ?? [],
+    });
   }
 }

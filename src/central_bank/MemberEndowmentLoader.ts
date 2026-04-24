@@ -24,12 +24,9 @@ export class MemberEndowmentLoader {
   }
 
   loadAll(): MemberEndowment[] {
-    return this.store.readAll<MemberEndowmentRecord>().map(r => {
-      const e = new MemberEndowment(r.memberId);
-      e.endowment = r.endowment;
-      e.communityEndowmentIssued = r.communityEndowmentIssued ?? false;
-      return e;
-    });
+    return this.store.readAll<MemberEndowmentRecord>().map(r =>
+      MemberEndowment.restore(r.memberId, r.endowment, r.communityEndowmentIssued ?? false)
+    );
   }
 
   delete(memberId: string): void {

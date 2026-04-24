@@ -6,6 +6,8 @@
   import AddApplicationPage from './AddApplicationPage.svelte';
   import AccountsPage from './AccountsPage.svelte';
   import AccountPage from './AccountPage.svelte';
+  import DemographicsPage from './DemographicsPage.svelte';
+  import ProjectionPage from './ProjectionPage.svelte';
   import SettingsPage from './SettingsPage.svelte';
 
   const { navigate, path } = $props<{ navigate: (to: string) => void; path: string }>();
@@ -27,6 +29,10 @@
       <AccountsPage {navigate} />
     {:else if path.startsWith('/admin/accounts/')}
       <AccountPage id={path.slice('/admin/accounts/'.length)} {navigate} />
+    {:else if path === '/admin/demographics'}
+      <DemographicsPage />
+    {:else if path === '/admin/projection'}
+      <ProjectionPage />
     {:else if path === '/admin/settings'}
       <SettingsPage {navigate} />
     {/if}

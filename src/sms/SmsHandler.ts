@@ -93,7 +93,7 @@ export class SmsHandler {
         // PIN <code>
         const code = tokens[1];
         if (!code) return reply("Usage: PIN <code>");
-        if (!member.pinHash) return reply("No PIN set on your account. Contact an administrator.");
+        if (!member.hasPin()) return reply("No PIN set on your account. Contact an administrator.");
         if (!MemberService.getInstance().verifyPin(member.id, code)) return reply("Incorrect PIN.");
         sessions.authenticate(msg.from);
         return reply("Authenticated. Session valid for 15 minutes.");

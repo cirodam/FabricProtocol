@@ -16,14 +16,9 @@ import { SocialInsuranceBank } from "../social_insurance/SocialInsuranceBank.js"
  */
 export class CentralBank implements IEconomicActor {
     private static instance: CentralBank;
-
-    /** Kin issued per person-year (on joining and each anniversary). */
-    static readonly KIN_PER_PERSON_YEAR = 10_000;
+    private static readonly MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;
 
     readonly id: string;
-
-    /** The rate used for periodic bank demurrage. Set at startup by index.ts. */
-    demurrageRate: number = 0;
 
     /** One endowment record per member, keyed by memberId. */
     private endowments: Map<string, MemberEndowment> = new Map();
@@ -52,10 +47,19 @@ export class CentralBank implements IEconomicActor {
 
     static getInstance(): CentralBank {
         if (!CentralBank.instance) {
-        CentralBank.instance = new CentralBank();
+            CentralBank.instance = new CentralBank();
         }
         return CentralBank.instance;
     }
+
+    // ── Identity (IEconomicActor) ────────────────────────────────────────────────
+
+    /** Returns the unique identifier for this account owner. */
+    getId(): string { return this.id; }
+    getDisplayName(): string { return "Central Bank"; }
+    getHandle(): string { return "central_bank"; }
+
+    // ── Lifecycle ────────────────────────────────────────────────────────────────
 
     /**
      * Set the persistence layer and load all endowment profiles from disk.
@@ -68,10 +72,29 @@ export class CentralBank implements IEconomicActor {
         }
     }
 
-    /** Returns the unique identifier for this account owner. */
-    getId(): string { return this.id; }
-    getDisplayName(): string { return "Central Bank"; }
-    getHandle(): string { return "central_bank"; }
+    /**
+     * Restore poolIssued from persisted SocialInsuranceBank records at startup.
+     * Must be called after SocialInsuranceBank.init().
+     */
+    restorePoolIssued(total: number): void {
+        this.poolIssued = total;
+    }
+
+    /**
+     * Re-issue the community endowment for any pre-existing members that do not
+     * yet have one recorded (idempotent — safe to call on every startup).
+     */
+    backfillCommunityEndowments(members: IEconomicActor[]): void {
+        const constitution = Constitution.getInstance();
+        const amount = constitution.communityEndowment;
+        if (amount <= 0) return;
+        const commonwealth = Commonwealth.getInstance();
+        for (const member of members) {
+            this.issueCommunityEndowment(member, commonwealth, amount, constitution.demurrageFloor);
+        }
+    }
+
+    // ── Observability ────────────────────────────────────────────────────────────
 
     /** Total kin actually in circulation (magnitude of the bank's negative balance). */
     get moneyInCirculation(): number {
@@ -91,195 +114,17 @@ export class CentralBank implements IEconomicActor {
         return Math.max(0, this.moneyInCirculation - this.desiredMoneyInCirculation);
     }
 
-    /**
-     * Issue the community endowment for a new member.
-     * Mints `amount` kin: memberShare (1,000) → member's primary account,
-     * remainder → Commonwealth primary account.
-     * communityEndowmentTotal rises by `amount`.
-     */
-    issueCommunityEndowment(
-        member: IEconomicActor,
-        commonwealth: IEconomicActor,
-        amount: number,
-        memberShare: number,
-    ): void {
-        // Idempotent — skip if already issued for this member.
-        let e = this.endowments.get(member.getId());
-        if (e?.communityEndowmentIssued) {
-            this.communityEndowmentTotal += amount; // restore total from persisted records at startup
-            return;
-        }
-        const bankInst = Bank.getInstance();
-        const bankAccount = bankInst.getPrimaryAccount(this.id);
-        const memberAccount = bankInst.getPrimaryAccount(member.getId());
-        const cwAccount = bankInst.getPrimaryAccount(commonwealth.getId());
-        if (!bankAccount)  throw new Error("CentralBank has no primary account");
-        if (!memberAccount) throw new Error(`Member ${member.getId()} has no primary account`);
-        if (!cwAccount)    throw new Error("Commonwealth has no primary account");
-        const cwShare = amount - memberShare;
-        if (memberShare > 0)
-            bankInst.transfer(bankAccount.id, memberAccount.id, "kin", memberShare, "community endowment: member share");
-        if (cwShare > 0)
-            bankInst.transfer(bankAccount.id, cwAccount.id, "kin", cwShare, "community endowment: commonwealth share");
-        this.communityEndowmentTotal += amount;
-        if (!e) {
-            e = new MemberEndowment(member.getId());
-            this.endowments.set(e.memberId, e);
-        }
-        e.communityEndowmentIssued = true;
-        this.endowmentLoader?.save(e);
-    }
-
-    /**
-     * Reclaim the community endowment for a departing member.
-     * Attempts to burn `amount` kin from the member's and commonwealth's accounts.
-     * Any unrecoverable portion (already spent/demurraged) is left as a
-     * temporary overshoot that demurrage will absorb naturally.
-     * communityEndowmentTotal falls by `amount` regardless.
-     */
-    reclaimCommunityEndowment(
-        member: IEconomicActor,
-        commonwealth: IEconomicActor,
-        amount: number,
-        memberShare: number,
-    ): void {
-        const bankInst = Bank.getInstance();
-        const bankAccount = bankInst.getPrimaryAccount(this.id);
-        if (!bankAccount) return;
-        let remaining = amount;
-        // Reclaim from member first
-        for (const account of bankInst.getAccounts(member.getId())) {
-            if (remaining <= 0) break;
-            const take = Math.min(account.kin, remaining);
-            if (take > 0) {
-                bankInst.transfer(account.id, bankAccount.id, "kin", take, "community endowment reclaim: member");
-                remaining -= take;
-            }
-        }
-        // Reclaim remainder from Commonwealth (up to cwShare)
-        const cwShare = amount - memberShare;
-        const cwReclaim = Math.min(cwShare, remaining);
-        if (cwReclaim > 0) {
-            const cwAccount = bankInst.getPrimaryAccount(commonwealth.getId());
-            if (cwAccount) {
-                const take = Math.min(cwAccount.kin, cwReclaim);
-                if (take > 0)
-                    bankInst.transfer(cwAccount.id, bankAccount.id, "kin", take, "community endowment reclaim: commonwealth");
-            }
-        }
-        this.communityEndowmentTotal = Math.max(0, this.communityEndowmentTotal - amount);
-    }
-
-    /**
-     * Restore poolIssued from persisted SocialInsuranceBank records at startup.
-     * Must be called after SocialInsuranceBank.init().
-     */
-    restorePoolIssued(total: number): void {
-        this.poolIssued = total;
-    }
-
-    /**
-     * Mint kin into the retirement pool account.
-     * Called by SocialInsuranceBank for birthday and join contributions.
-     */
-    mintToPool(targetAccountId: string, amount: number, description: string): void {
-        const bankInst = Bank.getInstance();
-        const bankAccount = bankInst.getPrimaryAccount(this.id);
-        const poolAccount = bankInst.getAccount(targetAccountId);
-        if (!bankAccount) throw new Error("CentralBank has no primary account");
-        if (!poolAccount) throw new Error(`Pool account ${targetAccountId} not found`);
-        bankInst.transfer(bankAccount.id, poolAccount.id, "kin", amount, description);
-        this.poolIssued += amount;
-    }
-
-    /**
-     * Burn kin from the retirement pool back to the bank (contraction).
-     * Called by SocialInsuranceBank on member death to cancel their unspent entitlement.
-     */
-    burnFromPool(sourceAccountId: string, amount: number, description: string): void {
-        const bankInst = Bank.getInstance();
-        const bankAccount = bankInst.getPrimaryAccount(this.id);
-        const poolAccount = bankInst.getAccount(sourceAccountId);
-        if (!bankAccount) throw new Error("CentralBank has no primary account");
-        if (!poolAccount) throw new Error(`Pool account ${sourceAccountId} not found`);
-        bankInst.transfer(poolAccount.id, bankAccount.id, "kin", amount, description);
-        this.poolIssued = Math.max(0, this.poolIssued - amount);
-    }
-
     /** Returns the endowment record for a given member, or undefined if none exists. */
     getEndowment(memberId: string): MemberEndowment | undefined {
         return this.endowments.get(memberId);
     }
 
-    /**
-     * Issue a membership endowment to a member.
-     * Kin are transferred from the CentralBank account (which goes negative)
-     * directly to the member's primary account.
-     */
-    issueEndowment(member: IEconomicActor, amount: number): void {
-        let e = this.endowments.get(member.getId());
-        if (!e) {
-            e = new MemberEndowment(member.getId());
-            this.endowments.set(e.memberId, e);
-        }
-
-        e.endowment += amount;
-        const bankAccount = Bank.getInstance().getPrimaryAccount(this.id);
-        const memberAccount = Bank.getInstance().getPrimaryAccount(member.getId());
-        if (!bankAccount) throw new Error("CentralBank has no primary account");
-        if (!memberAccount) throw new Error(`Member ${member.getId()} has no primary account`);
-        Bank.getInstance().transfer(bankAccount.id, memberAccount.id, "kin", amount, "endowment issuance");
-        this.endowmentLoader?.save(e);
-    }
-
-    /**
-     * Reclaim a departing member's balance (up to their endowment amount).
-     * Any shortfall remains as a negative balance on the bank account and is
-     * recovered gradually through demurrage.
-     */
-    reclaimEndowment(member: IEconomicActor): void {
-        const e = this.endowments.get(member.getId());
-        if (!e) return;
-
-        const bankInst = Bank.getInstance();
-        const bankAccount = bankInst.getPrimaryAccount(this.id);
-        if (!bankAccount) return;
-
-        let remaining = e.endowment;
-        for (const account of bankInst.getAccounts(member.getId())) {
-            if (remaining <= 0) break;
-            const take = Math.min(account.kin, remaining);
-            if (take > 0) {
-                bankInst.transfer(account.id, bankAccount.id, "kin", take, "endowment reclaim on exit");
-                remaining -= take;
-            }
-        }
-        this.endowments.delete(member.getId());
-        this.endowmentLoader?.delete(member.getId());
-    }
-
-    /**
-     * Calculate what demurrage would collect at the given rate without applying it.
-     * Only the portion of each balance above `floor` is taxable.
-     * Returns the total amount that would be collected across all non-exempt accounts.
-     */
-    calculateDemurrage(rate: number, floor: number = 0): number {
-        if (this.moneyInCirculation <= 0) return 0;
-        let total = 0;
-        for (const account of Bank.getInstance().getAllAccounts()) {
-            if (account.exemptFromDemurrage || account.kin <= 0) continue;
-            const taxable = Math.max(0, account.kin - floor);
-            total += Math.round(taxable * rate * 100) / 100;
-        }
-        return total;
-    }
+    // ── Demurrage ────────────────────────────────────────────────────────────────
 
     /**
      * Collect demurrage from all non-exempt accounts and return it to the bank.
      * Only the portion of each balance above `floor` is subject to demurrage.
      * Only runs when money is in circulation (i.e. the bank account is negative).
-     * This is the mechanism by which the money supply gradually contracts after
-     * member exits result in shortfalls.
      */
     assessDemurrage(rate: number, floor: number = 0): void {
         if (this.moneyInCirculation <= 0) return;
@@ -298,12 +143,9 @@ export class CentralBank implements IEconomicActor {
         }
     }
 
-    // ── Event handlers ──────────────────────────────────────────────────────────
+    // ── Event handlers ───────────────────────────────────────────────────────────
     // Registered in index.ts via MemberService.on* callbacks.
     // CentralBank is the sole authority on all minting and burning decisions.
-    // It reads Constitution directly so callers pass only the Member.
-
-    private static readonly MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;
 
     /**
      * Monetary response to a new member joining.
@@ -347,6 +189,160 @@ export class CentralBank implements IEconomicActor {
         const endowment = constitution.communityEndowment;
         if (endowment > 0)
             this.reclaimCommunityEndowment(member, Commonwealth.getInstance(), endowment, constitution.demurrageFloor);
+    }
+
+    // ── Private: minting, burning, endowment management ─────────────────────────
+
+    /**
+     * Issue the community endowment for a new member.
+     * Mints `amount` kin: memberShare (1,000) → member's primary account,
+     * remainder → Commonwealth primary account.
+     * communityEndowmentTotal rises by `amount`.
+     */
+    private issueCommunityEndowment(
+        member: IEconomicActor,
+        commonwealth: IEconomicActor,
+        amount: number,
+        memberShare: number,
+    ): void {
+        // Idempotent — skip if already issued for this member.
+        let e = this.endowments.get(member.getId());
+        if (e?.communityEndowmentIssued) {
+            this.communityEndowmentTotal += amount; // restore total from persisted records at startup
+            return;
+        }
+        const bankInst = Bank.getInstance();
+        const bankAccount = bankInst.getPrimaryAccount(this.id);
+        const memberAccount = bankInst.getPrimaryAccount(member.getId());
+        const cwAccount = bankInst.getPrimaryAccount(commonwealth.getId());
+        if (!bankAccount)  throw new Error("CentralBank has no primary account");
+        if (!memberAccount) throw new Error(`Member ${member.getId()} has no primary account`);
+        if (!cwAccount)    throw new Error("Commonwealth has no primary account");
+        const cwShare = amount - memberShare;
+        if (memberShare > 0)
+            bankInst.transfer(bankAccount.id, memberAccount.id, "kin", memberShare, "community endowment: member share");
+        if (cwShare > 0)
+            bankInst.transfer(bankAccount.id, cwAccount.id, "kin", cwShare, "community endowment: commonwealth share");
+        this.communityEndowmentTotal += amount;
+        if (!e) {
+            e = new MemberEndowment(member.getId());
+            this.endowments.set(e.memberId, e);
+        }
+        e.markCommunityEndowmentIssued();
+        this.endowmentLoader?.save(e);
+    }
+
+    /**
+     * Reclaim the community endowment for a departing member.
+     * Attempts to burn `amount` kin from the member's and commonwealth's accounts.
+     * Any unrecoverable portion (already spent/demurraged) is left as a
+     * temporary overshoot that demurrage will absorb naturally.
+     * communityEndowmentTotal falls by `amount` regardless.
+     */
+    private reclaimCommunityEndowment(
+        member: IEconomicActor,
+        commonwealth: IEconomicActor,
+        amount: number,
+        memberShare: number,
+    ): void {
+        const bankInst = Bank.getInstance();
+        const bankAccount = bankInst.getPrimaryAccount(this.id);
+        if (!bankAccount) return;
+        let remaining = amount;
+        // Reclaim from member first
+        for (const account of bankInst.getAccounts(member.getId())) {
+            if (remaining <= 0) break;
+            const take = Math.min(account.kin, remaining);
+            if (take > 0) {
+                bankInst.transfer(account.id, bankAccount.id, "kin", take, "community endowment reclaim: member");
+                remaining -= take;
+            }
+        }
+        // Reclaim remainder from Commonwealth (up to cwShare)
+        const cwShare = amount - memberShare;
+        const cwReclaim = Math.min(cwShare, remaining);
+        if (cwReclaim > 0) {
+            const cwAccount = bankInst.getPrimaryAccount(commonwealth.getId());
+            if (cwAccount) {
+                const take = Math.min(cwAccount.kin, cwReclaim);
+                if (take > 0)
+                    bankInst.transfer(cwAccount.id, bankAccount.id, "kin", take, "community endowment reclaim: commonwealth");
+            }
+        }
+        this.communityEndowmentTotal = Math.max(0, this.communityEndowmentTotal - amount);
+    }
+
+    /**
+     * Mint kin into the retirement pool account.
+     */
+    private mintToPool(targetAccountId: string, amount: number, description: string): void {
+        const bankInst = Bank.getInstance();
+        const bankAccount = bankInst.getPrimaryAccount(this.id);
+        const poolAccount = bankInst.getAccount(targetAccountId);
+        if (!bankAccount) throw new Error("CentralBank has no primary account");
+        if (!poolAccount) throw new Error(`Pool account ${targetAccountId} not found`);
+        bankInst.transfer(bankAccount.id, poolAccount.id, "kin", amount, description);
+        this.poolIssued += amount;
+    }
+
+    /**
+     * Burn kin from the retirement pool back to the bank (contraction).
+     */
+    private burnFromPool(sourceAccountId: string, amount: number, description: string): void {
+        const bankInst = Bank.getInstance();
+        const bankAccount = bankInst.getPrimaryAccount(this.id);
+        const poolAccount = bankInst.getAccount(sourceAccountId);
+        if (!bankAccount) throw new Error("CentralBank has no primary account");
+        if (!poolAccount) throw new Error(`Pool account ${sourceAccountId} not found`);
+        bankInst.transfer(poolAccount.id, bankAccount.id, "kin", amount, description);
+        this.poolIssued = Math.max(0, this.poolIssued - amount);
+    }
+
+    /**
+     * Issue a membership endowment to a member.
+     * Kin are transferred from the CentralBank account (which goes negative)
+     * directly to the member's primary account.
+     */
+    private issueEndowment(member: IEconomicActor, amount: number): void {
+        let e = this.endowments.get(member.getId());
+        if (!e) {
+            e = new MemberEndowment(member.getId());
+            this.endowments.set(e.memberId, e);
+        }
+
+        e.addEndowment(amount);
+        const bankAccount = Bank.getInstance().getPrimaryAccount(this.id);
+        const memberAccount = Bank.getInstance().getPrimaryAccount(member.getId());
+        if (!bankAccount) throw new Error("CentralBank has no primary account");
+        if (!memberAccount) throw new Error(`Member ${member.getId()} has no primary account`);
+        Bank.getInstance().transfer(bankAccount.id, memberAccount.id, "kin", amount, "endowment issuance");
+        this.endowmentLoader?.save(e);
+    }
+
+    /**
+     * Reclaim a departing member's balance (up to their endowment amount).
+     * Any shortfall remains as a negative balance on the bank account and is
+     * recovered gradually through demurrage.
+     */
+    private reclaimEndowment(member: IEconomicActor): void {
+        const e = this.endowments.get(member.getId());
+        if (!e) return;
+
+        const bankInst = Bank.getInstance();
+        const bankAccount = bankInst.getPrimaryAccount(this.id);
+        if (!bankAccount) return;
+
+        let remaining = e.endowment;
+        for (const account of bankInst.getAccounts(member.getId())) {
+            if (remaining <= 0) break;
+            const take = Math.min(account.kin, remaining);
+            if (take > 0) {
+                bankInst.transfer(account.id, bankAccount.id, "kin", take, "endowment reclaim on exit");
+                remaining -= take;
+            }
+        }
+        this.endowments.delete(member.getId());
+        this.endowmentLoader?.delete(member.getId());
     }
 
     /**

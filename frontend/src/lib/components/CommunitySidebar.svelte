@@ -18,6 +18,8 @@
     { label: 'Members',      path: '/admin/members' },
     { label: 'Applications', path: '/admin/applications' },
     { label: 'Accounts',     path: '/admin/accounts' },
+    { label: 'Demographics', path: '/admin/demographics' },
+    { label: 'Projection',   path: '/admin/projection' },
     { label: 'Settings',     path: '/admin/settings' },
   ];
 

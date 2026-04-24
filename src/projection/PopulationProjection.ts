@@ -145,7 +145,9 @@ export function projectPopulation(size: number): PopulationProjection {
     const adults   = size - infants - children - elderly; // 13–64: remainder (~64%)
 
     const availableFTEs = r(size * 0.46);
-    const dependencyRatio = Math.round(((size - availableFTEs) / availableFTEs) * 100) / 100;
+    const dependencyRatio = availableFTEs > 0
+        ? Math.round(((size - availableFTEs) / availableFTEs) * 100) / 100
+        : 0;
 
     // ── Food ─────────────────────────────────────────────────────────────────
     // Weighted sums using DEFAULT_NUTRITIONAL_PROFILES values

@@ -66,74 +66,60 @@ export function createMember(req: Request, res: Response): void {
         new Date(birthDate),
         handle || undefined,
         disabled ?? false,
+        guardianId ?? null,
+        phone ?? null,
+        Array.isArray(languages) ? (languages as LanguageProficiency[]) : [],
     );
-    if (guardianId) member.guardianId = guardianId;
-    if (phone) member.phone = phone;
-    if (Array.isArray(languages)) member.languages = (languages as LanguageProficiency[]);
 
     service().add(member);
     res.status(201).json(toDto(member));
 }
 
 // PATCH /members/:id
-// Body: any subset of { firstName, lastName, phone, disabled, languages }
+// Body: any subset of { firstName, lastName, phone, disabled, retired, languages }
 export function updateMember(req: Request, res: Response): void {
-    const member = service().get(req.params.id as string);
-    if (!member) {
+    if (!service().get(req.params.id as string)) {
         res.status(404).json({ error: "Member not found" });
         return;
     }
 
     const { firstName, lastName, phone, disabled, retired, languages } = req.body ?? {};
 
-    if (firstName !== undefined) {
-        if (typeof firstName !== "string" || !firstName.trim()) {
-            res.status(400).json({ error: "firstName must be a non-empty string" });
-            return;
-        }
-        member.firstName = firstName.trim();
+    if (firstName !== undefined && (typeof firstName !== "string" || !firstName.trim())) {
+        res.status(400).json({ error: "firstName must be a non-empty string" });
+        return;
     }
-    if (lastName !== undefined) {
-        if (typeof lastName !== "string" || !lastName.trim()) {
-            res.status(400).json({ error: "lastName must be a non-empty string" });
-            return;
-        }
-        member.lastName = lastName.trim();
+    if (lastName !== undefined && (typeof lastName !== "string" || !lastName.trim())) {
+        res.status(400).json({ error: "lastName must be a non-empty string" });
+        return;
     }
-    if (phone !== undefined) {
-        if (phone !== null && typeof phone !== "string") {
-            res.status(400).json({ error: "phone must be an E.164 string or null" });
-            return;
-        }
-        member.phone = phone;
+    if (phone !== undefined && phone !== null && typeof phone !== "string") {
+        res.status(400).json({ error: "phone must be an E.164 string or null" });
+        return;
     }
-    if (disabled !== undefined) {
-        if (typeof disabled !== "boolean") {
-            res.status(400).json({ error: "disabled must be a boolean" });
-            return;
-        }
-        member.disabled = disabled;
+    if (disabled !== undefined && typeof disabled !== "boolean") {
+        res.status(400).json({ error: "disabled must be a boolean" });
+        return;
     }
-    if (retired !== undefined) {
-        if (typeof retired !== "boolean") {
-            res.status(400).json({ error: "retired must be a boolean" });
-            return;
-        }
-        member.retired = retired;
+    if (retired !== undefined && typeof retired !== "boolean") {
+        res.status(400).json({ error: "retired must be a boolean" });
+        return;
+    }
+    if (languages !== undefined && !Array.isArray(languages)) {
+        res.status(400).json({ error: "languages must be an array" });
+        return;
     }
 
-    if (languages !== undefined) {
-        if (!Array.isArray(languages)) {
-            res.status(400).json({ error: "languages must be an array" });
-            return;
-        }
-        member.languages = languages as LanguageProficiency[];
-    }
+    const updated = service().update(req.params.id as string, {
+        firstName: firstName !== undefined ? firstName.trim() : undefined,
+        lastName:  lastName  !== undefined ? lastName.trim()  : undefined,
+        phone,
+        disabled,
+        retired,
+        languages: languages as LanguageProficiency[] | undefined,
+    });
 
-    // Persist the changes
-    MemberService.getInstance().save(member);
-
-    res.json(toDto(member));
+    res.json(toDto(updated));
 }
 
 function toDto(m: Member) {

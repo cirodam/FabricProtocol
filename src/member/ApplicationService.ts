@@ -57,8 +57,10 @@ export class ApplicationService {
             app.lastName,
             app.birthDate,
             app.handle,
+            false,
+            null,
+            app.phone ?? null,
         );
-        if (app.phone) member.phone = app.phone;
 
         MemberService.getInstance().add(member);
 
